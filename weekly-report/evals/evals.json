@@ -1,0 +1,23 @@
+{
+  "skill_name": "weekly-report",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我生成上周的开发周报",
+      "expected_output": "自动计算上周一到周五的日期范围，获取该时间段的git commit，过滤无效提交，归纳为3-6条工作成果，使用'动词+结果'格式",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "根据 e98e60984835757a7595b0ae340d03ab6ab6c43d..19bd8cbf23a35c44e9f07a8a5baf4e7127687caf 这个commit区间生成周报",
+      "expected_output": "使用指定的commit区间获取提交记录，过滤无效提交，归纳为3-6条工作成果",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "写个工作总结，看看这周干了啥",
+      "expected_output": "自动计算本周一到今天的日期范围，获取commit，过滤并归纳为3-6条",
+      "files": []
+    }
+  ]
+}
