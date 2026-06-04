@@ -1,0 +1,45 @@
+{
+  "skill_name": "obsidian-icon-assigner",
+  "evals": [
+    {
+      "id": 1,
+      "name": "新知识库初始化",
+      "prompt": "我的Obsidian知识库刚创建，里面有很多Markdown文件但都没有图标。请帮我为所有文件自动分配Iconic插件的图标和颜色。知识库路径是：/home/user/my-vault。我需要目录颜色继承现有设置（如果有的话），新目录用哈希生成颜色，文件图标尽量保持唯一。",
+      "expected_output": "运行脚本为所有Markdown文件分配图标和颜色，更新Iconic插件的data.json文件，并输出统计报告。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "增量更新现有知识库",
+      "prompt": "我的Obsidian知识库已经有一些图标设置了，但最近新增了很多文件。请帮我为新增的、没有图标的文件分配图标，保持现有设置不变。知识库在：/home/user/obsidian-notes。请使用--skip-existing参数，只处理未设置图标的文件。",
+      "expected_output": "只对新文件分配图标，保留用户手动设置的图标，输出新增图标数量统计。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 3,
+      "name": "试运行检查配置",
+      "prompt": "我想先看看如果运行图标分配会有什么结果，但不实际修改文件。请对我的知识库进行试运行分析。路径：/home/user/project-docs。使用--dry-run参数，输出所有分配建议和统计，但不写入配置文件。",
+      "expected_output": "输出试运行报告，显示将为哪些文件分配什么图标，目录颜色如何分配，但不实际修改data.json。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 4,
+      "name": "强制重新分配所有图标",
+      "prompt": "我想重新整理整个知识库的图标系统，即使文件已有图标也重新分配。请使用--force参数强制重新分配所有图标。知识库路径：/home/user/study-notes。",
+      "expected_output": "为所有文件重新分配图标（覆盖现有设置），目录颜色继承现有或重新生成，输出完整统计。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 5,
+      "name": "列出可用图标库",
+      "prompt": "我想看看这个技能支持哪些Lucid图标。请运行--list-icons参数，列出所有可用的图标分类和具体图标名称。",
+      "expected_output": "按分类列出所有可用的Lucid图标名称，供用户参考或自定义映射。",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

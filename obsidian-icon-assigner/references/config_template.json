@@ -1,0 +1,57 @@
+{
+  "icon_assigner_config": {
+    "description": "Obsidian Iconic 图标分配器配置文件模板",
+    "version": "1.0",
+
+    "icon_selection": {
+      "策略": "目录级颜色继承，文件级图标尽量唯一",
+      "跳过已有图标": true,
+      "最大冲突尝试次数": 50,
+      "冲突解决策略": "使用图标变体（如lucide-file-text-2）"
+    },
+
+    "color_generation": {
+      "新目录颜色格式": "HSL",
+      "饱和度": 70,
+      "亮度": 50,
+      "继承现有颜色": true
+    },
+
+    "performance": {
+      "增量处理": false,
+      "缓存结果": true,
+      "并行处理": false
+    },
+
+    "exclusions": {
+      "跳过目录": [".git", "node_modules", ".obsidian", ".trash"],
+      "跳过文件模式": ["*.tmp", "*.bak", "*.log"],
+      "跳过特定路径": ["Templates/", "Daily Notes/"]
+    },
+
+    "custom_icon_mapping": {
+      "description": "自定义目录/文件到图标的映射（可选）",
+      "目录映射示例": {
+        "技术文档": "lucide-code-2",
+        "个人成长": "lucide-brain",
+        "项目资料": "lucide-briefcase"
+      },
+      "文件模式映射示例": {
+        "README.md": "lucide-home",
+        "*指南.md": "lucide-book-open",
+        "*教程.md": "lucide-graduation-cap"
+      }
+    },
+
+    "custom_color_palette": {
+      "description": "自定义目录颜色调色板（可选）",
+      "调色板示例": {
+        "技术文档": "hsl(220, 70%, 50%)",
+        "个人成长": "hsl(140, 70%, 50%)",
+        "项目资料": "hsl(25, 70%, 50%)",
+        "资源收藏": "hsl(340, 70%, 50%)",
+        "工具指南": "hsl(45, 70%, 50%)"
+      }
+    }
+  }
+}
