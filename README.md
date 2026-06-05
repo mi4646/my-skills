@@ -31,18 +31,7 @@ Claude Code 自定义技能插件。
 
 ## 安装
 
-### 选项 A：Claude Code 插件（推荐）
-
-在 Claude Code 中运行：
-
-```
-/plugin marketplace add mi4646/my-skills
-/plugin install my-skills
-```
-
-### 选项 B：克隆到 skills 目录
-
-将仓库直接克隆到 Claude Code 的用户技能目录，无需插件机制：
+将仓库克隆到 Claude Code 的用户技能目录，启动时自动发现：
 
 ```bash
 git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
@@ -58,7 +47,21 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 /weekly-report
 ```
 
-或在提示词中指定技能名称（如 `my-skills:obsidian-icon-assigner`）。
+或使用带插件命名空间的完整命令：
+
+```
+/my-skills:obsidian-icon-assigner
+/my-skills:update-version
+/my-skills:weekly-report
+```
+
+或在提示词中指定技能名称：
+
+```
+请使用 my-skills:obsidian-icon-assigner 为我的知识库分配图标
+请使用 my-skills:update-version 更新版本号
+请使用 my-skills:weekly-report 生成本周周报
+```
 
 ## 项目结构
 
