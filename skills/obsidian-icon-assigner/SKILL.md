@@ -13,7 +13,7 @@ description: 为Obsidian知识库的Markdown文档自动分配Iconic插件的图
 ### 2. 运行技能
 ```bash
 cd /path/to/vault
-python .claude/skills/obsidian-icon-assigner/scripts/assign_icons.py --vault-path .
+python ${CLAUDE_PLUGIN_ROOT}/skills/obsidian-icon-assigner/scripts/assign_icons.py --vault-path .
 ```
 
 ### 3. 检查结果
@@ -26,31 +26,31 @@ python .claude/skills/obsidian-icon-assigner/scripts/assign_icons.py --vault-pat
 ### 模式1：新知识库初始化
 ```bash
 # 为所有文件分配图标和颜色
-python scripts/assign_icons.py --vault-path /path/to/vault
+python ${CLAUDE_PLUGIN_ROOT}/skills/obsidian-icon-assigner/scripts/assign_icons.py --vault-path /path/to/vault
 ```
 
 ### 模式2：增量更新（推荐）
 ```bash
 # 只处理未设置图标的文件
-python scripts/assign_icons.py --vault-path /path/to/vault --skip-existing
+python ${CLAUDE_PLUGIN_ROOT}/skills/obsidian-icon-assigner/scripts/assign_icons.py --vault-path /path/to/vault --skip-existing
 ```
 
 ### 模式3：试运行分析
 ```bash
 # 预览分配结果，不实际修改
-python scripts/assign_icons.py --vault-path /path/to/vault --dry-run
+python ${CLAUDE_PLUGIN_ROOT}/skills/obsidian-icon-assigner/scripts/assign_icons.py --vault-path /path/to/vault --dry-run
 ```
 
 ### 模式4：强制重新分配
 ```bash
 # 覆盖所有现有图标
-python scripts/assign_icons.py --vault-path /path/to/vault --force
+python ${CLAUDE_PLUGIN_ROOT}/skills/obsidian-icon-assigner/scripts/assign_icons.py --vault-path /path/to/vault --force
 ```
 
 ### 模式5：查看图标库
 ```bash
 # 列出所有可用图标
-python scripts/assign_icons.py --list-icons
+python ${CLAUDE_PLUGIN_ROOT}/skills/obsidian-icon-assigner/scripts/assign_icons.py --list-icons
 ```
 
 ## 核心特性
@@ -80,7 +80,7 @@ python scripts/assign_icons.py --list-icons
 
 ```bash
 # 完整参数列表
-python scripts/assign_icons.py --help
+python ${CLAUDE_PLUGIN_ROOT}/skills/obsidian-icon-assigner/scripts/assign_icons.py --help
 
 # 主要参数：
 --vault-path PATH      Obsidian vault路径（必需）

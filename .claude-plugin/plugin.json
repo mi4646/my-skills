@@ -1,0 +1,10 @@
+{
+  "name": "my-skills",
+  "description": "个人技能集合：Obsidian 图标分配、版本号自动更新、开发周报生成",
+  "version": "1.0.0",
+  "author": {
+    "name": "Anonymous"
+  },
+  "license": "MIT",
+  "keywords": ["obsidian", "version", "weekly-report", "chinese"]
+}

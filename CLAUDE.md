@@ -1,0 +1,27 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## 项目概述
+
+Claude Code 自定义技能插件，包含三个中文技能。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
+
+## 技能架构
+
+每个技能是一个 `skills/<name>/` 目录，核心是 `SKILL.md`（YAML frontmatter + Markdown 指令）。只有 `obsidian-icon-assigner` 有可执行脚本（`scripts/assign_icons.py`，Python 3.7+，无第三方依赖）。
+
+- **obsidian-icon-assigner**：纯脚本技能，SKILL.md 指导 Claude 调用 Python 脚本操作 Obsidian Iconic 插件的 `data.json`，基于 SHA256 确定性分配图标和 HSL 颜色
+- **update-version**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则直接执行 git diff 分析和文件写入
+- **weekly-report**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则执行 git log 并归纳周报
+
+### evals
+
+`evals/evals.json` 为每个技能定义测试用例（prompt + expected_output），用于评估技能质量。目前没有自动化测试运行器。
+
+## 关键约定
+
+- SKILL.md frontmatter 的 `description` 字段决定技能何时被触发，需精确描述触发场景
+- 脚本路径使用 `${CLAUDE_PLUGIN_ROOT}` 环境变量，不硬编码路径
+- 所有技能面向中文用户，SKILL.md 和输出均为中文
+- `update-version` 依赖 `humanizer-zh` 技能优化文本
+- 插件名称在 `.claude-plugin/plugin.json` 中定义，安装后技能命名空间为 `my-skills:<skill-name>`
