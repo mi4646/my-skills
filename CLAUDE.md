@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-Claude Code 自定义技能插件，包含三个中文技能。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
+Claude Code 自定义技能插件，包含四个中文技能。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
 
 ## 技能架构
 
-每个技能是一个 `skills/<name>/` 目录，核心是 `SKILL.md`（YAML frontmatter + Markdown 指令）。只有 `obsidian-icon-assigner` 有可执行脚本（`scripts/assign_icons.py`，Python 3.7+，无第三方依赖）。
+每个技能是一个 `skills/<name>/` 目录，核心是 `SKILL.md`（YAML frontmatter + Markdown 指令）。部分技能带有 `scripts/` 下的 Python 辅助脚本，均不依赖第三方库。
 
-- **obsidian-icon-assigner**：纯脚本技能，SKILL.md 指导 Claude 调用 Python 脚本操作 Obsidian Iconic 插件的 `data.json`，基于 SHA256 确定性分配图标和 HSL 颜色
+- **obsidian-icon-assigner**：脚本技能，SKILL.md 指导 Claude 调用 Python 脚本操作 Obsidian Iconic 插件的 `data.json`，基于 SHA256 确定性分配图标和 HSL 颜色
+- **playlist-organizer**：访谈 + 脚本技能，先确认歌曲来源、分类场景、覆盖/重复规则和输出位置，再调用 `scripts/build_playlists.py` 生成多个导入友好的 txt 歌单和 `生成报告.txt`
 - **update-version**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则直接执行 git diff 分析和文件写入
 - **weekly-report**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则执行 git log 并归纳周报
 

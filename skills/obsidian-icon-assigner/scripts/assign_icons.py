@@ -89,8 +89,71 @@ ICON_CATEGORIES = {
     "sport": [
         "lucide-trophy", "lucide-medal", "lucide-gamepad-2",
         "lucide-football", "lucide-basketball", "lucide-tennis"
+    ],
+    "folder": [
+        "lucide-folder", "lucide-folder-open", "lucide-folder-plus",
+        "lucide-folder-search", "lucide-folder-heart", "lucide-folder-lock",
+        "lucide-folder-tree", "lucide-folder-kanban", "lucide-folder-git",
+        "lucide-folder-clock", "lucide-folder-input", "lucide-folder-output"
     ]
 }
+
+# 目录关键词 → 图标映射（用于目录图标语义分配）
+DIR_KEYWORD_ICONS = {
+    "技术": "lucide-code",
+    "文档": "lucide-file-text",
+    "AI": "lucide-brain",
+    "agent": "lucide-bot",
+    "python": "lucide-python",
+    "docker": "lucide-container",
+    "kubernetes": "lucide-ship-wheel",
+    "k8s": "lucide-ship-wheel",
+    "linux": "lucide-terminal",
+    "mysql": "lucide-database",
+    "rust": "lucide-ferris",
+    "elastic": "lucide-search",
+    "rabbitmq": "lucide-message-circle",
+    "tauri": "lucide-window",
+    "wsl": "lucide-monitor",
+    "工具": "lucide-tool",
+    "项目": "lucide-briefcase",
+    "旅游": "lucide-plane",
+    "资源": "lucide-bookmark",
+    "收藏": "lucide-star",
+    "个人": "lucide-user",
+    "成长": "lucide-trending-up",
+    "学习": "lucide-graduation-cap",
+    "模板": "lucide-copy",
+    "笔记": "lucide-notebook",
+    "cli": "lucide-terminal",
+    "superpowers": "lucide-zap",
+    "claude": "lucide-sparkles",
+    "prompt": "lucide-message-square",
+    "skill": "lucide-lightbulb",
+    "gstack": "lucide-git-branch",
+    "clippings": "lucide-scissors",
+    "驾照": "lucide-car",
+    "安全": "lucide-shield",
+    "测试": "lucide-check-circle",
+    "docs": "lucide-book-open",
+    "plans": "lucide-kanban",
+    "specs": "lucide-file-check",
+    "plugin": "lucide-puzzle",
+    "指南": "lucide-compass",
+    "应用": "lucide-app-window",
+    "服务": "lucide-server",
+    "配置": "lucide-settings",
+    "数据": "lucide-database",
+    "网络": "lucide-network",
+    "开发": "lucide-code-2",
+}
+# 目录图标回退池（不被DIR_KEYWORD_ICONS覆盖时使用）
+FOLDER_ICONS = [
+    "lucide-folder", "lucide-folder-open", "lucide-folder-plus",
+    "lucide-folder-search", "lucide-folder-heart", "lucide-folder-lock",
+    "lucide-folder-tree", "lucide-folder-kanban", "lucide-folder-git",
+    "lucide-folder-clock", "lucide-folder-input", "lucide-folder-output"
+]
 
 # 扁平化图标列表
 ALL_ICONS = []
@@ -178,24 +241,69 @@ class IconAssigner:
                     directories.add(dir_path)
         return directories
 
+    def find_parent_color(self, directory: str, colors: Dict[str, str]) -> Optional[str]:
+        """查找最近父目录的颜色"""
+        parts = directory.split('/')
+        for i in range(len(parts) - 1, 0, -1):
+            parent = '/'.join(parts[:i])
+            if parent in colors:
+                return colors[parent]
+            if parent in self.existing_colors:
+                return self.existing_colors[parent]
+        return None
+
     def assign_directory_colors(self, directories: Set[str]) -> Dict[str, str]:
         """为目录分配颜色"""
         colors = {}
 
         for directory in sorted(directories):
             if directory in self.existing_colors:
-                # 继承现有颜色
+                # 保留目录自身已有颜色
                 colors[directory] = self.existing_colors[directory]
-            else:
-                # 新目录：哈希生成HSL颜色
-                # 使用确定性哈希确保一致性
-                hash_bytes = hashlib.sha256(directory.encode()).digest()
-                hue = int.from_bytes(hash_bytes[:2], 'big') % 360
+                continue
 
-                # 生成美观的HSL颜色（固定饱和度和亮度）
-                colors[directory] = f"hsl({hue}, 70%, 50%)"
+            parent_color = self.find_parent_color(directory, colors)
+            if parent_color:
+                # 新子目录继承最近父目录颜色
+                colors[directory] = parent_color
+                continue
+
+            # 没有可继承的父目录颜色时，哈希生成HSL颜色
+            hash_bytes = hashlib.sha256(directory.encode()).digest()
+            hue = int.from_bytes(hash_bytes[:2], 'big') % 360
+            colors[directory] = f"hsl({hue}, 70%, 50%)"
 
         return colors
+
+    def assign_directory_icons(self, directories: Set[str], skip_existing: bool = True) -> Dict[str, str]:
+        """为目录分配图标"""
+        assigned = {}
+        skipped = 0
+        assigned_count = 0
+
+        for directory in sorted(directories):
+            if skip_existing and directory in self.existing_icons:
+                assigned[directory] = self.existing_icons[directory]
+                skipped += 1
+                continue
+
+            directory_lower = directory.lower()
+            matched_icon = None
+            for keyword, icon in DIR_KEYWORD_ICONS.items():
+                if keyword.lower() in directory_lower:
+                    matched_icon = icon
+                    break
+
+            if not matched_icon:
+                hash_bytes = hashlib.sha256(directory.encode()).digest()
+                icon_index = int.from_bytes(hash_bytes[:2], 'big') % len(FOLDER_ICONS)
+                matched_icon = FOLDER_ICONS[icon_index]
+
+            assigned[directory] = matched_icon
+            assigned_count += 1
+
+        print(f"目录图标分配完成: 跳过 {skipped} 个, 新分配 {assigned_count} 个")
+        return assigned
 
     def assign_file_icons(self, files: List[str], skip_existing: bool = True) -> Dict[str, str]:
         """为文件分配图标"""
@@ -260,7 +368,7 @@ class IconAssigner:
         print(f"图标分配完成: 跳过 {skipped} 个, 新分配 {assigned_count} 个, 冲突解决 {conflicts} 个")
         return assigned
 
-    def update_configuration(self, file_icons: Dict[str, str], dir_colors: Dict[str, str]) -> None:
+    def update_configuration(self, file_icons: Dict[str, str], dir_colors: Dict[str, str], dir_icons: Dict[str, str]) -> None:
         """更新配置文件"""
         if 'fileIcons' not in self.config:
             self.config['fileIcons'] = {}
@@ -278,11 +386,13 @@ class IconAssigner:
                 if dir_path and dir_path in dir_colors:
                     self.config['fileIcons'][file_path]['color'] = dir_colors[dir_path]
 
-        # 确保目录也有颜色记录（用于未来继承）
+        # 确保目录也有图标和颜色记录（用于未来继承）
         for dir_path, color in dir_colors.items():
             if dir_path not in self.config['fileIcons']:
-                self.config['fileIcons'][dir_path] = {'color': color}
-            elif isinstance(self.config['fileIcons'][dir_path], dict):
+                self.config['fileIcons'][dir_path] = {}
+            if isinstance(self.config['fileIcons'][dir_path], dict):
+                if dir_path in dir_icons:
+                    self.config['fileIcons'][dir_path]['icon'] = dir_icons[dir_path]
                 self.config['fileIcons'][dir_path]['color'] = color
 
     def run(self, skip_existing: bool = True, dry_run: bool = False) -> Dict:
@@ -317,25 +427,31 @@ class IconAssigner:
         print("3. 分配目录颜色...")
         dir_colors = self.assign_directory_colors(directories)
 
-        # 5. 分配文件图标
-        print("4. 分配文件图标...")
+        # 5. 分配目录图标
+        print("4. 分配目录图标...")
+        dir_icons = self.assign_directory_icons(directories, skip_existing)
+
+        # 6. 分配文件图标
+        print("5. 分配文件图标...")
         file_icons = self.assign_file_icons(files, skip_existing)
 
-        # 6. 更新配置
+        # 7. 更新配置
         if not dry_run:
-            print("5. 更新配置文件...")
-            self.update_configuration(file_icons, dir_colors)
+            print("6. 更新配置文件...")
+            self.update_configuration(file_icons, dir_colors, dir_icons)
             self.save_config()
             print("   配置已保存")
         else:
-            print("5. [试运行] 跳过实际写入")
+            print("6. [试运行] 跳过实际写入")
 
         # 统计信息
         stats = {
             'total_files': len(files),
             'total_directories': len(directories),
-            'existing_icons': len(self.existing_icons),
-            'new_icons': len(file_icons) - len(self.existing_icons),
+            'existing_file_icons': len([path for path in files if path in self.existing_icons]),
+            'existing_dir_icons': len([path for path in directories if path in self.existing_icons]),
+            'new_file_icons': len([path for path in file_icons if path not in self.existing_icons]),
+            'new_dir_icons': len([path for path in dir_icons if path not in self.existing_icons]),
             'dir_colors_assigned': len(dir_colors),
             'dry_run': dry_run
         }
@@ -343,8 +459,10 @@ class IconAssigner:
         print(f"\n=== 分配完成 ===")
         print(f"文件总数: {stats['total_files']}")
         print(f"目录总数: {stats['total_directories']}")
-        print(f"已有图标: {stats['existing_icons']}")
-        print(f"新分配图标: {stats['new_icons']}")
+        print(f"已有文件图标: {stats['existing_file_icons']}")
+        print(f"已有目录图标: {stats['existing_dir_icons']}")
+        print(f"新分配文件图标: {stats['new_file_icons']}")
+        print(f"新分配目录图标: {stats['new_dir_icons']}")
         print(f"目录颜色: {stats['dir_colors_assigned']}")
 
         return stats

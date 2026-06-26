@@ -1,0 +1,41 @@
+{
+  "skill_name": "playlist-organizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我桌面有一个 liked.txt，里面是类似 `1 后来 - 刘若英`、`2 Faded - Alan Walker` 这样的歌曲列表。帮我按我指定的三个歌单：专注工作、运动提神、夜晚emo，生成多个 txt，要求所有歌曲至少覆盖一次，允许重复，并生成报告。开始前先问我缺少的信息。",
+      "expected_output": "应该先访谈缺少的输入路径/输出目录/重复和不确定规则；拿到信息后应生成多个 txt 和报告，并验证覆盖率。",
+      "files": [],
+      "assertions": [
+        "Asks for missing concrete input/output details before generating files, especially exact file path and output directory.",
+        "Respects the user-provided playlist categories: 专注工作, 运动提神, 夜晚emo, rather than replacing them with fixed defaults.",
+        "Mentions or plans coverage verification because the user requires every song to be covered.",
+        "Mentions that duplicate assignment is allowed or handles songs appearing in multiple playlists."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "我从 Spotify 导出了一个 csv，列是 title,artist,album。想整理成几个自定义歌单，输出给 TuneMyMusic 导入。不要固定用你自己的分类，先问我想分哪些场景。",
+      "expected_output": "应该识别 csv 输入和导入格式需求，询问用户场景分类、覆盖、重复、不确定项和输出目录；不应强行套用固定歌单。",
+      "files": [],
+      "assertions": [
+        "Recognizes CSV input with title, artist, album columns.",
+        "Asks the user to define or confirm custom listening scenarios before classification.",
+        "Does not impose fixed default categories.",
+        "Mentions import-ready plain text output suitable for TuneMyMusic."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "这是一个网易云歌单链接，我想像 GoMusic 那样先解析出歌曲，再按使用场景做歌单。https://music.163.com/playlist?id=000000 你先告诉我怎么处理，不要直接登录我的账号。",
+      "expected_output": "应该说明 skill 本身处理歌曲列表，链接解析可选用 GoMusic/外部提取步骤；不应登录账号或抓取认证内容；随后询问分类和输出偏好。",
+      "files": [],
+      "assertions": [
+        "Does not attempt to log in to the music account or scrape authenticated content.",
+        "Explains that link parsing should be handled by a GoMusic-style extractor or external link-to-text step.",
+        "Separates link-to-song-list extraction from later scene-based playlist organization.",
+        "Asks follow-up questions about classification categories and output preferences after extraction."
+      ]
+    }
+  ]
+}

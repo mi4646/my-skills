@@ -13,6 +13,14 @@ Claude Code 自定义技能插件。
 - 基于 SHA256 哈希的确定性映射，同一文件路径始终获得相同结果
 - 300+ Lucide 图标支持
 
+### [playlist-organizer](./skills/playlist-organizer)
+
+将音乐收藏、歌单链接解析结果、本地 txt/csv 歌曲列表整理成自定义场景歌单。
+
+- 先访谈确认分类场景、覆盖规则、重复归属和不确定歌曲处理方式
+- 支持本地 txt/csv、复制文本，以及 GoMusic 风格的“链接先转歌曲清单”工作流
+- 内置 Python 脚本生成多个导入友好的 txt 歌单和 `生成报告.txt`
+
 ### [update-version](./skills/update-version)
 
 根据 git diff 差异自动更新版本号到 `update_info.txt` 和 `version` 文件。
@@ -54,6 +62,7 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 
 ```
 /obsidian-icon-assigner
+/playlist-organizer
 /update-version
 /weekly-report
 ```
@@ -71,6 +80,10 @@ my-skills/
 │   │   ├── SKILL.md
 │   │   ├── evals/
 │   │   ├── references/
+│   │   └── scripts/
+│   ├── playlist-organizer/
+│   │   ├── SKILL.md
+│   │   ├── evals/
 │   │   └── scripts/
 │   ├── update-version/
 │   │   └── SKILL.md
