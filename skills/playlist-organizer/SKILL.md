@@ -93,6 +93,8 @@ python <skill-dir>/scripts/build_playlists.py \
   --summary-json
 ```
 
+For QQ Music import, add `--max-chars-per-file 1000`. QQ Music limits the text pasted in one import operation, so split by character count rather than by a fixed number of songs. The script keeps each song line intact and writes files such as `通勤_part01.txt`, `通勤_part02.txt` when a playlist exceeds the limit.
+
 `assignments.json` maps playlist names to songs. Values may be 1-based source indexes or exact canonical song strings:
 
 ```json
@@ -122,6 +124,7 @@ and pass it with `--uncertain <uncertain.json>`.
 Default output style:
 - Do not include original numbering in playlist files unless requested.
 - Use one song per line: `Song - Artist`.
+- For QQ Music import, keep each txt file within 1000 characters when possible by using `--max-chars-per-file 1000`. Split only between song lines; never truncate a song line.
 - Keep duplicate source rows if the source contains duplicates; this preserves what the user exported.
 - Sanitize playlist filenames only enough to be valid on Windows/macOS/Linux; keep Chinese names intact.
 

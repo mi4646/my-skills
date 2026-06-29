@@ -38,6 +38,19 @@
         "Falls back to asking the user for an exported txt/csv if the API call fails or is not authorized.",
         "Asks follow-up questions about classification categories and output preferences after extraction."
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "我有一个本地 liked_qq.txt，里面大概 80 首歌。我想分成“通勤提神”和“夜晚放松”两个 QQ 音乐可导入的 txt。QQ 音乐一次粘贴最多 1000 个字符，所以每个 txt 都要能直接粘贴导入，不能把一首歌截断；所有歌都要覆盖，允许重复。请生成报告和 summary.json。",
+      "expected_output": "应该使用或建议 build_playlists.py 的 --max-chars-per-file 1000，按字符数而不是歌曲数拆分，分片文件名应带 partNN，歌曲行不能被截断，报告和 summary.json 应列出所有分片并验证覆盖。",
+      "files": [],
+      "assertions": [
+        "Mentions or uses --max-chars-per-file 1000 for QQ Music import.",
+        "Splits by character count rather than a fixed number of songs.",
+        "Keeps each song line intact and does not truncate songs.",
+        "Produces or plans part-numbered txt files when a playlist exceeds the limit.",
+        "Includes report and summary.json outputs with coverage verification."
+      ]
     }
   ]
 }

@@ -26,6 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--allow-repeats', action='store_true', help='Allow one source entry to appear in multiple playlists.')
     parser.add_argument('--require-coverage', action='store_true', help='Report failure when any source entry is uncovered.')
     parser.add_argument('--import-ready', action='store_true', help='Use plain import-ready txt output. Currently this is the default format.')
+    parser.add_argument('--max-chars-per-file', type=int, help='Split playlist txt files so each file stays within this character limit when possible.')
     parser.add_argument('--html-report', action='store_true', help='Also write an offline visual HTML report.')
     parser.add_argument('--summary-json', action='store_true', help='Also write summary.json with report data.')
     return parser.parse_args()
@@ -101,8 +102,68 @@ def sanitize_filename(name: str) -> str:
     return sanitized.rstrip('.') or '未命名歌单'
 
 
+def playlist_text(songs: list[str]) -> str:
+    return '\n'.join(songs) + ('\n' if songs else '')
+
+
 def write_playlist(path: Path, songs: list[str]) -> None:
-    path.write_text('\n'.join(songs) + ('\n' if songs else ''), encoding='utf-8')
+    with path.open('w', encoding='utf-8', newline='\n') as handle:
+        handle.write(playlist_text(songs))
+
+
+def split_playlist_songs(songs: list[str], max_chars: int) -> list[list[str]]:
+    if max_chars <= 0:
+        raise ValueError('--max-chars-per-file 必须大于 0。')
+
+    chunks: list[list[str]] = []
+    current: list[str] = []
+    for song in songs:
+        candidate = current + [song]
+        if current and len(playlist_text(candidate)) > max_chars:
+            chunks.append(current)
+            current = [song]
+        else:
+            current = candidate
+    if current or not chunks:
+        chunks.append(current)
+    return chunks
+
+
+def unique_filename(filename: str, used_filenames: set[str]) -> str:
+    if filename not in used_filenames:
+        used_filenames.add(filename)
+        return filename
+
+    path = Path(filename)
+    counter = 2
+    while True:
+        candidate = f'{path.stem}_{counter}{path.suffix}'
+        if candidate not in used_filenames:
+            used_filenames.add(candidate)
+            return candidate
+        counter += 1
+
+
+def write_playlist_files(
+    output_dir: Path,
+    playlist_name: str,
+    songs: list[str],
+    max_chars: int | None,
+    used_filenames: set[str],
+) -> list[tuple[str, list[str]]]:
+    base_name = sanitize_filename(playlist_name)
+    chunks = [songs] if max_chars is None else split_playlist_songs(songs, max_chars)
+    if len(chunks) == 1:
+        filename = unique_filename(base_name + '.txt', used_filenames)
+        write_playlist(output_dir / filename, chunks[0])
+        return [(filename, chunks[0])]
+
+    written: list[tuple[str, list[str]]] = []
+    for index, chunk in enumerate(chunks, start=1):
+        filename = unique_filename(f'{base_name}_part{index:02d}.txt', used_filenames)
+        write_playlist(output_dir / filename, chunk)
+        written.append((filename, chunk))
+    return written
 
 
 def build_summary(
@@ -276,6 +337,7 @@ def main() -> int:
     playlist_counts: dict[str, int] = {}
     playlist_details: list[dict[str, Any]] = []
     generated_files: list[str] = []
+    used_filenames: set[str] = set()
 
     for playlist_name, raw_items in assignments.items():
         if not isinstance(raw_items, list):
@@ -288,17 +350,17 @@ def main() -> int:
             if index is not None:
                 covered_indexes.add(index)
 
-        filename = sanitize_filename(str(playlist_name)) + '.txt'
-        write_playlist(output_dir / filename, resolved_songs)
-        playlist_counts[filename] = len(resolved_songs)
-        playlist_details.append({
-            'name': str(playlist_name),
-            'filename': filename,
-            'count': len(resolved_songs),
-            'preview': resolved_songs[:10],
-            'songs': resolved_songs,
-        })
-        generated_files.append(filename)
+        written_files = write_playlist_files(output_dir, str(playlist_name), resolved_songs, args.max_chars_per_file, used_filenames)
+        for filename, file_songs in written_files:
+            playlist_counts[filename] = len(file_songs)
+            playlist_details.append({
+                'name': str(playlist_name),
+                'filename': filename,
+                'count': len(file_songs),
+                'preview': file_songs[:10],
+                'songs': file_songs,
+            })
+            generated_files.append(filename)
 
     uncertain_entries: list[str] = []
     if args.uncertain:
@@ -308,15 +370,16 @@ def main() -> int:
         for item in raw_uncertain:
             _, song = resolve_item(item, songs)
             uncertain_entries.append(song)
-        write_playlist(output_dir / '待整理.txt', uncertain_entries)
-        playlist_details.append({
-            'name': '待整理',
-            'filename': '待整理.txt',
-            'count': len(uncertain_entries),
-            'preview': uncertain_entries[:10],
-            'songs': uncertain_entries,
-        })
-        generated_files.append('待整理.txt')
+        written_files = write_playlist_files(output_dir, '待整理', uncertain_entries, args.max_chars_per_file, used_filenames)
+        for filename, file_songs in written_files:
+            playlist_details.append({
+                'name': '待整理',
+                'filename': filename,
+                'count': len(file_songs),
+                'preview': file_songs[:10],
+                'songs': file_songs,
+            })
+            generated_files.append(filename)
 
     uncovered = [(index + 1, song) for index, song in enumerate(songs) if index not in covered_indexes]
     status = '未通过：存在未覆盖歌曲' if args.require_coverage and uncovered else '通过'
@@ -329,6 +392,7 @@ def main() -> int:
         f'已覆盖条目数：{len(covered_indexes)}',
         f'要求全覆盖：{"是" if args.require_coverage else "否"}',
         f'允许重复归属：{"是" if args.allow_repeats else "否"}',
+        f'单文件字符上限：{args.max_chars_per_file if args.max_chars_per_file else "未限制"}',
         '',
         '生成文件：',
     ]
