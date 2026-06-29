@@ -21,6 +21,15 @@ Claude Code 自定义技能插件。
 - 支持本地 txt/csv、复制文本，以及 GoMusic 风格的“链接先转歌曲清单”工作流
 - 内置 Python 脚本生成多个导入友好的 txt 歌单和 `生成报告.txt`
 
+### [storage-analyzer](./skills/storage-analyzer)
+
+只读扫描 macOS / Windows 磁盘占用，生成分级清理建议和交互式 HTML 报告。
+
+- 自动识别系统，扫描常见用户目录、缓存目录、下载目录和开发缓存
+- 将占用项分为 🟢可自动清理 / 🟡需人工判断 / 🔴谨慎清理 三级
+- 生成可折叠、命令可复制的 HTML 报告；可选本地服务模式提供移到废纸篓/打开目录操作
+- 第三方技能，来源：[KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills/)
+
 ### [update-version](./skills/update-version)
 
 根据 git diff 差异自动更新版本号到 `update_info.txt` 和 `version` 文件。
@@ -63,6 +72,7 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 ```
 /obsidian-icon-assigner
 /playlist-organizer
+/storage-analyzer
 /update-version
 /weekly-report
 ```
@@ -84,6 +94,11 @@ my-skills/
 │   ├── playlist-organizer/
 │   │   ├── SKILL.md
 │   │   ├── evals/
+│   │   └── scripts/
+│   ├── storage-analyzer/
+│   │   ├── SKILL.md
+│   │   ├── assets/
+│   │   ├── references/
 │   │   └── scripts/
 │   ├── update-version/
 │   │   └── SKILL.md
