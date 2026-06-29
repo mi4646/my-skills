@@ -10,7 +10,8 @@
         "Asks for missing concrete input/output details before generating files, especially exact file path and output directory.",
         "Respects the user-provided playlist categories: 专注工作, 运动提神, 夜晚emo, rather than replacing them with fixed defaults.",
         "Mentions or plans coverage verification because the user requires every song to be covered.",
-        "Mentions that duplicate assignment is allowed or handles songs appearing in multiple playlists."
+        "Mentions that duplicate assignment is allowed or handles songs appearing in multiple playlists.",
+        "Keeps the text report as the baseline and may offer optional HTML visual report or summary.json for easier review."
       ]
     },
     {
@@ -27,13 +28,14 @@
     },
     {
       "id": 3,
-      "prompt": "这是一个网易云歌单链接，我想像 GoMusic 那样先解析出歌曲，再按使用场景做歌单。https://music.163.com/playlist?id=000000 你先告诉我怎么处理，不要直接登录我的账号。",
-      "expected_output": "应该说明 skill 本身处理歌曲列表，链接解析可选用 GoMusic/外部提取步骤；不应登录账号或抓取认证内容；随后询问分类和输出偏好。",
+      "prompt": "这是一个 QQ 音乐歌单链接，我想先解析出歌曲，再按使用场景做歌单。https://c6.y.qq.com/base/fcgi-bin/u?__=REDACTED 你可以用配置好的 GoMusic API，但不要登录我的账号。",
+      "expected_output": "应该说明会先询问或确认用户授权把链接发送到 GoMusic API；授权后使用 fetch_gomusic_songlist.py 生成本地 txt；不应登录账号或抓取认证内容；API 失败时回退到让用户提供导出列表；随后询问分类和输出偏好。",
       "files": [],
       "assertions": [
         "Does not attempt to log in to the music account or scrape authenticated content.",
-        "Explains that link parsing should be handled by a GoMusic-style extractor or external link-to-text step.",
-        "Separates link-to-song-list extraction from later scene-based playlist organization.",
+        "Asks for or relies on explicit authorization before sending the playlist URL to the GoMusic API.",
+        "Mentions using scripts/fetch_gomusic_songlist.py or the configured POST form field url to extract a local song list.",
+        "Falls back to asking the user for an exported txt/csv if the API call fails or is not authorized.",
         "Asks follow-up questions about classification categories and output preferences after extraction."
       ]
     }

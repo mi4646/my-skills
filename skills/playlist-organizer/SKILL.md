@@ -13,12 +13,13 @@ Inputs can be:
 - Local `.txt` files with lines like `1 Song - Artist` or `Song - Artist`.
 - Local `.csv` files with common columns such as `title`, `track`, `name`, `artist`, `artists`, `歌曲名`, `歌名`, `歌手`.
 - Copied text from music apps or migration tools.
-- Playlist links from NetEase Cloud Music, QQ Music, Spotify, or similar services, when paired with an external link-to-text extractor.
+- Playlist links from NetEase Cloud Music, QQ Music, Spotify, or similar services, using the bundled GoMusic API extractor when the user authorizes link extraction.
 
 Outputs can be:
 - One `.txt` per playlist, each line as `Song - Artist`.
 - Import-ready plain text for tools such as TuneMyMusic or Spotlistr.
-- A report file showing source count, covered count, playlist sizes, duplicates allowed/not allowed, and uncertain items.
+- A text report showing source count, covered count, playlist sizes, duplicates allowed/not allowed, and uncertain items.
+- Optional offline visual HTML report and `summary.json` for easier review of large playlist splits.
 
 ## First: interview before generating
 
@@ -26,25 +27,36 @@ Before reading large files or writing outputs, ask only the missing questions. R
 
 Clarify these points:
 1. **Input source**: local file, copied text, or playlist link.
-2. **If the input is a link**: ask whether the user wants to use an external extractor such as GoMusic first. Do not log in to music accounts or scrape authenticated pages unless the user explicitly authorizes a safe method.
+2. **If the input is a link**: ask whether the user authorizes using the bundled GoMusic API extractor. Do not log in to music accounts or scrape authenticated pages unless the user explicitly authorizes a safe method.
 3. **Playlist categories**: ask the user to define or approve categories. Do not force fixed categories. You may suggest examples such as focus, commute, workout, night, emotional release, Chinese style, foreign-language, KTV, nostalgia, but treat them as optional.
 4. **Coverage rule**: ask whether every song must appear in at least one playlist.
 5. **Repeat rule**: ask whether the same song may appear in multiple playlists.
 6. **Uncertain items**: ask whether to batch-question the user, create `待整理.txt`, or assign to the closest category.
-7. **Output location and format**: ask for output directory, file naming, whether to include a report, and whether import-ready text is needed.
+7. **Output location and format**: ask for output directory, file naming, whether to include text report, offline HTML visual report, `summary.json`, and whether import-ready text is needed.
 
 For large collections, avoid asking per-song questions one by one. First classify the obvious items, then batch uncertain items into a short list for user review.
 
-## Link input and GoMusic-style workflow
+## Link input and GoMusic API workflow
 
 If the user provides a playlist link rather than a local song list:
 
 1. Identify the source if possible: NetEase Cloud Music, QQ Music, Spotify, or unknown.
-2. Explain that this skill's deterministic script works on song lists, not directly on platform accounts.
-3. Offer a link-to-text step:
-   - If the user already has a GoMusic-style extractor available, ask them to run it and provide the resulting txt/csv.
-   - If they want help using GoMusic, explain the high-level flow: paste playlist link into GoMusic, copy/export the resulting song list, then feed that list into this skill.
-4. Continue with local-list parsing after the extracted list is available.
+2. Ask whether the user authorizes sending the playlist URL to the configured GoMusic API. Treat this as an external network call because the URL is sent to a third-party service.
+3. If authorized, use `scripts/fetch_gomusic_songlist.py` to extract the link into a local `.txt` song list before classification:
+
+```bash
+python <skill-dir>/scripts/fetch_gomusic_songlist.py \
+  --url <playlist-url> \
+  --output <song-list.txt>
+```
+
+The script calls:
+- Endpoint: `https://sss.unmeta.cn/songlist?detailed=false&format=song-singer&order=normal`
+- Method: `POST`
+- Form field: `url=<playlist-url>`
+
+4. If the API call fails, returns an empty list, or the user does not authorize the network call, fall back to asking the user to run GoMusic or another extractor and provide the resulting txt/csv.
+5. Continue with local-list parsing after the extracted list is available.
 
 Keep the boundary clear: GoMusic-style tools extract links into song lists; this skill organizes the song list into playlists.
 
@@ -76,7 +88,9 @@ python <skill-dir>/scripts/build_playlists.py \
   --assignments <assignments.json> \
   --allow-repeats \
   --require-coverage \
-  --import-ready
+  --import-ready \
+  --html-report \
+  --summary-json
 ```
 
 `assignments.json` maps playlist names to songs. Values may be 1-based source indexes or exact canonical song strings:
@@ -91,6 +105,8 @@ python <skill-dir>/scripts/build_playlists.py \
 The script writes:
 - `<playlist-name>.txt` for each playlist.
 - `生成报告.txt` with counts and verification notes.
+- `生成报告.html` when `--html-report` is passed. This is an offline visual report with summary cards, playlist size bars, and complete per-playlist song lists inside scrollable cards.
+- `summary.json` when `--summary-json` is passed. This includes playlist counts, short previews, and complete song lists for later automation or deeper analysis.
 - `待整理.txt` if uncertain items are provided.
 
 If you need to pass uncertain items, create an optional JSON file like:
@@ -118,6 +134,8 @@ Report should include:
 - Count per playlist.
 - Uncovered entries, if any.
 - Uncertain entries, if any.
+
+When the collection is large or the user wants easier review, prefer passing `--html-report --summary-json` in addition to the text report. Keep `生成报告.txt` as the stable baseline; treat HTML and JSON as additive outputs, not replacements.
 
 ## Quality checks before saying done
 
