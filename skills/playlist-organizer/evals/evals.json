@@ -28,13 +28,13 @@
     },
     {
       "id": 3,
-      "prompt": "这是一个 QQ 音乐歌单链接，我想先解析出歌曲，再按使用场景做歌单。https://c6.y.qq.com/base/fcgi-bin/u?__=REDACTED 你可以用配置好的 GoMusic API，但不要登录我的账号。",
-      "expected_output": "应该说明会先询问或确认用户授权把链接发送到 GoMusic API；授权后使用 fetch_gomusic_songlist.py 生成本地 txt；不应登录账号或抓取认证内容；API 失败时回退到让用户提供导出列表；随后询问分类和输出偏好。",
+      "prompt": "这是一个 QQ 音乐歌单链接，我想先解析出歌曲，再按使用场景做歌单。https://c6.y.qq.com/base/fcgi-bin/u?__=REDACTED 你可以用配置好的解析 API，但不要登录我的账号。",
+      "expected_output": "应该说明会先询问或确认用户授权把链接发送到解析 API；授权后使用 fetch_gomusic_songlist.py 生成本地 txt；不应登录账号或抓取认证内容；API 失败时回退到让用户提供导出列表；随后询问分类和输出偏好。",
       "files": [],
       "assertions": [
         "Does not attempt to log in to the music account or scrape authenticated content.",
-        "Asks for or relies on explicit authorization before sending the playlist URL to the GoMusic API.",
-        "Mentions using scripts/fetch_gomusic_songlist.py or the configured POST form field url to extract a local song list.",
+        "Asks for or relies on explicit authorization before sending the playlist URL to the parsing API.",
+        "Mentions using scripts/fetch_gomusic_songlist.py to extract a local song list via the configured POST /api/playlist endpoint.",
         "Falls back to asking the user for an exported txt/csv if the API call fails or is not authorized.",
         "Asks follow-up questions about classification categories and output preferences after extraction."
       ]

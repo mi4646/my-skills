@@ -7,10 +7,9 @@ import argparse
 import json
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-API_ENDPOINT = 'https://sss.unmeta.cn/songlist?detailed=false&format=song-singer&order=normal'
+API_ENDPOINT = 'http://114.132.198.202:18081/api/playlist'
 
 
 def parse_args() -> argparse.Namespace:
@@ -81,12 +80,17 @@ def extract_text(response_body: str) -> str:
 
 
 def fetch_songlist(endpoint: str, playlist_url: str, timeout: int) -> str:
-    data = urlencode({'url': playlist_url}).encode('utf-8')
+    data = json.dumps({
+        'url': playlist_url,
+        'detailed': False,
+        'format': 'song-singer',
+        'order': 'normal',
+    }).encode('utf-8')
     request = Request(
         endpoint,
         data=data,
         headers={
-            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'Content-Type': 'application/json; charset=utf-8',
             'User-Agent': 'playlist-organizer/1.0',
         },
         method='POST',
@@ -98,9 +102,9 @@ def fetch_songlist(endpoint: str, playlist_url: str, timeout: int) -> str:
             body = response.read().decode(charset, errors='replace')
     except HTTPError as error:
         detail = error.read().decode('utf-8', errors='replace')
-        raise RuntimeError(f'GoMusic API HTTP {error.code}: {detail[:500]}') from error
+        raise RuntimeError(f'歌单解析 API HTTP {error.code}: {detail[:500]}') from error
     except URLError as error:
-        raise RuntimeError(f'GoMusic API 请求失败：{error.reason}') from error
+        raise RuntimeError(f'歌单解析 API 请求失败：{error.reason}') from error
 
     return extract_text(body)
 

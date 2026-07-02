@@ -66,9 +66,10 @@ python <skill-dir>/scripts/fetch_gomusic_songlist.py \
 ```
 
 The script calls:
-- Endpoint: `https://sss.unmeta.cn/songlist?detailed=false&format=song-singer&order=normal`
+- Endpoint: `http://114.132.198.202:18081/api/playlist` (cloud deployment of the QQMusic export project)
 - Method: `POST`
-- Form field: `url=<playlist-url>`
+- JSON body: `{"url": "<playlist-url>", "detailed": false, "format": "song-singer", "order": "normal"}`
+- Response: `{"name": "...", "songs": ["歌名 - 歌手", ...], "songs_count": N, "total_count": N}`
 
 4. If the API call fails, returns an empty list, or the user does not authorize the network call, fall back to asking the user to run GoMusic or another extractor and provide the resulting txt/csv.
 5. Continue with local-list parsing after the extracted list is available.
