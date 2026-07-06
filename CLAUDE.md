@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-Claude Code 自定义技能插件，包含四个中文技能。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
+Claude Code 自定义技能插件，包含四个自研中文技能与两个第三方技能。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
 
 ## 技能架构
 
@@ -14,6 +14,8 @@ Claude Code 自定义技能插件，包含四个中文技能。通过 `.claude-p
 - **playlist-organizer**：访谈 + 脚本技能，先确认歌曲来源、分类场景、覆盖/重复规则和输出位置，再调用 `scripts/build_playlists.py` 生成多个导入友好的 txt 歌单和 `生成报告.txt`
 - **update-version**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则直接执行 git diff 分析和文件写入
 - **weekly-report**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则执行 git log 并归纳周报
+- **storage-analyzer**：第三方脚本技能（来源 [KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills/)），只读扫描磁盘占用并生成分级清理 HTML 报告
+- **neat-freak**：第三方纯指令技能（来源 [KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills/tree/main/neat-freak)），会话末对项目文档与 agent 记忆进行洁癖级同步与规范执行审计，跨平台兼容 Claude Code / Codex / OpenCode / OpenClaw
 
 ### evals
 
