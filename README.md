@@ -4,6 +4,16 @@ Claude Code 自定义技能插件。
 
 ## 技能列表
 
+### [baoyu-design](./skills/baoyu-design)
+
+创建精美的设计产物为自包含 HTML：UI 原型、交互原型、线框图、落地页、仪表盘、App 界面、幻灯片（PPT）以及视觉探索。
+
+- 支持线框图、高保真设计、交互原型、移动端原型、PPT/幻灯片、动画视频等丰富产出形式
+- 内置设计系统管理、Figma 导入、设计审查等完整设计工作流
+- 可导出为 PDF、PPTX（可编辑版或截图版）、视频（MP4）
+- 跨平台兼容 Claude Code / Cursor / Codex Agent
+- **第三方技能**，来源：[jimliu/baoyu-design](https://github.com/jimliu/baoyu-design)
+
 ### [neat-freak](./skills/neat-freak)
 
 会话末对项目文档（CLAUDE.md / README.md / docs/）和 agent 记忆进行洁癖级同步与规范执行审计。
@@ -29,6 +39,15 @@ Claude Code 自定义技能插件。
 - 先访谈确认分类场景、覆盖规则、重复归属和不确定歌曲处理方式
 - 支持本地 txt/csv、复制文本，以及 GoMusic 风格的“链接先转歌曲清单”工作流
 - 内置 Python 脚本生成多个导入友好的 txt 歌单和 `生成报告.txt`
+
+### [release-skills](./skills/release-skills)
+
+通用发布工作流，支持多语言变更日志，自动检测版本文件和 changelog。
+
+- 支持 Node.js、Python、Rust、Claude Plugin、GitHub Releases、annotated tags
+- 自动检测项目类型并选择合适的版本文件与发布策略
+- 支持历史发布回填、通用项目发布
+- 可自定义：Release URL 模板、版本文件、变更日志路径
 
 ### [storage-analyzer](./skills/storage-analyzer)
 
@@ -68,9 +87,11 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 安装后，在 Claude Code 中通过技能名称调用：
 
 ```
+/baoyu-design
 /neat-freak
 /obsidian-icon-assigner
 /playlist-organizer
+/release-skills
 /storage-analyzer
 /update-version
 /weekly-report
@@ -90,36 +111,4 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 请使用 my-skills:obsidian-icon-assigner 为我的知识库分配图标
 请使用 my-skills:update-version 更新版本号
 请使用 my-skills:weekly-report 生成本周周报
-```
-
-## 项目结构
-
-```
-my-skills/
-├── .claude-plugin/
-│   └── plugin.json           # 插件清单
-├── skills/
-│   ├── neat-freak/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   ├── obsidian-icon-assigner/
-│   │   ├── SKILL.md
-│   │   ├── evals/
-│   │   ├── references/
-│   │   └── scripts/
-│   ├── playlist-organizer/
-│   │   ├── SKILL.md
-│   │   ├── evals/
-│   │   └── scripts/
-│   ├── storage-analyzer/
-│   │   ├── SKILL.md
-│   │   ├── assets/
-│   │   ├── references/
-│   │   └── scripts/
-│   ├── update-version/
-│   │   └── SKILL.md
-│   └── weekly-report/
-│       ├── SKILL.md
-│       └── evals/
-└── README.md
 ```
