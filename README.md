@@ -100,7 +100,9 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 或使用带插件命名空间的完整命令：
 
 ```
+/my-skills:baoyu-design
 /my-skills:obsidian-icon-assigner
+/my-skills:release-skills
 /my-skills:update-version
 /my-skills:weekly-report
 ```
@@ -108,7 +110,9 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 或在提示词中指定技能名称：
 
 ```
+请使用 my-skills:baoyu-design 设计一个登录页面原型
 请使用 my-skills:obsidian-icon-assigner 为我的知识库分配图标
+请使用 my-skills:release-skills 发布新版本
 请使用 my-skills:update-version 更新版本号
 请使用 my-skills:weekly-report 生成本周周报
 ```
