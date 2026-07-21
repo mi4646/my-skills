@@ -1,0 +1,26 @@
+{
+  "skill_name": "opencode-model-optimizer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "weighted-workload-strict-budget",
+      "prompt": "我刚开通 OpenCode Go，每天大概开发 10 小时左右，主要是 Python 后端。我平时用 gstack 的 plan-eng-review、investigate 这些 skill，工作流比较重。预算有限，每个月 $60 不想超。目前有的模型和配额是这样的：\n\n```\nModel    每 5 小时    每周    每月\nGrok 4.5    120    300    600\nGLM-5.2    880    2,150    4,300\nGLM-5.1    880    2,150    4,300\nKimi K3    110    250    490\nKimi K2.7 Code    1,350    4,630    9,250\nKimi K2.6    1,150    2,880    5,750\nMiMo-V2.5    30,100    75,200    150,400\nMiMo-V2.5-Pro    3,250    8,150    16,300\nMiniMax M3    3,200    8,000    16,000\nMiniMax M2.7    3,400    8,500    17,000\nQwen3.7 Max    950    2,390    4,770\nQwen3.7 Plus    4,300    10,800    21,600\nQwen3.6 Plus    3,300    8,200    16,300\nDeepSeek V4 Pro    3,450    8,550    17,150\nDeepSeek V4 Flash    31,650    79,050    158,150\n```\n\n帮我推荐 Sonnet/Opus/Fable/Haiku 怎么配置？",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "light-user-budget-sensitive",
+      "prompt": "我偶尔用 OpenCode，每天也就 2-3 小时写写 Python 脚本。不怎么用复杂工作流，就是普通开发。但预算卡得很紧，每个月 $30 不能再多了。帮我看看这些模型怎么配最省钱？\n\nModel: DeepSeek V4 Flash (31,650/5h), DeepSeek V4 Pro (3,450/5h), MiMo-V2.5 (30,100/5h), Qwen3.7 Plus (4,300/5h)",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 3,
+      "name": "quality-first-no-budget-limit",
+      "prompt": "我想在 OpenCode 上配 Claude Code 的模型层级。每天大概 6-8 小时全栈开发（Python + TypeScript 前端），用 gstack 的 superpowers 工作流，比较看重代码质量，预算不是大问题，每月 $100 以内都能接受。我的模型有这些：\n\nQwen3.7 Max 950/5h\nQwen3.7 Plus 4,300/5h\nDeepSeek V4 Pro 3,450/5h\nDeepSeek V4 Flash 31,650/5h\nKimi K2.7 Code 1,350/5h\nGLM-5.2 880/5h\nKimi K3 110/5h\n\n能帮我搭配一个质量最优的方案吗？最好旗舰能强一些。",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}
