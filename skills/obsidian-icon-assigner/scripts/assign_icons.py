@@ -99,7 +99,7 @@ ICON_CATEGORIES = {
 }
 
 # 目录关键词 → 图标映射（用于目录图标语义分配）
-DIR_KEYWORD_ICONS = {
+KEYWORD_ICONS = {
     "技术": "lucide-code",
     "文档": "lucide-file-text",
     "AI": "lucide-brain",
@@ -147,7 +147,14 @@ DIR_KEYWORD_ICONS = {
     "网络": "lucide-network",
     "开发": "lucide-code-2",
 }
-# 目录图标回退池（不被DIR_KEYWORD_ICONS覆盖时使用）
+
+# 图标名 → 所属分类的反查表（自动从 ICON_CATEGORIES 生成）
+ICON_TO_CATEGORY = {}
+for _cat_name, _icons in ICON_CATEGORIES.items():
+    for _icon in _icons:
+        ICON_TO_CATEGORY[_icon] = _cat_name
+
+# 目录图标回退池（不被KEYWORD_ICONS覆盖时使用）
 FOLDER_ICONS = [
     "lucide-folder", "lucide-folder-open", "lucide-folder-plus",
     "lucide-folder-search", "lucide-folder-heart", "lucide-folder-lock",
@@ -289,7 +296,7 @@ class IconAssigner:
 
             directory_lower = directory.lower()
             matched_icon = None
-            for keyword, icon in DIR_KEYWORD_ICONS.items():
+            for keyword, icon in KEYWORD_ICONS.items():
                 if keyword.lower() in directory_lower:
                     matched_icon = icon
                     break
