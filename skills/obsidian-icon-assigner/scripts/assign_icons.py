@@ -291,8 +291,8 @@ class IconAssigner:
 
         return colors
 
-    def assign_directory_icons(self, directories: Set[str], skip_existing: bool = True) -> Dict[str, str]:
-        """为目录分配图标"""
+    def assign_directory_icons(self, directories: Set[str], used_icons: Set[str], skip_existing: bool = True) -> Dict[str, str]:
+        """为目录分配图标（语义匹配 → 同类优先 → 全局去重 → 文件夹池）"""
         assigned = {}
         skipped = 0
         assigned_count = 0
@@ -303,19 +303,63 @@ class IconAssigner:
                 skipped += 1
                 continue
 
-            directory_lower = directory.lower()
             matched_icon = None
             for keyword, icon in KEYWORD_ICONS.items():
-                if keyword.lower() in directory_lower:
+                if _match_keyword(directory, keyword):
                     matched_icon = icon
                     break
 
-            if not matched_icon:
+            if matched_icon:
+                if matched_icon not in used_icons:
+                    used_icons.add(matched_icon)
+                    assigned[directory] = matched_icon
+                    print(f"  [语义] {directory}/ → {matched_icon}（匹配: {keyword}）")
+                else:
+                    # 图标已被占，同类优先回退
+                    cat = ICON_TO_CATEGORY.get(matched_icon)
+                    found = None
+                    if cat:
+                        cat_icons = ICON_CATEGORIES[cat]
+                        start = cat_icons.index(matched_icon)
+                        for offset in range(1, len(cat_icons)):
+                            candidate = cat_icons[(start + offset) % len(cat_icons)]
+                            if candidate not in used_icons:
+                                found = candidate
+                                break
+                    if not found:
+                        # 同类全用完或无分类 → 全局池寻未用
+                        for candidate in ALL_ICONS:
+                            if candidate not in used_icons:
+                                found = candidate
+                                break
+                        if not found:
+                            # 全部用完 → 最少使用
+                            from collections import Counter
+                            usage = Counter(assigned.values())
+                            min_usage = min(usage.values())
+                            candidates = [ic for ic, cnt in usage.items() if cnt == min_usage]
+                            hash_bytes = hashlib.sha256(directory.encode()).digest()[:4]
+                            found = candidates[int.from_bytes(hash_bytes, 'big') % len(candidates)]
+                    if not cat:
+                        print(f"  ⚠ 警告: {matched_icon} 不属于任何已定义分类，已回退到全局池分配")
+                    used_icons.add(found)
+                    assigned[directory] = found
+                    print(f"  [语义] {directory}/ → {found}（匹配: {keyword}，{matched_icon} 已被占）")
+            else:
+                # 无关键词匹配 → 从文件夹池选未用
                 hash_bytes = hashlib.sha256(directory.encode()).digest()
                 icon_index = int.from_bytes(hash_bytes[:2], 'big') % len(FOLDER_ICONS)
-                matched_icon = FOLDER_ICONS[icon_index]
-
-            assigned[directory] = matched_icon
+                for offset in range(len(FOLDER_ICONS)):
+                    candidate = FOLDER_ICONS[(icon_index + offset) % len(FOLDER_ICONS)]
+                    if candidate not in used_icons:
+                        assigned[directory] = candidate
+                        used_icons.add(candidate)
+                        break
+                else:
+                    # 文件夹池全用完，直接哈希分配
+                    assigned[directory] = FOLDER_ICONS[icon_index]
+                    used_icons.add(assigned[directory])
+                print(f"  [哈希] {directory}/ → {assigned[directory]}")
             assigned_count += 1
 
         print(f"目录图标分配完成: 跳过 {skipped} 个, 新分配 {assigned_count} 个")
@@ -445,7 +489,7 @@ class IconAssigner:
 
         # 5. 分配目录图标
         print("4. 分配目录图标...")
-        dir_icons = self.assign_directory_icons(directories, skip_existing)
+        dir_icons = self.assign_directory_icons(directories, set(self.existing_icons.values()), skip_existing)
 
         # 6. 分配文件图标
         print("5. 分配文件图标...")
