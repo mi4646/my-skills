@@ -365,65 +365,94 @@ class IconAssigner:
         print(f"目录图标分配完成: 跳过 {skipped} 个, 新分配 {assigned_count} 个")
         return assigned
 
-    def assign_file_icons(self, files: List[str], skip_existing: bool = True) -> Dict[str, str]:
-        """为文件分配图标"""
+    def assign_file_icons(self, files: List[str], used_icons: Set[str], skip_existing: bool = True) -> Dict[str, str]:
+        """为文件分配图标（语义匹配 → 同类优先 → 全局去重 → 最少使用回退）"""
         assigned = {}
-        used_icons = set(self.existing_icons.values())  # 已使用的图标
-
-        # 统计跳过和分配的文件
         skipped = 0
         assigned_count = 0
         conflicts = 0
 
         for file_path in sorted(files):
             if skip_existing and file_path in self.existing_icons:
-                # 跳过已有图标的文件
                 assigned[file_path] = self.existing_icons[file_path]
                 skipped += 1
                 continue
 
-            # 计算文件指纹（确定性哈希）
-            hash_obj = hashlib.sha256(file_path.encode())
-            fingerprint = int.from_bytes(hash_obj.digest()[:8], 'big')
+            filename = file_path.rsplit('/', 1)[-1]  # 提取文件名部分
 
-            # 尝试分配唯一图标
-            max_attempts = min(50, len(ALL_ICONS) * 2)  # 最大尝试次数
-            icon_assigned = False
-
-            for attempt in range(max_attempts):
-                # 选择图标（基于指纹+尝试次数）
-                icon_index = (fingerprint + attempt) % len(ALL_ICONS)
-                candidate = ALL_ICONS[icon_index]
-
-                if candidate not in used_icons:
-                    used_icons.add(candidate)
-                    assigned[file_path] = candidate
-                    icon_assigned = True
-                    assigned_count += 1
+            # 优先尝试文件名语义匹配
+            matched_keyword = None
+            matched_icon = None
+            for keyword, icon in KEYWORD_ICONS.items():
+                if _match_keyword(filename, keyword):
+                    matched_keyword = keyword
+                    matched_icon = icon
                     break
 
-            if not icon_assigned:
-                # 图标池耗尽，使用冲突解决策略
-                # 选择使用最少的图标变体
-                base_icon = ALL_ICONS[fingerprint % len(ALL_ICONS)]
+            if matched_icon:
+                if matched_icon not in used_icons:
+                    used_icons.add(matched_icon)
+                    assigned[file_path] = matched_icon
+                    print(f"  [语义] {file_path} → {matched_icon}（匹配: {matched_keyword}）")
+                    assigned_count += 1
+                    continue
 
-                # 尝试变体1-5
-                for variant_num in range(1, 6):
-                    variant = f"{base_icon}-{variant_num}"
-                    if variant not in used_icons:
-                        used_icons.add(variant)
-                        assigned[file_path] = variant
+                # 图标已被占 → 同类优先回退
+                cat = ICON_TO_CATEGORY.get(matched_icon)
+                found = None
+                if cat:
+                    cat_icons = ICON_CATEGORIES[cat]
+                    start = cat_icons.index(matched_icon)
+                    for offset in range(1, len(cat_icons)):
+                        candidate = cat_icons[(start + offset) % len(cat_icons)]
+                        if candidate not in used_icons:
+                            found = candidate
+                            break
+                if not found:
+                    # 同类全用完或无分类 → 全局池寻未用
+                    for candidate in ALL_ICONS:
+                        if candidate not in used_icons:
+                            found = candidate
+                            break
+                    if not found:
+                        # 全部图标用完 → 最少使用回退
+                        from collections import Counter
+                        usage = Counter(list(assigned.values()) + list(self.existing_icons.values()))
+                        min_usage = min(usage.values())
+                        candidates = [ic for ic, cnt in usage.items() if cnt == min_usage]
+                        hash_bytes = hashlib.sha256(file_path.encode()).digest()[:4]
+                        found = candidates[int.from_bytes(hash_bytes, 'big') % len(candidates)]
+                        conflicts += 1
+                if not cat:
+                    print(f"  ⚠ 警告: {matched_icon} 不属于任何已定义分类，已回退到全局池分配")
+                used_icons.add(found)
+                assigned[file_path] = found
+                print(f"  [语义] {file_path} → {found}（匹配: {matched_keyword}，{matched_icon} 已被占）")
+                assigned_count += 1
+            else:
+                # 无关键词匹配 → 哈希全量扫描去重
+                hash_obj = hashlib.sha256(file_path.encode())
+                fingerprint = int.from_bytes(hash_obj.digest()[:8], 'big')
+                icon_assigned = False
+                for attempt in range(len(ALL_ICONS)):
+                    icon_index = (fingerprint + attempt) % len(ALL_ICONS)
+                    candidate = ALL_ICONS[icon_index]
+                    if candidate not in used_icons:
+                        used_icons.add(candidate)
+                        assigned[file_path] = candidate
                         icon_assigned = True
                         assigned_count += 1
-                        conflicts += 1
                         break
-
                 if not icon_assigned:
-                    # 最后手段：使用带修饰符的图标
-                    assigned[file_path] = f"{base_icon}"
-                    used_icons.add(assigned[file_path])
+                    from collections import Counter
+                    usage = Counter(list(assigned.values()) + list(self.existing_icons.values()))
+                    min_usage = min(usage.values())
+                    candidates = [ic for ic, cnt in usage.items() if cnt == min_usage]
+                    chosen = candidates[fingerprint % len(candidates)]
+                    assigned[file_path] = chosen
                     assigned_count += 1
                     conflicts += 1
+                print(f"  [哈希] {file_path} → {assigned[file_path]}")
 
         print(f"图标分配完成: 跳过 {skipped} 个, 新分配 {assigned_count} 个, 冲突解决 {conflicts} 个")
         return assigned
@@ -489,11 +518,12 @@ class IconAssigner:
 
         # 5. 分配目录图标
         print("4. 分配目录图标...")
-        dir_icons = self.assign_directory_icons(directories, set(self.existing_icons.values()), skip_existing)
+        used_icons = set(self.existing_icons.values())
+        dir_icons = self.assign_directory_icons(directories, used_icons, skip_existing)
 
         # 6. 分配文件图标
         print("5. 分配文件图标...")
-        file_icons = self.assign_file_icons(files, skip_existing)
+        file_icons = self.assign_file_icons(files, used_icons, skip_existing)
 
         # 7. 更新配置
         if not dry_run:
