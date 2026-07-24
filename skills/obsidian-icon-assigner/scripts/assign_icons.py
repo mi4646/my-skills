@@ -10,6 +10,7 @@ import os
 import sys
 import json
 import hashlib
+import re
 import argparse
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Optional
@@ -153,6 +154,14 @@ ICON_TO_CATEGORY = {}
 for _cat_name, _icons in ICON_CATEGORIES.items():
     for _icon in _icons:
         ICON_TO_CATEGORY[_icon] = _cat_name
+
+
+def _match_keyword(name: str, keyword: str) -> bool:
+    """关键词匹配函数，短关键词（<3字符）用词边界正则避免假阳性"""
+    if len(keyword) < 3:
+        return bool(re.search(r'\b' + re.escape(keyword) + r'\b', name, re.IGNORECASE))
+    return keyword.lower() in name.lower()
+
 
 # 目录图标回退池（不被KEYWORD_ICONS覆盖时使用）
 FOLDER_ICONS = [
