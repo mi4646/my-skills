@@ -14,14 +14,15 @@ Claude Code 自定义技能插件。
 - 跨平台兼容 Claude Code / Cursor / Codex Agent
 - **第三方技能**，来源：[jimliu/baoyu-design](https://github.com/jimliu/baoyu-design)
 
-### [neat-freak](./skills/neat-freak)
+### [hallmark](./skills/hallmark)
 
-会话末对项目文档（CLAUDE.md / README.md / docs/）和 agent 记忆进行洁癖级同步与规范执行审计。
+反 AI 设计技能，适用于新建页面、设计审计、改版和从 URL/截图提取设计 DNA。
 
-- 三类知识（agent 记忆 / 项目根 CLAUDE.md / docs）分层同步，记忆「毕业」机制防止膨胀
-- 审计工作空间规范的执行：命名约定、必备文件、CLAUDE.md 与 AGENTS.md 软链同源、规则文件死引用
-- 跨平台兼容 Claude Code / OpenAI Codex / OpenCode / OpenClaw
-- 第三方技能，来源：[KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills/tree/main/neat-freak)
+- 20+ 宏观结构（Bento Grid、Manifesto、Long Document 等）+ 50+ 组件原型（导航、Hero、Feature、CTA 等）
+- 内置 slop-test 质量门与多样化轮换机制，防止 AI 模板化输出
+- 支持 `audit`（审计）、`study`（研习）、`redesign`（改版）三种设计动词
+- 跨平台兼容 Claude Code / Cursor / Codex Agent
+- **第三方技能**，由 Together AI 驱动
 
 ### [obsidian-icon-assigner](./skills/obsidian-icon-assigner)
 
@@ -31,6 +32,14 @@ Claude Code 自定义技能插件。
 - 支持增量更新、试运行、强制重新分配
 - 基于 SHA256 哈希的确定性映射，同一文件路径始终获得相同结果
 - 300+ Lucide 图标支持
+
+### [opencode-model-optimizer](./skills/opencode-model-optimizer)
+
+为 OpenCode Go 或类似多模型平台的 Claude Code 模型层级（Sonnet/Opus/Fable/Haiku）提供分层配置推荐。
+
+- 先问后答：必须了解用户场景、预算、配额后才给出推荐方案
+- 支持分层配置、成本最优、配额友好等多种推荐模式
+- 推荐模式含数据来源引用，透明可追溯
 
 ### [playlist-organizer](./skills/playlist-organizer)
 
@@ -88,8 +97,9 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 
 ```
 /baoyu-design
-/neat-freak
+/hallmark
 /obsidian-icon-assigner
+/opencode-model-optimizer
 /playlist-organizer
 /release-skills
 /storage-analyzer
@@ -101,7 +111,9 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 
 ```
 /my-skills:baoyu-design
+/my-skills:hallmark
 /my-skills:obsidian-icon-assigner
+/my-skills:opencode-model-optimizer
 /my-skills:release-skills
 /my-skills:update-version
 /my-skills:weekly-report
@@ -111,7 +123,9 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 
 ```
 请使用 my-skills:baoyu-design 设计一个登录页面原型
+请使用 my-skills:hallmark 设计一个反 AI 模板化的页面
 请使用 my-skills:obsidian-icon-assigner 为我的知识库分配图标
+请使用 my-skills:opencode-model-optimizer 推荐模型配置方案
 请使用 my-skills:release-skills 发布新版本
 请使用 my-skills:update-version 更新版本号
 请使用 my-skills:weekly-report 生成本周周报
