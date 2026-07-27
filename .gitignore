@@ -14,6 +14,8 @@ env/
 
 # Claude/local workspaces
 *-workspace/
+*/.superpowers/
+/.superpowers/
 
 # Local environment
 .env
