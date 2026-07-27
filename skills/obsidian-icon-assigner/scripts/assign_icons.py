@@ -147,6 +147,26 @@ KEYWORD_ICONS = {
     "数据": "lucide-database",
     "网络": "lucide-network",
     "开发": "lucide-code-2",
+    # ===== 中文专有名词映射（更长关键词优先于 AI 等短词） =====
+    "ClaudeCode": "lucide-sparkles",
+    "OpenClaw": "lucide-bot",
+    "基础概念": "lucide-book",
+    "工具使用": "lucide-tool",
+    "提示词技巧": "lucide-message-square",
+    "资源收集": "lucide-bookmark",
+    "AI插件": "lucide-puzzle",
+    "学习文档": "lucide-graduation-cap",
+    "博客写作": "lucide-file-text",
+    "云存储": "lucide-cloud",
+    "网络工具": "lucide-network",
+    "通讯工具": "lucide-phone",
+    "安全测试": "lucide-shield",
+    "达梦数据库": "lucide-database",
+    "影音资源": "lucide-film",
+    "资源聚合": "lucide-bookmark",
+    "个人成长": "lucide-trending-up",
+    "移动开发": "lucide-cpu",
+    "项目资料": "lucide-folder-kanban",
 }
 
 # 图标名 → 所属分类的反查表（自动从 ICON_CATEGORIES 生成）
@@ -304,7 +324,7 @@ class IconAssigner:
                 continue
 
             matched_icon = None
-            for keyword, icon in KEYWORD_ICONS.items():
+            for keyword, icon in sorted(KEYWORD_ICONS.items(), key=lambda x: -len(x[0])):
                 if _match_keyword(directory, keyword):
                     matched_icon = icon
                     break
@@ -383,7 +403,7 @@ class IconAssigner:
             # 优先尝试文件名语义匹配
             matched_keyword = None
             matched_icon = None
-            for keyword, icon in KEYWORD_ICONS.items():
+            for keyword, icon in sorted(KEYWORD_ICONS.items(), key=lambda x: -len(x[0])):
                 if _match_keyword(filename, keyword):
                     matched_keyword = keyword
                     matched_icon = icon
@@ -518,7 +538,7 @@ class IconAssigner:
 
         # 5. 分配目录图标
         print("4. 分配目录图标...")
-        used_icons = set(self.existing_icons.values())
+        used_icons = set() if not skip_existing else set(self.existing_icons.values())
         dir_icons = self.assign_directory_icons(directories, used_icons, skip_existing)
 
         # 6. 分配文件图标
