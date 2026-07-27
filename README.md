@@ -86,11 +86,19 @@ Codex / Claude Code 自定义技能插件。
 
 ## 安装
 
-将仓库克隆到 Codex 或 Claude Code 的用户技能目录，启动时自动发现：
+### Codex
 
 ```bash
 git clone https://github.com/mi4646/my-skills.git ~/.codex/skills/my-skills
 ```
+
+### Claude Code
+
+```bash
+git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
+```
+
+克隆后重启应用，技能自动发现。
 
 ## 使用方式
 
@@ -115,7 +123,9 @@ git clone https://github.com/mi4646/my-skills.git ~/.codex/skills/my-skills
 /my-skills:hallmark
 /my-skills:obsidian-icon-assigner
 /my-skills:opencode-model-optimizer
+/my-skills:playlist-organizer
 /my-skills:release-skills
+/my-skills:storage-analyzer
 /my-skills:update-version
 /my-skills:weekly-report
 ```
@@ -132,13 +142,3 @@ git clone https://github.com/mi4646/my-skills.git ~/.codex/skills/my-skills
 请使用 my-skills:weekly-report 生成本周周报
 ```
 
-## 开发
-
-### 构建产出
-
-技能开发过程中，子任务（subagent）可能在工作区生成 `.superpowers/` 目录存放阶段性报告。该目录已加入 `.gitignore`，不会进入版本控制。
-如需清理工作区内的 `.superpowers/`：
-
-```bash
-rm -rf .superpowers/
-```
