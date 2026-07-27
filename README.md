@@ -1,6 +1,6 @@
 # My Skills
 
-Claude Code 自定义技能插件。
+Codex / Claude Code 自定义技能插件。
 
 ## 技能列表
 
@@ -32,6 +32,7 @@ Claude Code 自定义技能插件。
 - 支持增量更新、试运行、强制重新分配
 - 基于 SHA256 哈希的确定性映射，同一文件路径始终获得相同结果
 - 300+ Lucide 图标支持
+- 中文关键词优先匹配（按长度降序），场景化覆盖更精准
 
 ### [opencode-model-optimizer](./skills/opencode-model-optimizer)
 
@@ -85,10 +86,10 @@ Claude Code 自定义技能插件。
 
 ## 安装
 
-将仓库克隆到 Claude Code 的用户技能目录，启动时自动发现：
+将仓库克隆到 Codex 或 Claude Code 的用户技能目录，启动时自动发现：
 
 ```bash
-git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
+git clone https://github.com/mi4646/my-skills.git ~/.codex/skills/my-skills
 ```
 
 ## 使用方式
@@ -121,7 +122,7 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 
 或在提示词中指定技能名称：
 
-```
+```text
 请使用 my-skills:baoyu-design 设计一个登录页面原型
 请使用 my-skills:hallmark 设计一个反 AI 模板化的页面
 请使用 my-skills:obsidian-icon-assigner 为我的知识库分配图标
@@ -129,4 +130,15 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 请使用 my-skills:release-skills 发布新版本
 请使用 my-skills:update-version 更新版本号
 请使用 my-skills:weekly-report 生成本周周报
+```
+
+## 开发
+
+### 构建产出
+
+技能开发过程中，子任务（subagent）可能在工作区生成 `.superpowers/` 目录存放阶段性报告。该目录已加入 `.gitignore`，不会进入版本控制。
+如需清理工作区内的 `.superpowers/`：
+
+```bash
+rm -rf .superpowers/
 ```
