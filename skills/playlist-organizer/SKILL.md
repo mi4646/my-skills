@@ -1,6 +1,7 @@
 ---
 name: playlist-organizer
-description: 当用户有一份音乐收藏、喜欢列表导出、歌单分享链接、本地 txt/csv 歌曲列表或从音乐 App 复制的曲目清单，想把它排序、分类、拆分成多个歌单或整理以便导入时使用。触发词包括“整理歌单”“分类”“拆分成歌单”“做成运动/专注/夜晚歌单”“排序”“导入”，以及提到网易云、QQ音乐、Spotify 或本地歌曲列表时。
+description: 当用户有一份音乐收藏、喜欢列表导出、歌单分享链接、本地 txt/csv 歌曲列表或从音乐 App 复制的曲目清单，想把它排序、分类、拆分成多个歌单或整理以便导入时使用。触发词包括"整理歌单""分类""拆分成歌单""做成运动/专注/夜晚歌单""排序""导入"，以及提到网易云、QQ音乐、Spotify 或本地歌曲列表时。
+version: v1.0.0
 ---
 
 # Playlist Organizer
@@ -197,3 +198,4 @@ Before final response:
 4. State any limitations, especially uncertain classifications or link extraction steps the user still needs to perform.
 
 If tests or generation fail, report the actual error and fix it before claiming completion.
+version: v1.0.0

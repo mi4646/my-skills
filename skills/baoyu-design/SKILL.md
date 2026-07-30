@@ -11,7 +11,8 @@ description: >-
   (deck-stage / this skill's slide-structured HTML), NOT arbitrary HTML, so confirm the
   target is such a deck first. Also use for setting up, importing, or authoring reusable
   design systems, UI kits, brand tokens, or component libraries. Harness-agnostic for
-  Claude Code, Cursor, Codex Agent, and similar file-capable agents.
+ Claude Code, Cursor, Codex Agent, and similar file-capable agents.
+version: v1.0.0
 ---
 
 # Design
@@ -49,3 +50,4 @@ You are an expert designer producing design artifacts as HTML on the user's beha
 ## Notes
 - `system-prompt.md` is the single source of truth for craft; `references/<harness>.md` is the single source of truth for which tool to call. This file just orchestrates the entry flow.
 - Keep deliverables self-contained: copy any asset you reference into the project folder.
+version: v1.0.0

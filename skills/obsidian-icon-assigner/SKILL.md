@@ -1,6 +1,7 @@
 ---
 name: obsidian-icon-assigner
 description: 为Obsidian知识库的Markdown文档自动分配Iconic插件的图标和颜色。目录级颜色继承，文件级图标保持不重复，同一个库内文件和目录无图标冲突。文件名语义匹配优先（关键词→同类别图标），分类回退，全量哈希去重。当用户需要为Obsidian文档批量设置视觉标识、整理知识库视觉层次、或需要一致的图标配色方案时，使用此技能。特别适用于新知识库初始化、目录结构调整后重新分配图标、或需要批量更新大量未设置图标的文档。
+version: v1.0.0
 ---
 
 # Obsidian 图标自动分配器
@@ -141,3 +142,4 @@ cp .obsidian/plugins/iconic/data.json.20240420_143025.bak .obsidian/plugins/icon
 ---
 
 *技能设计遵循"最小惊讶原则"，用户手动设置的图标和颜色始终优先分配。*
+version: v1.0.0

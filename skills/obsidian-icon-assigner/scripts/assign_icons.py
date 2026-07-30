@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Obsidian Iconic 图标自动分配器
 
@@ -72,7 +72,7 @@ ICON_CATEGORIES = {
         "lucide-lightbulb", "lucide-brain", "lucide-target"
     ],
     "nature": [
-        "lucide-leaf", "lucide-tree", "lucide-flower", "lucide-mountain",
+        "lucide-leaf", "lucide-tree-pine", "lucide-flower", "lucide-mountain",
         "lucide-sun", "lucide-moon", "lucide-cloud"
     ],
     "transport": [
@@ -148,9 +148,11 @@ KEYWORD_ICONS = {
     "网络": "lucide-network",
     "开发": "lucide-code-2",
     # ===== 中文专有名词映射（更长关键词优先于 AI 等短词） =====
-    "ClaudeCode": "lucide-sparkles",
-    "OpenClaw": "lucide-bot",
-    "基础概念": "lucide-book",
+   "ClaudeCode": "lucide-sparkles",
+   "OpenClaw": "lucide-bot",
+    "git": "lucide-git-branch",
+    "Git": "lucide-git-branch",
+   "基础概念": "lucide-book",
     "工具使用": "lucide-tool",
     "提示词技巧": "lucide-message-square",
     "资源收集": "lucide-bookmark",
@@ -491,9 +493,9 @@ class IconAssigner:
                 self.config['fileIcons'][file_path]['icon'] = icon
 
                 # 设置颜色：使用文件所在目录的颜色
-                dir_path = '/'.join(file_path.split('/')[:-1])
-                if dir_path and dir_path in dir_colors:
-                    self.config['fileIcons'][file_path]['color'] = dir_colors[dir_path]
+               dir_path = '/'.join(file_path.split('/')[:-1])
+               if dir_path and dir_path in dir_colors:
+                   self.config['fileIcons'][file_path]['color'] = dir_colors[dir_path]
 
         # 确保目录也有图标和颜色记录（用于未来继承）
         for dir_path, color in dir_colors.items():
@@ -619,3 +621,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+                elif not dir_path:
+                    # 根目录文件：基于文件名哈希生成HSL颜色
+                    hash_bytes = hashlib.sha256(file_path.encode()).digest()
+                    hue = int.from_bytes(hash_bytes[:2], 'big') % 360
+                    self.config['fileIcons'][file_path]['color'] = f"hsl({hue}, 70%, 50%)"

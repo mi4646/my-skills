@@ -8,6 +8,7 @@ metadata:
   trigger: 根据代码修改更新版本号，维护 update_info.txt 和 version 文件
   author: custom
 user-invocable: true
+version: v1.0.0
 ---
 
 # Update Version: 自动更新版本号
@@ -187,3 +188,4 @@ v2.3.8
 
 `update_info.txt` 和 `version` 文件已更新，可以提交了。
 ```
+version: v1.0.0
