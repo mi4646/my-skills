@@ -14,6 +14,15 @@ Codex / Claude Code 自定义技能插件。
 - 跨平台兼容 Claude Code / Cursor / Codex Agent
 - **第三方技能**，来源：[jimliu/baoyu-design](https://github.com/jimliu/baoyu-design)
 
+### [grill-me](./skills/grill-me)
+
+无代码库的无状态审讯——一次一个问题磨你的计划/决定，直到共享理解达成，不保存任何东西。
+
+- 每问附推荐答案，能查的事实绝不问你，决策才归你
+- 无状态：不建 `CONTEXT.md`，不留痕
+- 没有代码库时磨想法/决定的入口
+- **第三方技能**，来源：[mattpocock/skills](https://github.com/mattpocock/skills)
+
 ### [hallmark](./skills/hallmark)
 
 反 AI 设计技能，适用于新建页面、设计审计、改版和从 URL/截图提取设计 DNA。
@@ -50,6 +59,15 @@ Codex / Claude Code 自定义技能插件。
 - 支持本地 txt/csv、复制文本，以及 GoMusic 风格的“链接先转歌曲清单”工作流
 - 内置 Python 脚本生成多个导入友好的 txt 歌单和 `生成报告.txt`
 
+### [prototype](./skills/prototype)
+
+一次性原型回答设计问题——逻辑/状态机用可交互终端小应用，UI 用同一路由的多种可切换变体。
+
+- 逻辑分支 → 可交互终端应用；UI 分支 → 多种 UI 变体切换
+- 用完即弃：答案留档到一次性分支，主分支只保留验证过的决策
+- 纸面上定不下来的状态机、业务逻辑、界面观感时触发
+- **第三方技能**，来源：[mattpocock/skills](https://github.com/mattpocock/skills)
+
 ### [release-skills](./skills/release-skills)
 
 通用发布工作流，支持多语言变更日志，自动检测版本文件和 changelog。
@@ -58,6 +76,23 @@ Codex / Claude Code 自定义技能插件。
 - 自动检测项目类型并选择合适的版本文件与发布策略
 - 支持历史发布回填、通用项目发布
 - 可自定义：Release URL 模板、版本文件、变更日志路径
+
+### [research](./skills/research)
+
+派后台 agent 调研一手资料——只查高可信一手来源，每个论断溯源，写带引用的 Markdown 笔记进仓库。
+
+- 后台 agent 并行调研，主线程继续干活
+- 只信官方文档、源码、规范，不取二手转述
+- **第三方技能**，来源：[mattpocock/skills](https://github.com/mattpocock/skills)
+
+### [resolving-merge-conflicts](./skills/resolving-merge-conflicts)
+
+逐 hunk 解决合并冲突——找两侧一手来源理解原始意图，尽量保住双方意图，绝不 `--abort`。
+
+- 每个冲突定位两侧提交/PR/issue 还原意图
+- 冲突不可调和时按合并目标选择并说明代价
+- 解决完跑项目自动化检查再完成合并
+- **第三方技能**，来源：[mattpocock/skills](https://github.com/mattpocock/skills)
 
 ### [storage-analyzer](./skills/storage-analyzer)
 
@@ -114,6 +149,10 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 /storage-analyzer
 /update-version
 /weekly-report
+/grill-me
+/prototype
+/research
+/resolving-merge-conflicts
 ```
 
 或使用带插件命名空间的完整命令：
@@ -128,6 +167,10 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 /my-skills:storage-analyzer
 /my-skills:update-version
 /my-skills:weekly-report
+/my-skills:grill-me
+/my-skills:prototype
+/my-skills:research
+/my-skills:resolving-merge-conflicts
 ```
 
 或在提示词中指定技能名称：
