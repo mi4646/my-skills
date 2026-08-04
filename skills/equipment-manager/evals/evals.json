@@ -1,0 +1,49 @@
+{
+  "skill_name": "equipment-manager",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "wshobson 的 agents 仓库刚才 git pull 过了，好像加了一些新 skill。我主要是做 Python 后端和 LLM 应用的，你帮我从里面挑几个值得装到全局 ~/.claude/skills 的，给出推荐清单和理由。装的时候我想用复制方式，不要软链。先出方案，别真装。",
+      "expected_output": "增量识别新增 skill + 查重跳过已装 + 按复制方式给方案",
+      "expectations": [
+        "输出应使用 git log 或对比仓库档案识别『新增』的 skill，而非罗列整个仓库",
+        "输出应先识别本地已装的同源项并跳过/标注，不重复推荐",
+        "输出应按用户指定的复制(cp)方式给安装方案"
+      ],
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "我本地 ~/.claude/agents 下装了一堆 engineering 开头的 agent，感觉太多太杂，帮我精简一下。先给我一份保留/待定/删除的三档清单，别真删，等我确认。",
+      "expected_output": "三档清单 + 待定项明确倾向 + 统一备份路径",
+      "expectations": [
+        "输出三档中『待定』项应给出明确留/删倾向，而非含糊",
+        "删除方案应使用 ~/.claude/backups/ 统一备份路径，而非 mv .bak 临时改名",
+        "保留/删除理由应基于扫描真实项目栈（/var/www）判断方向"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "mattpocock 的 skills 仓库里有个 skill 叫 grill-me，帮我装到 my-skills 里，用软链。先检查是不是已经装过了，再给安装方案。",
+      "expected_output": "明确告知已装重复 + 内容一致性检查 + 软链方案含备份",
+      "expectations": [
+        "输出应明确告知『grill-me 已安装』并说明当前安装方式（复制/软链）",
+        "输出应检查本地副本与仓库源内容一致性（diff）再决定方案",
+        "软链转换的备份步骤应使用 cp 到 ~/.claude/backups/，而非 mv .bak"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我准备接入一个新的第三方 skill 仓库，git clone 到本地 ~/new-skill-repo，里面是 agents 和 skills 混合的。你按装备管理的流程帮我出一份接入方案——要建什么档案、怎么登记、description 怎么改。先出方案别动手。",
+      "expected_output": "五步接入流程 + 档案模板 + 克制边界声明",
+      "expectations": [
+        "输出应按『确认来源→摸清结构→建档案→登记表格→更新 description』五步组织",
+        "输出应给出 references/ 档案文件的具体模板/五段式结构",
+        "输出应声明不动通用方法论、不擅自执行安装"
+      ],
+      "files": []
+    }
+  ]
+}
