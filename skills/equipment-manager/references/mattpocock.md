@@ -18,5 +18,3 @@
 ## 坑位与约定
 - 每个技能可能带 `agents/openai.yaml`（面向 Codex/OpenAI 宿主，Claude Code 忽略），改动时注意保持同步
 
-## 已知实践（2026-08）
-- my-skills 生态已引入 4 个本仓库技能：`grill-me`、`prototype`、`research`、`resolving-merge-conflicts`

@@ -29,5 +29,3 @@
   [ -e <target> ] && echo OK || echo BROKEN    # 判断目标是否还存在
   ```
 
-## 已知实践（2026-08）
-- 项目 `/var/www/demo/.claude/skills/` 下 15 个知识包（python-×5、postgresql、api-design、openapi、prompt-engineering、llm-evaluation、rag、architecture-×2、bash-defensive、uv）是指向本仓库的符号链接；复制到全局 `~/.claude/skills/` 后同样为链接

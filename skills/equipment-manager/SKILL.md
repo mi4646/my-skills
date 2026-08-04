@@ -1,12 +1,12 @@
 ---
 name: equipment-manager
-description: 管理本地已装第三方 Claude skill 与 agent 的盘点、评估、精简、接入时用本技能：想盘点自己装了哪些 skill/agent、各来自哪个仓库？某仓库 git pull 或 clone 后，想评估新增的 skill/agent 值不值得装？想从某仓库装 skill/agent 到 my-skills、~/.claude/skills 或 ~/.claude/agents？想删掉/清理用不上的旧装备、查重去重？本技能先盘点、列清单给选项，你拍板才动手，不擅自改文件。已接入 msitarzewski/agency-agents、wshobson/agents、mattpocock/skills，新仓库可随时接入。注意：本技能只管理『skill/agent 装备本身』，不处理改代码、优化性能、写文档、数据处理等普通开发任务。
-version: v1.2.0
+description: 管理本地已装第三方 Claude skill 与 agent 的盘点、评估、精简、接入时用本技能：想盘点自己装了哪些 skill/agent、各来自哪个仓库？某仓库 git pull 或 clone 后，想评估新增的 skill/agent 值不值得装？想从某仓库装 skill/agent 到 my-skills、~/.claude/skills 或 ~/.claude/agents？想删掉/清理用不上的旧装备、查重去重？本技能先盘点、给出带理由的三张清单（建议安装/待权衡项/不建议安装），你拍板才动手，不擅自改文件。已接入 msitarzewski/agency-agents、wshobson/agents、mattpocock/skills，新仓库可随时接入。注意：本技能只管理『skill/agent 装备本身』，不处理改代码、优化性能、写文档、数据处理等普通开发任务。
+version: v1.4.0
 ---
 
 # 装备管理器（Equipment Manager）
 
-管理从第三方仓库安装的 skill 与 agent，全程用**对话式流程**推进：一次一问、给选项、你拍板、才动手。**方法论一份，各仓库专属情报按仓库归档在 `references/`**——加新仓库只需加一个档案文件，方法论不动。
+管理从第三方仓库安装的 skill 与 agent，全程用**对话式流程**推进：一次一问、给选项、你拍板、才动手。**方法论一份，各仓库专属情报按仓库归档在 `references/`**；**装备状态（已装清单/评估结论）存独立台账 `~/.config/equipment-manager/state.json`**——档案只存稳定情报、状态不跟 git，加新仓库只需加一个档案文件，方法论不动。
 
 ## 使用时机
 
@@ -23,13 +23,19 @@ version: v1.2.0
 | `references/wshobson.md` | wshobson/agents（Marketplace） | plugins 多域结构，符号链接惯例 |
 | `references/mattpocock.md` | mattpocock/skills | 按 domain 分目录，link-skills.sh |
 
+## 装备状态台账
+
+- **档案只存稳定情报**（基本信息/目录结构/安装机制/坑位），变更低频、进 git 语义干净
+- **已装清单与评估结论**（如"上次跳过这批的理由"）写 `~/.config/equipment-manager/state.json`，不进任何 git，装删零噪音、可被 dotfiles 同步
+- 查重以实际目录为准（`ls ~/.claude/skills/` + 软链来源识别），台账仅辅助回忆历史决策
+
 ## 接入新仓库
 
 当用户说「我新 clone 了 XX 仓库」「想接入 XX 仓库」、或提出一个新的 skill/agent 来源时：
 
 1. **确认来源**：`git -C <仓库路径> remote -v`
 2. **摸清结构**：目录结构、命名约定、安装机制（复制 vs 符号链接）
-3. **建档案**：在 `references/` 下新建档案文件（按作者或仓库名命名，仿照现有三个档案的格式：基本信息/目录结构/安装机制/坑位/已知实践）
+3. **建档案**：在 `references/` 下新建档案文件（按作者或仓库名命名，仿照现有三个档案的格式：基本信息/目录结构/安装机制/坑位），只存稳定情报
 4. **登记**：在上表加一行
 5. **更新 description**：把新仓库加入 frontmatter `description` 的「已接入」列表（保持触发精准）
 
@@ -56,14 +62,21 @@ version: v1.2.0
 
 ### 阶段三：摸底与查重（结果说人话）
 - 盘点本地：`ls ~/.claude/skills/`、`~/.claude/agents/`、`~/.claude/plugins/`，`ls -la` 识别软链来源，区分用户级/项目级
-- 识别增量：`git -C <repo> log --diff-filter=A --name-only --since="90 days"`，对照 `references/<仓库>.md` 档案区分新增与早已装，只评估新增
+- 识别增量：`git -C <repo> log --diff-filter=A --name-only --since="90 days"`，对照 `references/<仓库>.md` 档案 + `state.json` 台账区分新增与早已装，只评估新增
 - 查重：先看本地已装，同源项跳过，不重复推荐
 
 **输出必须用大白话**：什么是什么、哪来的。术语要翻译（in-progress=未完工、软链=跟着仓库更新自动传播、ticket=拆出的任务条），不许甩黑话。
 
-### 阶段四：给方案（每个决策点 2-3 个选项）
-每个决策点给 2-3 个选项带利弊，**先说我的推荐**，你选：
-- **装不装**：值得装 / 待定 / 不装，各给一句理由
+### 阶段四：给方案（先出三张带理由的表，再提问）
+摸底完成后，**先把全貌一次给全**——三张表格，每张都带理由列，让用户先看完整盘、再逐个拍板。**不要边摸底边穿插提问**。
+
+| 表 | 装什么 | 理由列要求 |
+|----|--------|-----------|
+| **建议安装** | 值得装的装备 | 每项：为何值得装 + 建议安装方式（软链/复制） |
+| **待权衡项** | 可装可不装的（依赖用户工作流/兴趣，或与现有装备部分重叠） | 每项：装与不装各自的利弊 |
+| **不建议安装** | 本地已有同类型、未完工、已废弃、太小众 | 每项：不装的具体理由 |
+
+三张表给出后，再进入逐项提问：每个决策点给 2-3 个选项带利弊，**先说我的推荐**，你选：
 - **安装方式**（须你拍板）：软链（仓库更新自动传播，省磁盘，但仓库路径变动会断链）vs 复制（独立稳定，但更新需手动重装）；默认推荐软链，听你的
 - **删不删**：给三档清单（保留/待定/删）+ 理由，等你确认
 
@@ -72,6 +85,7 @@ version: v1.2.0
 1. 覆盖/删除前先备份：`mkdir -p ~/.claude/backups/<日期>` + `cp`，不用 `mv xxx.bak`
 2. 按你选的安装方式执行（软链 `ln -s` / 复制 `cp -r`，官方脚本有软链选项优先用官方参数，具体见对应仓库档案）
 3. 验证：文件存在且非空；软链 `readlink` 确认目标存在、目标目录有 `SKILL.md`
+4. 同步台账：装/删后更新 `~/.config/equipment-manager/state.json`（installed 与 notes）
 
 ### 接入新仓库（同样对话式）
 用户说"接入新仓库"时，走阶段一 B/C 分支，确认仓库路径后依次确认：来源（`git remote -v`）→ 结构（目录/命名/安装机制）→ 建档案（`references/` 下按作者或仓库名新建，仿现有三个档案）→ 登记表格 → 更新 frontmatter description。**每一步都先确认再做下一步**，不一口气全做。

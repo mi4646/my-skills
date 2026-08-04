@@ -20,5 +20,3 @@
 - 本地 `~/.claude/agents/engineering-*.md` 是该仓库复制产物（非链接）
 - `install.sh` 会覆盖同名文件
 
-## 已知实践（2026-08）
-- 本地保留 22 个 engineering-* agents；删除 22 个无方向 agent（PHP/CMS、移动/小程序、区块链、嵌入式、网络、ITIL、安全冗余），备份于 `~/.claude/backups/agents-20260804/`
