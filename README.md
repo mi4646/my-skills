@@ -136,7 +136,7 @@ rm -rf ~/.claude/skills/mattpocock ~/.claude/skills/baoyu-design \
 
 ## 使用方式
 
-安装后通过带命名空间的技能名调用：
+### 自研技能（`my-skills:` 前缀）
 
 ```
 /my-skills:obsidian-icon-assigner
@@ -148,9 +148,35 @@ rm -rf ~/.claude/skills/mattpocock ~/.claude/skills/baoyu-design \
 /my-skills:equipment-manager
 ```
 
-第三方技能：
+### mattpocock 精选（`mattpocock:` 前缀）
 
 ```
-/mattpocock:obsidian-vault   /mattpocock:grill-me   /mattpocock:domain-modeling
-/baoyu-design                /hallmark              /storage-analyzer
+/mattpocock:obsidian-vault
+/mattpocock:edit-article
+/mattpocock:git-guardrails-claude-code
+/mattpocock:grill-with-docs
+/mattpocock:domain-modeling
+/mattpocock:handoff
+/mattpocock:grill-me
+/mattpocock:prototype
+/mattpocock:research
+/mattpocock:resolving-merge-conflicts
+```
+
+### 独立第三方（无前缀）
+
+```
+/baoyu-design   /hallmark   /storage-analyzer
+```
+
+### 提示词中指定技能
+
+```text
+请使用 my-skills:obsidian-icon-assigner 为我的知识库分配图标
+请使用 my-skills:opencode-model-optimizer 推荐模型配置方案
+请使用 my-skills:release-skills 发布新版本
+请使用 my-skills:update-version 更新版本号
+请使用 my-skills:weekly-report 生成本周周报
+请使用 mattpocock:grill-with-docs 拷问并沉淀这个计划的 ADR
+请使用 baoyu-design 设计一个登录页面原型
 ```
