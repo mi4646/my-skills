@@ -44,7 +44,7 @@ git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
 bash ~/.claude/skills/my-skills/install.sh   # 一键装好第三方技能
 ```
 
-重启 Claude Code（或 `/reload-plugins`）生效。Windows 用 Git Bash 跑，自动走复制、无需开发者模式；升级跑 `install.sh --update`。
+重启 Claude Code（或 `/reload-plugins`）生效。默认全平台复制安装——软链指向 `~/skills/` 源目录，误删该目录会断链，故一律复制，不依赖软链；升级跑 `install.sh --update`（`git pull` + 强制重新复制）。
 
 ---
 

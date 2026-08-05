@@ -15,14 +15,10 @@ UPDATE=false
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 skip() { printf '  · %s 已存在，跳过\n' "$*"; }
 
-# 平台检测：Windows 默认复制（避免符号链接权限问题），Linux/macOS 默认软链
-case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*) PLATFORM="windows" ;;
-  *) PLATFORM="linux" ;;
-esac
-INSTALL_MODE="${INSTALL_MODE:-$([ "$PLATFORM" = "windows" ] && echo copy || echo symlink)}"
+# 默认复制安装：软链指向 ~/skills/ vendor 目录，误删该目录会断链，故全平台一律复制
+INSTALL_MODE="${INSTALL_MODE:-copy}"
 [ "$UPDATE" = true ] && LABEL="升级" || LABEL="安装"
-printf '  · 平台: %s | 模式: %s | 安装方式: %s\n' "$PLATFORM" "$LABEL" "$INSTALL_MODE"
+printf '  · 安装方式: %s | 模式: %s\n' "$INSTALL_MODE" "$LABEL"
 
 mkdir -p "$SKILLS_DIR" "$VENDOR_DIR"
 
