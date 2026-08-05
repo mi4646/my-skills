@@ -1,100 +1,44 @@
 # My Skills
 
-个人自研技能集合。**本仓库只含自研技能**；第三方技能由 `install.sh` 一键安装，来源一目了然、更新互不影响。三方 skill/agents/plugins 清单见 [THIRD-PARTY.md](./THIRD-PARTY.md)。
+个人自研技能集合：7 个自研技能 + install.sh 一键安装第三方技能。
+第三方装备来源独立、更新互不影响（构成与调用见文末「三方装备」）。
 
-## 技能列表（自研 7 个）
+## 速览（30 秒）
 
-### [equipment-manager](./skills/equipment-manager)
-管理从第三方仓库安装的 skill/agent——对话式流程：盘点 → 查重 → 三档筛选 → 备份安装 → 验证。
-
-### [obsidian-icon-assigner](./skills/obsidian-icon-assigner)
-为 Obsidian 知识库的 Markdown 文档自动分配 Iconic 插件的图标和颜色。
-
-- 目录级颜色继承，文件级图标尽量唯一
-- 基于 SHA256 哈希的确定性映射，同一文件路径始终获得相同结果
-- 300+ Lucide 图标，中文关键词优先匹配
-
-### [opencode-model-optimizer](./skills/opencode-model-optimizer)
-为 OpenCode Go 等平台的 Claude Code 模型层级提供分层配置推荐。
-
-- 先问后答：了解场景、预算、配额后才给方案
-- 支持分层配置、成本最优、配额友好等推荐模式
-
-### [playlist-organizer](./skills/playlist-organizer)
-将音乐收藏、歌单链接、本地 txt/csv 整理成自定义场景歌单。
-
-- 先访谈确认分类场景、覆盖规则、重复归属
-- 内置 Python 脚本生成导入友好的 txt 歌单和报告
-
-### [release-skills](./skills/release-skills)
-通用发布工作流，支持多语言 changelog，自动检测版本文件和发布策略。
-
-### [update-version](./skills/update-version)
-根据 git diff 差异自动更新版本号。
-
-### [weekly-report](./skills/weekly-report)
-根据 git commit 历史归纳本周/上周工作成果，生成结构化开发周报。
-
----
+| 技能 | 用途 | 触发 |
+|------|------|------|
+| equipment-manager | 管理第三方安装的 skill/agent：盘点→查重→三档筛选→备份安装→验证 | /my-skills:equipment-manager |
+| obsidian-icon-assigner | 为 Obsidian Markdown 分配 Iconic 图标与颜色 | /my-skills:obsidian-icon-assigner |
+| opencode-model-optimizer | 推荐 OpenCode Go 模型分层配置 | /my-skills:opencode-model-optimizer |
+| playlist-organizer | 音乐收藏整理成场景歌单 | /my-skills:playlist-organizer |
+| release-skills | 通用发布工作流，多语言 changelog | /my-skills:release-skills |
+| update-version | 依 git diff 自动更新版本号 | /my-skills:update-version |
+| weekly-report | 依 git commit 归纳周报 | /my-skills:weekly-report |
 
 ## 安装
 
 ```bash
 git clone https://github.com/mi4646/my-skills.git ~/.claude/skills/my-skills
-bash ~/.claude/skills/my-skills/install.sh   # 一键装好第三方技能
+bash ~/.claude/skills/my-skills/install.sh
 ```
 
-重启 Claude Code（或 `/reload-plugins`）生效。默认全平台复制安装——软链指向 `~/skills/` 源目录，误删该目录会断链，故一律复制，不依赖软链；升级跑 `install.sh --update`（`git pull` + 强制重新复制）。
+升级 `bash install.sh --update`（git pull + 强制重新复制）｜清单 `bash install.sh --list`。
+重启 Claude Code（或 /reload-plugins）生效。（复制安装不依赖软链，误删 ~/skills 不中断）
 
----
+## 技能索引
 
-三方装备（skill/agents/plugins 构成、来源与维护）详见 [THIRD-PARTY.md](./THIRD-PARTY.md)，实时清单用 `bash install.sh --list` 查看。
+每个技能的完整工作流见其目录的 SKILL.md；一句话用途与触发命令见「速览」总表。
+（技能索引区为未来扩展位——截图、示例、更新记录可挂在各 H3 下。）
 
----
+### equipment-manager → [skills/equipment-manager/](./skills/equipment-manager/)
+### obsidian-icon-assigner → [skills/obsidian-icon-assigner/](./skills/obsidian-icon-assigner/)
+### opencode-model-optimizer → [skills/opencode-model-optimizer/](./skills/opencode-model-optimizer/)
+### playlist-organizer → [skills/playlist-organizer/](./skills/playlist-organizer/)
+### release-skills → [skills/release-skills/](./skills/release-skills/)
+### update-version → [skills/update-version/](./skills/update-version/)
+### weekly-report → [skills/weekly-report/](./skills/weekly-report/)
 
-## 使用方式
+## 三方装备
 
-### 自研技能（`my-skills:` 前缀）
-
-```
-/my-skills:obsidian-icon-assigner
-/my-skills:opencode-model-optimizer
-/my-skills:playlist-organizer
-/my-skills:release-skills
-/my-skills:update-version
-/my-skills:weekly-report
-/my-skills:equipment-manager
-```
-
-### mattpocock 精选（`mattpocock:` 前缀）
-
-```
-/mattpocock:obsidian-vault
-/mattpocock:edit-article
-/mattpocock:git-guardrails-claude-code
-/mattpocock:grill-with-docs
-/mattpocock:domain-modeling
-/mattpocock:handoff
-/mattpocock:grill-me
-/mattpocock:prototype
-/mattpocock:research
-/mattpocock:resolving-merge-conflicts
-```
-
-### 独立第三方（无前缀）
-
-```
-/baoyu-design   /hallmark   /storage-analyzer
-```
-
-### 提示词中指定技能
-
-```text
-请使用 my-skills:obsidian-icon-assigner 为我的知识库分配图标
-请使用 my-skills:opencode-model-optimizer 推荐模型配置方案
-请使用 my-skills:release-skills 发布新版本
-请使用 my-skills:update-version 更新版本号
-请使用 my-skills:weekly-report 生成本周周报
-请使用 mattpocock:grill-with-docs 拷问并沉淀这个计划的 ADR
-请使用 baoyu-design 设计一个登录页面原型
-```
+mattpocock、baoyu-design、hallmark、storage-analyzer 由 install.sh 一键安装，来源独立、更新互不影响。
+构成、来源、维护与全部调用命令（`/mattpocock:*`、`/baoyu-design`、`/hallmark`、`/storage-analyzer`）见 [THIRD-PARTY.md](./THIRD-PARTY.md)。

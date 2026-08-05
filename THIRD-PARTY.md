@@ -28,4 +28,26 @@
 - 安装：`bash install.sh`（幂等，已装跳过）
 - 升级：`bash install.sh --update`（`git pull` + 强制重新复制）
 - 实时清单：`bash install.sh --list`
-- 调用方式：见主 README「使用方式」章节
+
+### 调用方式
+
+**mattpocock 精选（`mattpocock:` 前缀）**
+
+```
+/mattpocock:obsidian-vault
+/mattpocock:edit-article
+/mattpocock:git-guardrails-claude-code
+/mattpocock:grill-with-docs
+/mattpocock:domain-modeling
+/mattpocock:handoff
+/mattpocock:grill-me
+/mattpocock:prototype
+/mattpocock:research
+/mattpocock:resolving-merge-conflicts
+```
+
+**独立第三方（无前缀）**
+
+```
+/baoyu-design   /hallmark   /storage-analyzer
+```
