@@ -10,7 +10,11 @@ SKILLS_DIR="${HOME}/.claude/skills"
 VENDOR_DIR="${HOME}/skills"
 
 UPDATE=false
-[ "${1:-}" = "--update" ] && UPDATE=true
+LIST=false
+case "${1:-}" in
+  --update) UPDATE=true ;;
+  --list)   LIST=true ;;
+esac
 
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 skip() { printf '  · %s 已存在，跳过\n' "$*"; }
@@ -18,17 +22,52 @@ skip() { printf '  · %s 已存在，跳过\n' "$*"; }
 # 默认复制安装：软链指向 ~/skills/ vendor 目录，误删该目录会断链，故全平台一律复制
 INSTALL_MODE="${INSTALL_MODE:-copy}"
 [ "$UPDATE" = true ] && LABEL="升级" || LABEL="安装"
-printf '  · 安装方式: %s | 模式: %s\n' "$INSTALL_MODE" "$LABEL"
+[ "$LIST" = false ] && printf '  · 安装方式: %s | 模式: %s\n' "$INSTALL_MODE" "$LABEL"
+
+# 三方装备元数据（来源与下方 repo URL 同源）
+EQUIP=(
+  "mattpocock|github.com/mattpocock/skills"
+  "baoyu-design|github.com/jimliu/baoyu-design"
+  "hallmark|github.com/nutlope/hallmark"
+  "storage-analyzer|github.com/KKKKhazix/khazix-skills"
+)
+
+# 三方装备清单：扫描已安装目录实时统计（不联网、不写盘）
+if [ "$LIST" = true ]; then
+  printf '\n\033[1;36m==> 三方装备清单\033[0m\n'
+  printf '%-16s %-6s %-8s %-8s %s\n' "资产" "插件" "技能数" "agents" "来源"
+  for kv in "${EQUIP[@]}"; do
+    name="${kv%%|*}"; repo="${kv#*|}"
+    d="$SKILLS_DIR/$name"
+    plugin=$([ -f "$d/.claude-plugin/plugin.json" ] && echo ✓ || echo -)
+    n=0
+    [ -d "$d/skills" ] && n=$((n + $(ls "$d/skills" | wc -l)))
+    [ -f "$d/SKILL.md" ] && n=$((n + 1))
+    [ -d "$d/built-in-skills" ] && n=$((n + $(ls "$d/built-in-skills" | wc -l)))
+    a=0
+    [ -d "$d/agents" ] && a=$(find "$d/agents" -maxdepth 1 -name '*.md' | wc -l)
+    printf '%-16s %-6s %-8s %-8s %s\n' "$name" "$plugin" "$n" "$a" "$repo"
+  done
+  exit 0
+fi
 
 mkdir -p "$SKILLS_DIR" "$VENDOR_DIR"
 
-# 仓库：不存在则 clone；--update 时 git pull
+# 仓库：有 .git 则 --update 时 git pull；目录存在但无 .git（如手动复制）则 --update 时重装 clone、否则跳过；不存在则 clone
 repo() {
   local url="$1" dir="$2"
   if [ -d "$dir/.git" ]; then
     if [ "$UPDATE" = true ]; then
       echo "  · git pull: $dir"
       git -C "$dir" pull --ff-only 2>&1 | sed 's/^/    /' || true
+    fi
+  elif [ -d "$dir" ]; then
+    if [ "$UPDATE" = true ]; then
+      echo "  · 无 .git，重装 clone: $dir"
+      rm -rf "$dir"
+      git clone --depth 1 "$url" "$dir"
+    else
+      echo "  · $dir 已存在（无 .git），跳过"
     fi
   else
     git clone --depth 1 "$url" "$dir"

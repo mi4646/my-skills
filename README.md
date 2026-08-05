@@ -48,6 +48,31 @@ bash ~/.claude/skills/my-skills/install.sh   # 一键装好第三方技能
 
 ---
 
+## 三方装备（install.sh 安装）
+
+第三方技能、agents、插件由 `install.sh` 一键安装，来源独立、更新互不影响。实时清单用 `bash install.sh --list` 查看。
+
+### Skills
+
+- **mattpocock** — 插件，mattpocock/skills 精选 10 个技能，命名空间 `mattpocock:`，来源 `github.com/mattpocock/skills`
+- **baoyu-design** — 技能 + 内置子技能/agents，前端与设计原型，除主技能外内置 50 余个流程子技能与 3 个只读子代理，来源 `github.com/jimliu/baoyu-design`
+- **hallmark** — 纯技能，反 AI 味的网页设计指导，来源 `github.com/nutlope/hallmark`
+- **storage-analyzer** — 技能 + Python 脚本，存储空间分析，来源 `github.com/KKKKhazix/khazix-skills`
+
+### Agents
+
+仅 baoyu-design 自带 3 个只读子代理，由主流程内部 spawn，**无全局调用命令**：
+
+- **vision-probe-agent** — 任务前探测当前模型/提供商是否支持图像输入
+- **fork-verifier-agent** — 校验刚生成的设计交付物，回报 `done` / `needs_work`
+- **design-system-checker** — 只读校验便携设计系统，输出一行健康摘要
+
+### Plugins
+
+仅 mattpocock 是插件（`.claude-plugin/plugin.json` 声明），其余为独立技能目录。
+
+---
+
 ## 使用方式
 
 ### 自研技能（`my-skills:` 前缀）
