@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-Claude Code 自定义技能插件，包含七个自研技能与七个第三方技能。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
+Claude Code 自定义技能插件，只含七个自研技能（第三方技能已迁出，各自独立安装，见 README 部署备忘录）。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
 
 ## 技能架构
 
@@ -17,13 +17,6 @@ Claude Code 自定义技能插件，包含七个自研技能与七个第三方�
 - **update-version**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则直接执行 git diff 分析和文件写入
 - **weekly-report**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则执行 git log 并归纳周报
 - **equipment-manager**：纯指令方法论技能，管理多个第三方 skill/agent 仓库的安装/筛选/精简；通用七步流程（盘点→查重→三档筛选→提问→备份安装→验证）+ `references/` 下按作者归档专属情报（msitarzewski / wshobson / mattpocock）
-- **baoyu-design**：第三方全功能设计技能（来源 [jimliu/baoyu-design](https://github.com/jimliu/baoyu-design)），用 HTML 创建设计原型、交互原型、PPT 等设计产物，含 Figma 导入、设计系统管理等子技能
-- **hallmark**：第三方设计技能，反 AI 设计风格，含 40+ 组件原型与 20+ 宏观结构参考，适用于新建页面、审计、改版和从 URL/截图提取设计 DNA
-- **storage-analyzer**：第三方脚本技能（来源 [KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills/)），只读扫描磁盘占用并生成分级清理 HTML 报告
-- **grill-me**：第三方无状态审讯（来源 mattpocock/skills），无代码库时磨计划/决定，不保存任何东西
-- **prototype**：第三方原型技能（来源 mattpocock/skills），用一次性可运行原型回答逻辑/状态机/UI 设计问题
-- **research**：第三方调研技能（来源 mattpocock/skills），派后台 agent 查一手来源、写带引用的 repo 笔记
-- **resolving-merge-conflicts**：第三方冲突解决技能（来源 mattpocock/skills），逐 hunk 保留双方意图、绝不 abort
 
 ### evals
 
@@ -35,5 +28,5 @@ Claude Code 自定义技能插件，包含七个自研技能与七个第三方�
 - 脚本路径使用 `${CLAUDE_PLUGIN_ROOT}` 环境变量，不硬编码路径
 - 所有技能面向中文用户，SKILL.md 和输出均为中文
 - `update-version` 依赖 `humanizer-zh` 技能优化文本
-- 从 mattpocock/skills 引入的四个技能各带 `agents/openai.yaml`（面向 Codex/OpenAI 宿主的调用策略，Claude Code 忽略），改动时注意保持同步
+- 第三方技能（mattpocock 精选、baoyu-design、hallmark、storage-analyzer）已迁出，位于 `~/.claude/skills/` 各独立目录，不在本仓库维护
 - 插件名称在 `.claude-plugin/plugin.json` 中定义，安装后技能命名空间为 `my-skills:<skill-name>`
