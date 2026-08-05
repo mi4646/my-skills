@@ -4,12 +4,12 @@
 
 ## Skills
 
-| 资产 | 类型 | 内含 | 来源 |
-|---|---|---|---|
-| mattpocock | 插件 | 10 个技能，命名空间 `mattpocock:` | `github.com/mattpocock/skills` |
-| baoyu-design | 技能 + 内置子技能/agents | 主技能 + 50 余个流程子技能 + 3 只读子代理 | `github.com/jimliu/baoyu-design` |
-| hallmark | 纯技能 | 1 | `github.com/nutlope/hallmark` |
-| storage-analyzer | 技能 + Python 脚本 | 1 | `github.com/KKKKhazix/khazix-skills` |
+| 资产 | 类型 | 用途 | 内含 | 来源 |
+|---|---|---|---|---|
+| mattpocock | 插件 | 精选个人工作流技能集：写作、原型、研究、Git 协作等 | 10 个技能，命名空间 `mattpocock:` | `github.com/mattpocock/skills` |
+| baoyu-design | 技能 + 内置子技能/agents | 设计原型生成：网页、PPT、图表、设计系统等交付物 | 主技能 + 50 余个流程子技能 + 3 只读子代理 | `github.com/jimliu/baoyu-design` |
+| hallmark | 纯技能 | 反 AI 味设计指导：新页面 / 重设计 / 审计 | 1 | `github.com/nutlope/hallmark` |
+| storage-analyzer | 技能 + Python 脚本 | 磁盘 / 仓库存储占用扫描分析 | 1 | `github.com/KKKKhazix/khazix-skills` |
 
 ## Agents
 
