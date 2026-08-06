@@ -1,0 +1,10 @@
+{
+  "eval_id": 2,
+  "eval_name": "install-dedup",
+  "prompt": "mattpocock 的 skills 仓库里有个 skill 叫 grill-me，帮我装到 my-skills 里，用软链。先检查是不是已经装过了，再给安装方案。",
+  "assertions": [
+    {"name": "explicit-duplicate-notice", "description": "明确告知已装重复+当前方式", "text": "输出应明确告知『grill-me 已安装』并说明当前安装方式（复制/软链）"},
+    {"name": "content-consistency-check", "description": "检查本地与源内容一致性", "text": "输出应检查本地副本与仓库源内容一致性（diff）再决定方案"},
+    {"name": "backup-cp-not-mv", "description": "备份用 cp 到 backups", "text": "软链转换的备份步骤应使用 cp 到 ~/.claude/backups/，而非 mv .bak"}
+  ]
+}

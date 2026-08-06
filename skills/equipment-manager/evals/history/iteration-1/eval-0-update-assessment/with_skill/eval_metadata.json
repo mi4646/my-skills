@@ -1,0 +1,10 @@
+{
+  "eval_id": 0,
+  "eval_name": "update-assessment",
+  "prompt": "wshobson 的 agents 仓库刚才 git pull 过了，好像加了一些新 skill。我主要是做 Python 后端和 LLM 应用的，你帮我从里面挑几个值得装到全局 ~/.claude/skills 的，给出推荐清单和理由。装的时候我想用复制方式，不要软链。先出方案，别真装。",
+  "assertions": [
+    {"name": "user-stack-filtering", "description": "推荐理由基于用户真实项目栈", "text": "输出应说明推荐理由与 Python 后端/LLM 等用户方向相关，而非泛泛而谈"},
+    {"name": "copy-not-symlink", "description": "尊重用户指定复制安装方式", "text": "输出应明确用复制(cp)而非软链(ln -s)安装"},
+    {"name": "plan-not-action", "description": "产出方案而非直接动手", "text": "输出应是推荐清单/方案，不包含实际安装执行动作"}
+  ]
+}

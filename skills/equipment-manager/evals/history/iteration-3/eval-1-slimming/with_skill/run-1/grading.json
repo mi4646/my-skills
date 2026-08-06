@@ -1,0 +1,63 @@
+{
+  "expectations": [
+    {
+      "text": "输出三档中『待定』项应给出明确留/删倾向，而非含糊",
+      "passed": true,
+      "evidence": "待定档 7 个 agent 表格每行均有\"明确倾向\"列并给出倾向，如\"engineering-email-intelligence-engineer —— **倾向删**\"\"engineering-incident-response-commander —— **倾向删**；仅当你本人负责生产运维时留\"等，无含糊项。"
+    },
+    {
+      "text": "删除方案应使用 ~/.claude/backups/ 统一备份路径，而非 mv .bak 临时改名",
+      "passed": true,
+      "evidence": "第三节执行方案第 1 条：\"备份：全部 15 个已在 `~/.claude/backups/agents-20260804/`（今天已统一备份，不是 mv .bak 临时改名）\"。"
+    },
+    {
+      "text": "保留/删除理由应基于扫描真实项目栈（/var/www）判断方向",
+      "passed": true,
+      "evidence": "第一节第 3 条：\"/var/www 扫描：以 **Python 后端为主**（rc-api-server / rc-api-server2 / rc-platform2 / shy_empower / vietguard2 / xiaochu / weather-agent / captcha-ocr-server，Django/FastAPI + Celery）\"；删除档理由均对照项目栈，如\"engineering-cms-developer —— Drupal/WordPress 主题与插件，/var/www 无任何 CMS 项目\"。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 130.4,
+    "duration_ms": 130431
+  },
+  "claims": [
+    {
+      "claim": "~/.claude/agents/ 当前为空，15 个 engineering agent 已统一备份到 ~/.claude/backups/agents-20260804/",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第一节第 1 条明确描述此状态"
+    },
+    {
+      "claim": "备份文件与源仓库 14/15 逐字节一致，唯一差异为 engineering-solidity-smart-contract-engineer.md",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第一节第 2 条给出对比结论"
+    },
+    {
+      "claim": "已装 15 个 agent 均为垂直领域特化，7 个领域本机不存在、7 个沾边、1 个通用兜底",
+      "type": "quality",
+      "verified": true,
+      "evidence": "第一节第 4 条结论与二节三档清单一致（保留1+待定7+删7=15）"
+    },
+    {
+      "claim": "仅出清单未删改任何文件",
+      "type": "process",
+      "verified": true,
+      "evidence": "标题\"仅清单与方案，未删改任何文件\"与第三节硬闸门声明"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "with_skill 与 old_skill 在未断言细节上不一致：with_skill 称备份目录同目录有\"6 个 security-* agent\"，old_skill 称\"7 个 security-* agent\"。该数字无法从 outputs 独立核验，无断言覆盖"
+      }
+    ],
+    "overall": "三条断言均具区分度且全部通过，未发现其他缺口。"
+  }
+}

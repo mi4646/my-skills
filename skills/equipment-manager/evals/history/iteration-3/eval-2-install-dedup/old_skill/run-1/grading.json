@@ -1,0 +1,54 @@
+{
+  "expectations": [
+    {
+      "text": "输出应明确告知『grill-me 已安装』并说明当前安装方式（复制/软链）",
+      "passed": true,
+      "evidence": "开头结论：\"grill-me 已经装过了，装的是「复制」不是「软链」\"；第①节盘点表：\"grill-me 本地副本：存在；副本形态：真实目录（复制），非符号链接（readlink 无输出）\"。"
+    },
+    {
+      "text": "输出应检查本地副本与仓库源内容一致性（diff）再决定方案",
+      "passed": true,
+      "evidence": "第③节：\"内容一致性：`diff -r` 源目录 vs 本地副本 → **IDENTICAL**，SKILL.md 与 agents/openai.yaml 逐字节一致，无更新需求\"。"
+    },
+    {
+      "text": "软链转换的备份步骤应使用 cp 到 ~/.claude/backups/，而非 mv .bak",
+      "passed": true,
+      "evidence": "第⑥节第 1 步：\"mkdir -p ~/.claude/backups/skills-$(date +%Y%m%d); cp -r ~/.claude/skills/my-skills/skills/grill-me ~/.claude/backups/skills-$(date +%Y%m%d)/grill-me\"。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "grill-me 已安装且为复制方式（非软链）",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第①节：真实目录，readlink 无输出"
+    },
+    {
+      "claim": "本地副本与仓库源逐字节一致",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第③节 diff -r → IDENTICAL"
+    },
+    {
+      "claim": "本次任务是复制→软链的换装而非全新安装",
+      "type": "quality",
+      "verified": true,
+      "evidence": "开头结论明确表述"
+    },
+    {
+      "claim": "副本两文件均已被 my-skills git 仓库跟踪，删除用 git rm",
+      "type": "process",
+      "verified": true,
+      "evidence": "第①节盘点表 + 第⑥节第 2 步 git rm 命令"
+    }
+  ],
+  "eval_feedback": {
+    "overall": "三条断言均具区分度且全部通过。"
+  }
+}

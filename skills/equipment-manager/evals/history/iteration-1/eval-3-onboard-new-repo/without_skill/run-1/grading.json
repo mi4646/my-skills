@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "方案含建仓库档案步骤/模板",
+      "passed": true,
+      "evidence": "方案含在 references/ 下新建档案的步骤与五段格式"
+    },
+    {
+      "text": "方案含登记到支持仓库表格",
+      "passed": true,
+      "evidence": "产出清单含「SKILL.md 表格新增一行」"
+    },
+    {
+      "text": "方案含更新 description",
+      "passed": true,
+      "evidence": "说明「description 是 skill 路由触发依据，必须保持精准」并给出改法"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "方案含建仓库档案步骤/模板",
+      "passed": true,
+      "evidence": "五步流程第3步建档案，产出 references/<新档案>.md，给出五段式模板"
+    },
+    {
+      "text": "方案含登记到支持仓库表格",
+      "passed": true,
+      "evidence": "第4步在 SKILL.md「支持的仓库」表格加一行"
+    },
+    {
+      "text": "方案含更新 description",
+      "passed": true,
+      "evidence": "第5步更新 frontmatter「已接入」列表追加新仓库名"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

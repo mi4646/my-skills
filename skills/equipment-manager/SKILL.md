@@ -115,3 +115,25 @@ version: v1.5.0
 
 ### 接入新仓库（同样对话式）
 用户说"接入新仓库"时，走阶段一 B/C 分支，确认仓库路径后依次确认：来源（`git remote -v`）→ 结构（目录/命名/安装机制）→ 建档案（`references/` 下按作者或仓库名新建，仿现有三个档案）→ 登记表格 → 更新 frontmatter description。**每一步都先确认再做下一步**，不一口气全做。
+
+## 常用操作速查
+
+| 场景 | 命令 / 做法 |
+|------|------------|
+| 盘点已装 | `ls ~/.claude/skills/ ~/.claude/agents/`，`ls -la` 识别软链来源 |
+| 识别仓库增量 | `git -C <repo> log --diff-filter=A --name-only --since="90 days"` |
+| 查重 | 以实际目录为准，台账仅辅助回忆历史决策 |
+| 备份 | `mkdir -p ~/.claude/backups/<日期>` + `cp`，不用 `mv xxx.bak` |
+| 软链安装 | `ln -s <仓库>/.../skills/<name> ~/.claude/skills/<name>` |
+| 复制安装 | `cp -r <仓库>/.../skills/<name> ~/.claude/skills/<name>` |
+| 软链验证 | `readlink <link>` + `[ -e <target> ] && echo OK` |
+| 台账更新 | 装/删后写 `~/.config/equipment-manager/state.json`（installed 与 notes） |
+
+## 常见误区
+
+- **把台账当真相** → 查重以实际目录为准（`ls` + `readlink`），台账只记历史决策
+- **按名字判重复** → 按任务粒度判：与本地已装解决**同一具体任务**才算重复
+- **一口气甩结论** → 必须对话式：阶段四才给全量三张表，之前一次一问
+- **默认安装方式** → 软链/复制由用户拍板，不默认；官方脚本有参数优先用官方参数
+- **删前不备份** → 覆盖/删除前一律先 `mkdir -p ~/.claude/backups/<日期>` + `cp`
+- **台账进 git** → `state.json` 不进 git，装删零噪音、可被 dotfiles 同步

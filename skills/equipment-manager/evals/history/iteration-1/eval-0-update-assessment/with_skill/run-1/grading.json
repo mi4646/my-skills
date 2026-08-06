@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "推荐理由基于用户真实项目栈（Python 后端/LLM）",
+      "passed": true,
+      "evidence": "每个推荐关联用户栈：llm-finetuning 基于 LLM 微调空白、session-guard 基于 CLAUDE.md 纪律、before-you-build 基于独立开发者身份"
+    },
+    {
+      "text": "明确用复制而非软链安装",
+      "passed": true,
+      "evidence": "开头声明「安装偏好：复制安装（cp -r），不要软链」"
+    },
+    {
+      "text": "产出方案而非直接动手",
+      "passed": true,
+      "evidence": "输出为保留/待定清单与理由，未执行安装"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

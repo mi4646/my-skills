@@ -1,0 +1,10 @@
+{
+  "eval_id": 1,
+  "eval_name": "slimming",
+  "prompt": "我本地 ~/.claude/agents 下装了一堆 engineering 开头的 agent，感觉太多太杂，帮我精简一下。先给我一份保留/待定/删除的三档清单，别真删，等我确认。",
+  "assertions": [
+    {"name": "three-tier-list", "description": "给出保留/待定/删除三档清单", "text": "输出应包含保留、待定、删除三个类别"},
+    {"name": "delete-with-reason", "description": "删除项给出理由", "text": "输出的删除项应带理由（基于方向/项目栈）"},
+    {"name": "backup-and-confirm", "description": "删除前备份并等用户确认", "text": "输出应提及删除前备份(~/.claude/backups/)或等用户确认，而非直接删"}
+  ]
+}

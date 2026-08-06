@@ -1,0 +1,63 @@
+{
+  "expectations": [
+    {
+      "text": "输出三档中『待定』项应给出明确留/删倾向，而非含糊",
+      "passed": true,
+      "evidence": "待定档 7 个 agent 表格每行\"明确倾向\"列均给出倾向，如\"engineering-mobile-app-builder —— **倾向删**；未来做 App 再装\"\"engineering-solidity-smart-contract-engineer —— **倾向删**；若陛下改过想留，请告知改了什么\"。"
+    },
+    {
+      "text": "删除方案应使用 ~/.claude/backups/ 统一备份路径，而非 mv .bak 临时改名",
+      "passed": true,
+      "evidence": "第三节执行方案第 1 条：\"备份（已就位，未用 mv .bak 临时改名）：15 个 agent 已统一在 `~/.claude/backups/agents-20260804/`（2026-08-04 统一备份目录）\"。"
+    },
+    {
+      "text": "保留/删除理由应基于扫描真实项目栈（/var/www）判断方向",
+      "passed": true,
+      "evidence": "第一节第 3 条实扫 /var/www 下 11 个项目（rc-api-server / rc-api-server2（FastAPI/Celery）、rc-platform2 / shy_empower / vietguard2（Django）、weather-agent / xiaochu / demo（AI/LLM）、captcha-ocr-server（ONNX OCR）等）；删除理由对照项目栈，如\"engineering-filament-optimization-specialist —— Filament PHP 后台；栈无 PHP\"。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 207.9,
+    "duration_ms": 207877
+  },
+  "claims": [
+    {
+      "claim": "~/.claude/agents/ 当前为空，15 个 engineering agent 已在 ~/.claude/backups/agents-20260804/",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第一节第 1 条明确描述此状态"
+    },
+    {
+      "claim": "备份文件与源仓库逐字节比对 14/15 一致，solidity 文件本地删除了源中的 XDC 链名",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第一节第 2 条给出对比细节"
+    },
+    {
+      "claim": "待定档 7 个均给出留/删倾向",
+      "type": "quality",
+      "verified": true,
+      "evidence": "第二节待定表每行\"明确倾向\"列均为\"倾向删\"+条件"
+    },
+    {
+      "claim": "仅出清单未删改任何文件",
+      "type": "process",
+      "verified": true,
+      "evidence": "标题\"仅清单与方案，未删改任何文件\"与硬闸门声明"
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "with_skill 与 old_skill 在未断言细节上不一致：old_skill 称备份目录同目录有\"7 个 security-* agent\"，with_skill 称\"6 个\"。该数字无法从 outputs 独立核验，无断言覆盖"
+      }
+    ],
+    "overall": "三条断言均具区分度且全部通过。"
+  }
+}

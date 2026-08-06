@@ -1,0 +1,68 @@
+{
+  "expectations": [
+    {
+      "text": "输出应使用 git log 或对比仓库档案识别『新增』的 skill，而非罗列整个仓库",
+      "passed": true,
+      "evidence": "第②节：\"依据：`git log --diff-filter=A --since=\"90 days\" --name-only`，只取 `plugins/*/skills/*/SKILL.md`，按插件聚合\"，列出各插件新增 skill，非罗列整个仓库。"
+    },
+    {
+      "text": "输出应先识别本地已装的同源项并跳过/标注，不重复推荐",
+      "passed": true,
+      "evidence": "第③节：\"逐一对照 `~/.claude/skills/`（61 项）、`~/.claude/plugins/installed_plugins.json`（空）、`/var/www/demo/.claude/skills/`（已无）——上述 31 个新增 skill 均未本地安装，无同源重复\"。先盘点本地已装项再判定无重复。"
+    },
+    {
+      "text": "输出应按用户指定的复制(cp)方式给安装方案",
+      "passed": true,
+      "evidence": "第⑦节\"用户指定复制方式、不软链\"，安装命令全部为 `cp -r`，并附 SKILL.md 存在性验证。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 143.2,
+    "duration_ms": 143203
+  },
+  "claims": [
+    {
+      "claim": "近 90 天新增 11 插件、31 个 skill",
+      "type": "factual",
+      "verified": false,
+      "evidence": "声称\"31 个 skill\"，但第②节表格逐项相加：10+3+5+3+1+1+1+1+1+1+0=27，与报告总数 31 不一致，内部矛盾"
+    },
+    {
+      "claim": "本机当前零 wshobson 系 skill",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第①节：\"本机当前**零** wshobson 系 skill，本次全部候选均为净新增\""
+    },
+    {
+      "claim": "增量识别用 git log --diff-filter=A --since=90 days",
+      "type": "process",
+      "verified": true,
+      "evidence": "第②节明确写出所用 git 命令"
+    },
+    {
+      "claim": "仅出方案，未执行任何安装/删除",
+      "type": "process",
+      "verified": true,
+      "evidence": "附·方法执行对照：\"未执行任何安装/删除/改动 ✅\""
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "输出应使用 git log 或对比仓库档案识别『新增』的 skill",
+        "reason": "断言只要求\"用了 git log\"，不校验统计自洽性：本 run 声称 31 个 skill 但表格只列出 27 个（10+3+5+3+1+1+1+1+1+1），内不一致未被捕获。且未像 with_skill 那样排除仅加元数据的既有插件。建议断言增量计数与其列表逐项相符"
+      },
+      {
+        "assertion": "输出应先识别本地已装的同源项并跳过/标注，不重复推荐",
+        "reason": "本场景本地无 wshobson 系项，\"跳过/标注\"易被\"无重复\"结论表面满足；建议要求输出枚举对照位置"
+      }
+    ],
+    "overall": "三条断言均通过，但报告的 31 个新增 skill 与其表格自相矛盾（实为 27），无断言捕获此计数失实。"
+  }
+}

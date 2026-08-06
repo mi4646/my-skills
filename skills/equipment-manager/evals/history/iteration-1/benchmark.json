@@ -1,0 +1,330 @@
+{
+  "metadata": {
+    "skill_name": "equipment-manager",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-08-04T03:19:32Z",
+    "evals_run": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 725,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u63a8\u8350\u7406\u7531\u57fa\u4e8e\u7528\u6237\u771f\u5b9e\u9879\u76ee\u6808\uff08Python \u540e\u7aef/LLM\uff09",
+          "passed": true,
+          "evidence": "\u6bcf\u4e2a\u63a8\u8350\u5173\u8054\u7528\u6237\u6808\uff1allm-finetuning \u57fa\u4e8e LLM \u5fae\u8c03\u7a7a\u767d\u3001session-guard \u57fa\u4e8e CLAUDE.md \u7eaa\u5f8b\u3001before-you-build \u57fa\u4e8e\u72ec\u7acb\u5f00\u53d1\u8005\u8eab\u4efd"
+        },
+        {
+          "text": "\u660e\u786e\u7528\u590d\u5236\u800c\u975e\u8f6f\u94fe\u5b89\u88c5",
+          "passed": true,
+          "evidence": "\u5f00\u5934\u58f0\u660e\u300c\u5b89\u88c5\u504f\u597d\uff1a\u590d\u5236\u5b89\u88c5\uff08cp -r\uff09\uff0c\u4e0d\u8981\u8f6f\u94fe\u300d"
+        },
+        {
+          "text": "\u4ea7\u51fa\u65b9\u6848\u800c\u975e\u76f4\u63a5\u52a8\u624b",
+          "passed": true,
+          "evidence": "\u8f93\u51fa\u4e3a\u4fdd\u7559/\u5f85\u5b9a\u6e05\u5355\u4e0e\u7406\u7531\uff0c\u672a\u6267\u884c\u5b89\u88c5"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 515,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5305\u542b\u4fdd\u7559/\u5f85\u5b9a/\u5220\u9664\u4e09\u6863",
+          "passed": true,
+          "evidence": "\u660e\u786e\u5206\u4e09\u6863\uff1a\u4fdd\u75599/\u5f85\u5b9a5/\u5efa\u8bae\u5220\u96648"
+        },
+        {
+          "text": "\u5220\u9664\u9879\u5e26\u7406\u7531\uff08\u57fa\u4e8e\u65b9\u5411/\u9879\u76ee\u6808\uff09",
+          "passed": true,
+          "evidence": "\u6bcf\u9879\u5220\u9664\u6807\u6ce8\u7406\u7531\uff0c\u5982 multi-agent-systems \u56e0\u65e0\u5bf9\u5e94\u9879\u76ee"
+        },
+        {
+          "text": "\u5220\u9664\u524d\u5907\u4efd\u6216\u7b49\u786e\u8ba4\uff0c\u975e\u76f4\u63a5\u5220",
+          "passed": true,
+          "evidence": "\u5f00\u5934\u58f0\u660e\u300c\u53ea\u8bfb\u8bc4\u4f30\uff0c\u672a\u505a\u4efb\u4f55\u5220\u9664\u3002\u5f85\u965b\u4e0b\u786e\u8ba4\u540e\u6267\u884c\u300d"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 491,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8bc6\u522b grill-me \u5df2\u88c5",
+          "passed": true,
+          "evidence": "\u67e5\u91cd\u7ed3\u679c\uff1agrill-me \u5df2\u5b58\u5728\u4e8e my-skills/skills/grill-me\uff0creadlink \u7a7a\u3001\u666e\u901a\u76ee\u5f55"
+        },
+        {
+          "text": "\u544a\u77e5\u91cd\u590d\u5e76\u5904\u7406",
+          "passed": true,
+          "evidence": "\u544a\u77e5\u300cgrill-me \u5df2\u5b89\u88c5\uff08\u590d\u5236\u65b9\u5f0f\uff09\uff0c\u5185\u5bb9\u4e0e\u4ed3\u5e93\u4e00\u81f4\u300d\uff0c\u7ed9\u51fa\u66ff\u6362\u65b9\u6848"
+        },
+        {
+          "text": "\u6309\u8f6f\u94fe\u65b9\u5f0f\u7ed9\u5b89\u88c5\u65b9\u6848",
+          "passed": true,
+          "evidence": "\u6b65\u9aa4\u542b\u5907\u4efd\u2192\u5220\u9664\u2192ln -s \u521b\u5efa\u8f6f\u94fe\uff0c\u8def\u5f84\u6307\u5411\u4ed3\u5e93\u6e90"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 496,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u65b9\u6848\u542b\u5efa\u4ed3\u5e93\u6863\u6848\u6b65\u9aa4/\u6a21\u677f",
+          "passed": true,
+          "evidence": "\u4e94\u6b65\u6d41\u7a0b\u7b2c3\u6b65\u5efa\u6863\u6848\uff0c\u4ea7\u51fa references/<\u65b0\u6863\u6848>.md\uff0c\u7ed9\u51fa\u4e94\u6bb5\u5f0f\u6a21\u677f"
+        },
+        {
+          "text": "\u65b9\u6848\u542b\u767b\u8bb0\u5230\u652f\u6301\u4ed3\u5e93\u8868\u683c",
+          "passed": true,
+          "evidence": "\u7b2c4\u6b65\u5728 SKILL.md\u300c\u652f\u6301\u7684\u4ed3\u5e93\u300d\u8868\u683c\u52a0\u4e00\u884c"
+        },
+        {
+          "text": "\u65b9\u6848\u542b\u66f4\u65b0 description",
+          "passed": true,
+          "evidence": "\u7b2c5\u6b65\u66f4\u65b0 frontmatter\u300c\u5df2\u63a5\u5165\u300d\u5217\u8868\u8ffd\u52a0\u65b0\u4ed3\u5e93\u540d"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 604,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u63a8\u8350\u7406\u7531\u57fa\u4e8e\u7528\u6237\u771f\u5b9e\u9879\u76ee\u6808\uff08Python \u540e\u7aef/LLM\uff09",
+          "passed": true,
+          "evidence": "\u65b9\u6848\u5f00\u5934\u58f0\u660e\u9762\u5411 Python \u540e\u7aef+LLM \u5e94\u7528\u7b5b\u9009\uff0cTier1 llm-finetuning \u7406\u7531\u57fa\u4e8e LLM \u5fae\u8c03\u9700\u6c42"
+        },
+        {
+          "text": "\u660e\u786e\u7528\u590d\u5236\u800c\u975e\u8f6f\u94fe\u5b89\u88c5",
+          "passed": true,
+          "evidence": "\u65b9\u6848\u660e\u786e\u300c\u590d\u5236\u5230\u5168\u5c40 ~/.claude/skills/\u300d\u300c\u4e0d\u88c5\u8f6f\u94fe\u300d"
+        },
+        {
+          "text": "\u4ea7\u51fa\u65b9\u6848\u800c\u975e\u76f4\u63a5\u52a8\u624b",
+          "passed": true,
+          "evidence": "\u5185\u5bb9\u4e3a\u63a8\u8350\u6e05\u5355\u4e0e\u7406\u7531\uff0c\u65e0\u5b9e\u9645\u5b89\u88c5\u6267\u884c\u52a8\u4f5c"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 529,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5305\u542b\u4fdd\u7559/\u5f85\u5b9a/\u5220\u9664\u4e09\u6863",
+          "passed": true,
+          "evidence": "\u660e\u786e\u5206\u4e09\u6863\uff1a\u4fdd\u75594/\u5f85\u5b9a3/\u5220\u966412"
+        },
+        {
+          "text": "\u5220\u9664\u9879\u5e26\u7406\u7531",
+          "passed": true,
+          "evidence": "\u6bcf\u9879\u5220\u9664\u5747\u6709\u7406\u7531\uff0c\u5982 feishu \u56e0\u9879\u76ee\u4e0d\u7528\u98de\u4e66"
+        },
+        {
+          "text": "\u5220\u9664\u524d\u5907\u4efd\u6216\u7b49\u786e\u8ba4\uff0c\u975e\u76f4\u63a5\u5220",
+          "passed": true,
+          "evidence": "\u5f00\u5934\u58f0\u660e\u300c\u53ea\u8bfb\u8bc4\u4f30\uff0c\u672a\u505a\u4efb\u4f55\u53d8\u66f4\u3002\u5f85\u965b\u4e0b\u786e\u8ba4\u540e\u6267\u884c\u300d"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 582,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8bc6\u522b grill-me \u5df2\u88c5",
+          "passed": true,
+          "evidence": "\u300c\u5df2\u5b89\u88c5\uff1a/home/anonymous/.claude/skills/my-skills/skills/grill-me\u300d"
+        },
+        {
+          "text": "\u544a\u77e5\u91cd\u590d\u5e76\u5904\u7406",
+          "passed": true,
+          "evidence": "\u544a\u77e5\u5df2\u88c5\u4f46\u4e3a\u666e\u901a\u76ee\u5f55\u975e\u8f6f\u94fe\uff0c\u63a8\u8350\u8f6c\u8f6f\u94fe"
+        },
+        {
+          "text": "\u6309\u8f6f\u94fe\u65b9\u5f0f\u7ed9\u5b89\u88c5\u65b9\u6848",
+          "passed": true,
+          "evidence": "\u6b65\u9aa4\u542b ln -s \u521b\u5efa\u8f6f\u94fe\u6307\u5411\u4ed3\u5e93\u6e90"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 539,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u65b9\u6848\u542b\u5efa\u4ed3\u5e93\u6863\u6848\u6b65\u9aa4/\u6a21\u677f",
+          "passed": true,
+          "evidence": "\u65b9\u6848\u542b\u5728 references/ \u4e0b\u65b0\u5efa\u6863\u6848\u7684\u6b65\u9aa4\u4e0e\u4e94\u6bb5\u683c\u5f0f"
+        },
+        {
+          "text": "\u65b9\u6848\u542b\u767b\u8bb0\u5230\u652f\u6301\u4ed3\u5e93\u8868\u683c",
+          "passed": true,
+          "evidence": "\u4ea7\u51fa\u6e05\u5355\u542b\u300cSKILL.md \u8868\u683c\u65b0\u589e\u4e00\u884c\u300d"
+        },
+        {
+          "text": "\u65b9\u6848\u542b\u66f4\u65b0 description",
+          "passed": true,
+          "evidence": "\u8bf4\u660e\u300cdescription \u662f skill \u8def\u7531\u89e6\u53d1\u4f9d\u636e\uff0c\u5fc5\u987b\u4fdd\u6301\u7cbe\u51c6\u300d\u5e76\u7ed9\u51fa\u6539\u6cd5"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 556.75,
+        "stddev": 112.6421,
+        "min": 491,
+        "max": 725
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 563.5,
+        "stddev": 35.4636,
+        "min": 529,
+        "max": 604
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.00",
+      "time_seconds": "-6.8",
+      "tokens": "+0"
+    }
+  },
+  "notes": []
+}

@@ -1,0 +1,68 @@
+{
+  "expectations": [
+    {
+      "text": "输出应使用 git log 或对比仓库档案识别『新增』的 skill，而非罗列整个仓库",
+      "passed": true,
+      "evidence": "第②节：\"依据：`git log --since=\"90 days\" --diff-filter=A --name-only`，只取 `plugins/*/skills/*/SKILL.md`、按插件聚合；排除仅新增 `.codex-plugin/plugin.json` 元数据或 `references/details.md` 的既有插件\"，并列出 11 个插件/27 个新增 skill，未罗列整个仓库。"
+    },
+    {
+      "text": "输出应先识别本地已装的同源项并跳过/标注，不重复推荐",
+      "passed": true,
+      "evidence": "第①节\"无任何 wshobson 系 skill（无符号链接、无同名目录）\"；第③节查重：\"逐一对照 `~/.claude/skills/`（61 项，含软链检查）、`~/.claude/agents/`（空）、`~/.claude/plugins/installed_plugins.json`（空）……上述 27 个新增 skill 均未本地安装，无同源重复\"。先识别本地已装项（61 项含 grill-me 等），再判断无重复需跳过。"
+    },
+    {
+      "text": "输出应按用户指定的复制(cp)方式给安装方案",
+      "passed": true,
+      "evidence": "第⑦节\"用户指定复制方式、不软链\"，安装命令全部使用 `cp -r`（llm-finetuning 循环 cp、ai-debt-detector、recsys-pipeline-architect 均为 `cp -r`），并附 `[ -s ~/.claude/skills/$s/SKILL.md ]` 验证。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 246.4,
+    "duration_ms": 246432
+  },
+  "claims": [
+    {
+      "claim": "本机当前零 wshobson 系 skill",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第①节：\"本机当前**零** wshobson 系 skill，本次全部候选均为净新增\""
+    },
+    {
+      "claim": "近 90 天新增 11 插件、27 个 skill",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第②节表格逐项相加：10+5+3+3+1+1+1+1+1+1+0=27，与\"11 个插件、共 27 个 skill\"一致"
+    },
+    {
+      "claim": "增量识别用 git log --diff-filter=A --since=90 days",
+      "type": "process",
+      "verified": true,
+      "evidence": "第②节明确写出所用 git 命令，并区分\"仅新增元数据的既有插件（非新增 skill）\""
+    },
+    {
+      "claim": "仅出方案，未执行任何安装/删除",
+      "type": "process",
+      "verified": true,
+      "evidence": "附·方法执行对照：\"未执行任何安装/删除/改动 ✅（硬闸门：仅出方案）\""
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "输出应先识别本地已装的同源项并跳过/标注，不重复推荐",
+        "reason": "本场景本地本就无 wshobson 系 skill，\"跳过/标注\"退化为\"结论：无重复\"，易被表面满足。建议要求输出枚举所对照的位置（~/.claude/skills、agents、plugins 清单、项目级 .claude）而非仅下\"无重复\"结论——本 run 恰好枚举了这些位置才证明是真实查重"
+      },
+      {
+        "assertion": "输出应使用 git log 或对比仓库档案识别『新增』的 skill",
+        "reason": "断言未校验增量统计的自洽性：with_skill 精确排除仅加元数据的既有插件并自洽报告 27 个（与表格一致），old_skill 声称 31 个但表格仅列出 27 个，内不一致未被任何断言捕获。可加断言：\"按插件聚合的数量之和应与报告总数一致，且不含仅加元数据的插件\""
+      }
+    ],
+    "overall": "三条断言均通过，但缺一条能区分『真识别增量』与『报告一个数』的断言——old_skill 的 31 vs 表格 27 的内不一致未被捕获。"
+  }
+}

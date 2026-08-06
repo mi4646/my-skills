@@ -1,0 +1,58 @@
+{
+  "expectations": [
+    {
+      "text": "输出应按『确认来源→摸清结构→建档案→登记表格→更新 description』五步组织",
+      "passed": true,
+      "evidence": "正文按五步组织：\"第 1 步：确认来源\"（git remote -v + git log -1 版本时间点）、\"第 2 步：摸清结构\"、\"第 3 步：建档案\"、\"第 4 步：登记\"（表格加一行）、\"第 5 步：更新 description\"。"
+    },
+    {
+      "text": "输出应给出 references/ 档案文件的具体模板/五段式结构",
+      "passed": true,
+      "evidence": "第 3 步给出完整模板（references/new-skill-repo.md），含\"基本信息 / 目录结构 / 安装机制 / 坑位与约定 / 已知实践\"五段，并给出各段占位说明。"
+    },
+    {
+      "text": "输出应声明不动通用方法论、不擅自执行安装",
+      "passed": true,
+      "evidence": "\"通用内核不动\"：\"五步全部是'建档案 + 表格一行 + description 补一个名字'，方法论正文（七步流程、克制原则）零改动\"；末尾\"本方案不包含任何实际创建档案、登记或修改 description 的动作\"。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 50.6,
+    "duration_ms": 50623
+  },
+  "claims": [
+    {
+      "claim": "新仓库与 wshobson 结构最像（agents+skills 混合）",
+      "type": "quality",
+      "verified": true,
+      "evidence": "现状段：\"新仓库为 agents + skills 混合，结构与 wshobson 最像，档案格式可直接参照\""
+    },
+    {
+      "claim": "已接入 3 个仓库：msitarzewski/agency-agents、wshobson/agents、mattpocock/skills",
+      "type": "factual",
+      "verified": true,
+      "evidence": "现状段列举"
+    },
+    {
+      "claim": "首次建档案时已知实践可先留空或写待评估",
+      "type": "process",
+      "verified": true,
+      "evidence": "第 3 步要点说明"
+    },
+    {
+      "claim": "仓库尚未 clone，为通用接入方案",
+      "type": "process",
+      "verified": true,
+      "evidence": "开头\"仓库 ~/new-skill-repo 本机尚不存在，以下为通用接入方案\""
+    }
+  ],
+  "eval_feedback": {
+    "overall": "三条断言均具区分度且全部通过。"
+  }
+}

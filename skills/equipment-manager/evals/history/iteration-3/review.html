@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "equipment-manager", "runs": [{"id": "eval-0-update-assessment-old_skill", "prompt": "wshobson \u7684 agents \u4ed3\u5e93\u521a\u624d git pull \u8fc7\u4e86\uff0c\u597d\u50cf\u52a0\u4e86\u4e00\u4e9b\u65b0 skill\u3002\u6211\u4e3b\u8981\u662f\u505a Python \u540e\u7aef\u548c LLM \u5e94\u7528\u7684\uff0c\u4f60\u5e2e\u6211\u4ece\u91cc\u9762\u6311\u51e0\u4e2a\u503c\u5f97\u88c5\u5230\u5168\u5c40 ~/.claude/skills \u7684\uff0c\u7ed9\u51fa\u63a8\u8350\u6e05\u5355\u548c\u7406\u7531\u3002\u88c5\u7684\u65f6\u5019\u6211\u60f3\u7528\u590d\u5236\u65b9\u5f0f\uff0c\u4e0d\u8981\u8f6f\u94fe\u3002\u5148\u51fa\u65b9\u6848\uff0c\u522b\u771f\u88c5\u3002", "eval_id": 0, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u88c5\u5907\u8bc4\u4f30\uff1awshobson/agents \u589e\u91cf\u7b5b\u9009\u4e0e\u590d\u5236\u5b89\u88c5\u65b9\u6848\n\n> \u6309\u300a\u88c5\u5907\u7ba1\u7406\u5668\u300b\u4e03\u6b65\u65b9\u6cd5\u8bba\u6267\u884c\uff1a\u76d8\u70b9 \u2192 \u589e\u91cf\u8bc6\u522b \u2192 \u67e5\u91cd \u2192 \u4e09\u6863\u7b5b\u9009 \u2192 \u65b9\u6848\u3002\u7528\u6237\u5df2\u6307\u5b9a**\u590d\u5236(cp)\u65b9\u5f0f**\u3001\u4ec5\u51fa\u65b9\u6848\u4e0d\u6267\u884c\u3002\n> \u8bc4\u4f30\u65f6\u95f4\uff1a2026-08-04\n\n---\n\n## \u2460 \u76d8\u70b9\u672c\u5730\u73b0\u72b6\n\n| \u4f4d\u7f6e | \u73b0\u72b6 |\n|------|------|\n| `~/.claude/skills/` | 61 \u4e2a\u6761\u76ee\uff1a\u7edd\u5927\u591a\u6570\u4e3a gstack \u751f\u6001\uff08gstack\u3001review\u3001qa\u3001spec\u3001ship\u2026\uff09+ `my-skills`\uff08\u5185\u542b\u6765\u81ea mattpocock \u7684 grill-me / prototype / research / resolving-merge-conflicts\uff09+ find-skills\u3001learned\u3002**\u65e0\u4efb\u4f55 wshobson \u7cfb skill** |\n| `~/.claude/agents/` | \u7a7a |\n| `~/.claude/plugins/` | `installed_plugins.json` \u7684 plugins \u5217\u8868\u4e3a\u7a7a\uff1b\u5df2\u77e5 marketplace \u6709 karpathy-skills\u3001claude-plugins-official\u3001ponytail\u3001claude-hud \u7b49\uff0c**wshobson/agents \u672a\u63a5\u5165 marketplace** |\n| `/var/www/demo/.claude/skills/` | \u6863\u6848\u4e2d\u8bb0\u8f7d\u7684 15 \u4e2a wshobson \u77e5\u8bc6\u5305\u7b26\u53f7\u94fe\u63a5**\u5df2\u4e0d\u5b58\u5728**\uff08\u5f53\u524d .claude \u4e0b\u4ec5 settings.local.json \u4e0e worktrees\uff09\uff0c\u6863\u6848\u300c\u5df2\u77e5\u5b9e\u8df5\u300d\u5df2\u8fc7\u671f |\n\n\u7ed3\u8bba\uff1a\u672c\u673a\u5f53\u524d**\u96f6** wshobson \u7cfb skill\uff0c\u672c\u6b21\u5168\u90e8\u5019\u9009\u5747\u4e3a\u51c0\u65b0\u589e\u3002\n\n## \u2461 \u589e\u91cf\u8bc6\u522b\uff08git log\uff0c\u8fd1 90 \u5929\u65b0\u589e\uff09\n\n- \u4ed3\u5e93\u786e\u8ba4\u5b58\u5728\uff1a`/home/anonymous/agents`\uff0cremote \u6b63\u786e\uff08`https://github.com/wshobson/agents.git`\uff09\u3002\n- \u4f9d\u636e\uff1a`git log --diff-filter=A --since=\"90 days\" --name-only`\uff0c\u53ea\u53d6 `plugins/*/skills/*/SKILL.md`\uff0c\u6309\u63d2\u4ef6\u805a\u5408\u3002\n\n\u65b0\u589e\u63d2\u4ef6\u4e0e skills\uff0811 \u4e2a\u63d2\u4ef6\u3001\u5171 31 \u4e2a skill\uff09\uff1a\n\n| \u63d2\u4ef6 | \u65b0\u589e SKILL | \u63d0\u4ea4\u65e5\u671f |\n|------|-----------|---------|\n| **llm-finetuning** | checkpoint-promotion\u3001dataset-curation\u3001eval-harness-first\u3001finetuning-method-selection\u3001grpo-rlvr-training\u3001lora-qlora-recipes\u3001preference-optimization\u3001quantized-export\u3001trace-to-training-data\u3001vision-sft\uff0810 \u4e2a\uff09 | 2026-07-14 |\n| **dgx-spark-ops** | spark-environment-setup\u3001spark-memory-thermal-ops\u3001spark-training-gotchas\uff083 \u4e2a\uff09 | 2026-07-14 |\n| **pptx-deck-creation** | pptx-deck-context\u3001pptx-quality-gates\u3001pptx-reference-deck-analysis\u3001pptx-slide-specification\u3001pptx-visual-assets\uff085 \u4e2a\uff09 | 2026-07-19 |\n| **skill-forge-essentials** | ai-debt-detector\u3001session-guard\u3001visual-edit-precision\uff083 \u4e2a\uff09 | 2026-07-08 |\n| **machine-learning-ops** | recsys-pipeline-architect\uff08\u4ec5\u6b64 1 \u4e2a\u4e3a\u65b0\u589e\uff0cml-pipeline-workflow \u4e3a\u65e7\u6709\uff09 | 90 \u5929\u5185 |\n| **before-you-build** | before-you-build | 90 \u5929\u5185 |\n| **file-conversion** | file-conversion | 90 \u5929\u5185 |\n| **hermes-tweet** | hermes-tweet | 2026-07-08 |\n| **ship-mate** | scan | 90 \u5929\u5185 |\n| **social-publishing** | social-publishing | 90 \u5929\u5185 |\n| **operating-kit** | \uff08\u4ec5 agents\uff0c\u65e0 skill\uff1acode-review-preshipment / deploy-with-verification / prod-logs-health-check / session-start / session-end\uff09 | 2026-07-08 |\n\n## \u2462 \u67e5\u91cd\n\n- \u9010\u4e00\u5bf9\u7167 `~/.claude/skills/`\uff0861 \u9879\uff09\u3001`~/.claude/plugins/installed_plugins.json`\uff08\u7a7a\uff09\u3001`/var/www/demo/.claude/skills/`\uff08\u5df2\u65e0\uff09\u2014\u2014**\u4e0a\u8ff0 31 \u4e2a\u65b0\u589e skill \u5747\u672a\u672c\u5730\u5b89\u88c5\uff0c\u65e0\u540c\u6e90\u91cd\u590d**\u3002\n- \u65e0\u540c\u540d\u6216\u540c\u529f\u80fd\u8fd1\u4eb2\uff1a\u672c\u5730\u65e0 llm-evaluation / rag / prompt-engineering \u7b49\u65e7\u6863\u6848\u8bb0\u8f7d\u7684\u77e5\u8bc6\u5305\u6b8b\u7559\u3002\n- \u7ed3\u8bba\uff1a\u63a8\u8350\u6e05\u5355\u65e0\u9700\u5254\u9664\u91cd\u590d\u9879\u3002\n\n## \u2463 \u57fa\u4e8e\u771f\u5b9e\u9700\u6c42\u4e09\u6863\u7b5b\u9009\n\n\u771f\u5b9e\u6808\u626b\u63cf\uff08/var/www \u4e0b 11 \u4e2a\u9879\u76ee\uff09\uff1a`demo`\uff08FastAPI + uvicorn + httpx + playwright\uff0cLLM \u6b4c\u5355\u6574\u7406\uff09\u3001`weather-agent`\u3001`captcha-ocr-server`\uff08OCR\uff09\u3001`rc-api-server/rc-api-server2`\uff08FastAPI \u540e\u7aef\uff09\u3001`i18n_hardening`\uff08\u524d\u7aef\uff09\u3001`xiaochu`\u3001`vietguard2` \u7b49\u3002\u6838\u5fc3\u65b9\u5411\uff1a**Python \u540e\u7aef\uff08FastAPI\uff09+ LLM \u5e94\u7528 + \u5c11\u91cf\u524d\u7aef/\u81ea\u52a8\u5316**\u3002\u65e0 GPU/Spark\u3001\u65e0 PPT \u529e\u516c\u3001\u65e0\u793e\u5a92\u8fd0\u8425\u3001\u65e0\u4ea7\u54c1\u5b75\u5316\u3002\n\n| \u6863\u4f4d | \u5019\u9009 | \u7406\u7531 |\n|------|------|------|\n| **\u4fdd\u7559\uff08\u63a8\u8350\u88c5\uff09** | **llm-finetuning \u5168\u5957 10 \u4e2a skill** | \u7528\u6237\u6838\u5fc3\u6808\u5373 LLM \u5e94\u7528\uff1b\u8be5\u5957\u4ef6\u8986\u76d6\u5fae\u8c03\u5168\u751f\u547d\u5468\u671f\uff08\u65b9\u6cd5\u9009\u578b\u2192\u6570\u636e\u6e05\u6d17\u2192LoRA/QLoRA\u2192eval \u5148\u884c\u2192\u504f\u597d\u4f18\u5316\u2192GRPO/RLVR\u2192trace \u8f6c\u8bad\u7ec3\u6570\u636e\u2192checkpoint \u95e8\u7981\u2192\u91cf\u5316\u5bfc\u51fa\u2192VLM \u5fae\u8c03\uff09\uff0c\u662f LLM \u5e94\u7528\u5de5\u7a0b\u5e08\u7684\u8fdb\u9636\u80fd\u529b\u5305\uff0c\u4e0e\u6808\u76f4\u63a5\u5339\u914d\u3002\u82e5\u60f3\u6536\u655b\uff0c\u6700\u5c0f\u5b50\u96c6\u4e3a `finetuning-method-selection` + `dataset-curation` + `eval-harness-first`\uff08RAG/\u63d0\u793a\u8bcd vs \u5fae\u8c03\u9009\u578b\u4e0e\u8bc4\u4f30\u95e8\u7981\uff0c\u5e94\u7528\u5c42\u4e5f\u9002\u7528\uff09 |\n| **\u4fdd\u7559\uff08\u63a8\u8350\u88c5\uff09** | **ai-debt-detector**\uff08skill-forge-essentials\uff09 | \u5ba1\u67e5 AI \u751f\u6210\u4ee3\u7801\u7684\u8106\u5f31\u70b9/\u503a\u52a1\uff0c\u4e0e\u300cPython \u540e\u7aef + AI \u8f85\u52a9\u5f00\u53d1\u300d\u5f3a\u5339\u914d\uff0c\u662f\u5bf9 AI \u4ea7\u51fa\u628a\u5173\u7684\u901a\u7528\u5de5\u7a0b\u6280\u80fd |\n| **\u4fdd\u7559\uff08\u63a8\u8350\u88c5\uff09** | **recsys-pipeline-architect**\uff08machine-learning-ops\uff09 | Source\u2192Hydrator\u2192Filter\u2192Scorer\u2192Selector\u2192SideEffect \u516d\u6bb5\u6846\u67b6\u76f4\u63a5\u8986\u76d6\u300ctop-K \u7b5b\u9009 / RAG \u91cd\u6392 / \u5185\u5bb9\u63a8\u8350\u300d\uff1b\u7528\u6237\u7684\u6b4c\u5355\u6574\u7406\uff08\u5bf9\u6b4c\u66f2\u6253\u5206\u53d1\u724c\uff09\u4e0e weather-agent \u6b63\u662f\u6b64\u7c7b\u573a\u666f |\n| \u5f85\u5b9a | **session-guard**\uff08skill-forge-essentials\uff09 | \u957f\u4f1a\u8bdd/\u591a\u6b65\u4efb\u52a1\u884c\u4e3a\u7ea6\u675f\uff0c\u9002\u5408\u4f60\u9ad8\u9891\u591a\u6b65\u5f00\u53d1\u4f1a\u8bdd\uff1b\u884c\u4e3a\u7c7b\u6536\u76ca\u56e0\u4eba\u800c\u5f02\uff0c\u503e\u5411\u88c5 |\n| \u5f85\u5b9a | **visual-edit-precision**\uff08skill-forge-essentials\uff09 | \u9762\u5411\u524d\u7aef/UI \u89c6\u89c9\u6539\u52a8\uff1b\u4f60\u504f\u540e\u7aef\uff0c\u4ec5 i18n_hardening \u7b49\u5c11\u91cf\u524d\u7aef\uff0c\u503e\u5411\u4e0d\u88c5 |\n| \u5f85\u5b9a | **scan**\uff08ship-mate\uff09 | \u626b\u63cf\u751f\u6210 AGENTS.md/project-doc.md\uff1b\u4f60\u7684\u4ed3\u5e93\u5df2\u6709 CLAUDE.md \u4f53\u7cfb\uff0c\u8fb9\u9645\u4ef7\u503c\u6709\u9650\uff0c\u82e5\u8981\u505a agent \u53cb\u597d\u65b0\u4ed3\u5e93\u53ef\u88c5 |\n| \u5efa\u8bae\u4e0d\u88c5 | before-you-build\uff08\u4ea7\u54c1/\u521b\u4e1a\u98ce\u9669\u8bc4\u5ba1\uff09 | \u9762\u5411 founder/PM\uff0c\u975e\u5de5\u7a0b\u6808 |\n| \u5efa\u8bae\u4e0d\u88c5 | file-conversion\uff08\u7f51\u9875\u8f6c\u6362\u670d\u52a1\u5c01\u88c5\uff09 | \u4e00\u6b21\u6027\u5de5\u5177\u58f3\uff0c\u4ef7\u503c\u4f4e |\n| \u5efa\u8bae\u4e0d\u88c5 | hermes-tweet\u3001social-publishing | \u793e\u5a92/\u63a8\u7279\uff0c\u65e0\u5bf9\u5e94\u9879\u76ee |\n| \u5efa\u8bae\u4e0d\u88c5 | dgx-spark-ops\uff083 \u4e2a\uff09 | \u65e0 GPU/Spark/DGX \u57fa\u7840\u8bbe\u65bd |\n| \u5efa\u8bae\u4e0d\u88c5 | pptx-deck-creation\uff085 \u4e2a\uff09 | \u65e0 PPT \u5de5\u4f5c\u6d41 |\n| \u8d85\u8303\u56f4\u8bf4\u660e | operating-kit | \u4ea7\u51fa\u4e3a agents\uff08\u975e skills\uff09\uff0c\u4e0d\u7b26\u300c\u88c5\u5230 ~/.claude/skills\u300d\u9700\u6c42\uff1b\u82e5\u65e5\u540e\u60f3\u8981\uff0c`code-review-preshipment` \u4e0e `prod-logs-health-check` \u503c\u5f97\u8003\u8651\u88c5\u5230 ~/.claude/agents |\n\n## \u2464 \u6f84\u6e05\u70b9\uff08\u4f9b\u5b9a\u593a\uff0c\u4e00\u6b21\u4e00\u95ee\uff09\n\n1. **llm-finetuning \u88c5\u5168\u5957 10 \u4e2a\u8fd8\u662f\u6700\u5c0f 3 \u4e2a\u5b50\u96c6\uff1f**\uff08\u4f60\u5f53\u524d\u9879\u76ee\u504f\u300c\u5e94\u7528\u5c42\u6d88\u8d39 LLM\u300d\uff0c\u82e5\u77ed\u671f\u65e0\u5fae\u8c03/\u8bad\u7ec3\u8ba1\u5212\uff0c3 \u4e2a\u8bc4\u4f30\u7c7b\u5373\u53ef\uff1b\u88c5\u5168\u5957\u4e5f\u65e0\u5bb3\uff0c\u7eaf\u589e\u91cf\u3002\uff09\n2. skill-forge-essentials \u88c5 1 \u4e2a\uff08ai-debt-detector\uff09\u8fd8\u662f 3 \u4e2a\u5168\u88c5\uff1f\n3. scan \u662f\u5426\u8981\uff1f\n\n## \u2465 \u63a8\u8350\u6e05\u5355\u4e0e\u7406\u7531\uff08\u5b9a\u7a3f\uff09\n\n### \u5f3a\u70c8\u63a8\u8350\uff083 \u4e2a\u6765\u6e90\u3001\u5171 12+ \u4e2a skill\uff09\n1. `llm-finetuning` \u5168\u5957 10 \u4e2a\uff08\u6216\u6700\u5c0f\u5b50\u96c6 3 \u4e2a\uff09\u2014 LLM \u5e94\u7528\u6838\u5fc3\u6808\u7684\u5fae\u8c03\u5168\u751f\u547d\u5468\u671f\u80fd\u529b\u5305\n2. `ai-debt-detector` \u2014 AI \u751f\u6210\u4ee3\u7801\u8d28\u91cf\u628a\u5173\uff0cPython \u540e\u7aef + AI \u8f85\u52a9\u5f00\u53d1\u5f3a\u5339\u914d\n3. `recsys-pipeline-architect` \u2014 top-K/\u63a8\u8350/RAG \u91cd\u6392\u6846\u67b6\uff0c\u76f4\u63a5\u547d\u4e2d\u6b4c\u5355\u6574\u7406\u7c7b\u9879\u76ee\n\n### \u5f85\u5b9a\uff083 \u4e2a\uff0c\u503e\u5411\u987a\u5e8f\uff1asession-guard > scan > visual-edit-precision\uff09\n4. `session-guard` \u2014 \u957f\u4f1a\u8bdd\u884c\u4e3a\u7ea6\u675f\uff0c\u9002\u5408\u9ad8\u9891\u591a\u6b65\u5f00\u53d1\n5. `scan` \u2014 AGENTS.md \u5f15\u5bfc\uff0c\u9002\u5408\u65b0\u5efa agent \u53cb\u597d\u4ed3\u5e93\n6. `visual-edit-precision` \u2014 \u504f\u524d\u7aef\uff0c\u5f31\u5339\u914d\n\n### \u5efa\u8bae\u4e0d\u88c5\uff0811 \u4e2a\uff09\nbefore-you-build\u3001file-conversion\u3001hermes-tweet\u3001social-publishing\u3001dgx-spark-ops\u00d73\u3001pptx-deck-creation\u00d75\n\n## \u2466 \u590d\u5236(cp)\u5b89\u88c5\u65b9\u6848\uff08\u4e0d\u6267\u884c\uff09\n\n> \u7528\u6237\u6307\u5b9a\u590d\u5236\u65b9\u5f0f\u3001\u4e0d\u8f6f\u94fe\u3002\u590d\u5236\u540e\u5b8c\u5168\u72ec\u7acb\u4e8e\u4ed3\u5e93\u8def\u5f84\uff0c\u6c38\u4e0d\u65ad\u94fe\uff1b\u4ed3\u5e93\u66f4\u65b0\u9700\u624b\u52a8\u91cd\u88c5\u3002\n\n```bash\n# 0) \u5907\u4efd\uff08\u672c\u6b21\u4e3a\u51c0\u65b0\u589e\u3001\u65e0\u8986\u76d6\uff0c\u53ef\u9009\uff09\nmkdir -p ~/.claude/backups/20260804 && cp -r ~/.claude/skills ~/.claude/backups/20260804/skills\n\n# 1) llm-finetuning \u5168\u5957\uff0810 \u4e2a skill\uff0c\u6bcf\u4e2a\u662f\u72ec\u7acb\u76ee\u5f55\uff0c\u542b SKILL.md + references/\uff09\nfor s in /home/anonymous/agents/plugins/llm-finetuning/skills/*/; do\n  cp -r \"$s\" ~/.claude/skills/\ndone\n# \u6536\u655b\u4e3a\u6700\u5c0f\u5b50\u96c6\u65f6\u6539\u4e3a\u9010\u76ee\u5f55\u590d\u5236\uff1a\n# cp -r /home/anonymous/agents/plugins/llm-finetuning/skills/finetuning-method-selection ~/.claude/skills/\n# cp -r /home/anonymous/agents/plugins/llm-finetuning/skills/dataset-curation ~/.claude/skills/\n# cp -r /home/anonymous/agents/plugins/llm-finetuning/skills/eval-harness-first ~/.claude/skills/\n\n# 2) ai-debt-detector\ncp -r /home/anonymous/agents/plugins/skill-forge-essentials/skills/ai-debt-detector ~/.claude/skills/\n\n# 3) recsys-pipeline-architect\ncp -r /home/anonymous/agents/plugins/machine-learning-ops/skills/recsys-pipeline-architect ~/.claude/skills/\n\n# 4) \u5f85\u5b9a\u9879\uff08\u786e\u8ba4\u540e\u518d\u52a0\uff09\uff1a\n# cp -r /home/anonymous/agents/plugins/skill-forge-essentials/skills/session-guard ~/.claude/skills/\n# cp -r /home/anonymous/agents/plugins/ship-mate/skills/scan ~/.claude/skills/\n\n# 5) \u9a8c\u8bc1\uff08\u6bcf\u4e2a\u590d\u5236\u76ee\u5f55\u987b\u542b\u975e\u7a7a SKILL.md\uff09\nfor s in ai-debt-detector recsys-pipeline-architect; do\n  [ -s ~/.claude/skills/$s/SKILL.md ] && echo \"OK: $s\" || echo \"FAIL: $s\"\ndone\n# llm-finetuning \u7684 10 \u4e2a\u5b50\u76ee\u5f55\u6309\u5404\u81ea skill \u540d\u843d\u5230 ~/.claude/skills/\uff0c\n# \u590d\u5236\u524d\u5148 ls /home/anonymous/agents/plugins/llm-finetuning/skills/ \u6838\u5bf9\u5b9e\u9645\u76ee\u5f55\u540d\n```\n\n\u590d\u5236\u65b9\u5f0f\u7279\u6027\uff08\u53c2\u8003\u6863\u6848 wshobson.md\uff09\uff1a`cp -r` \u9047\u7b26\u53f7\u94fe\u63a5\u4f1a\u539f\u6837\u4fdd\u7559\u94fe\u63a5\uff1b\u672c\u6e05\u5355\u6e90\u5747\u4e3a\u771f\u5b9e\u76ee\u5f55\uff08\u975e\u94fe\u63a5\uff09\uff0c\u590d\u5236\u540e\u4e3a\u666e\u901a\u76ee\u5f55\uff0c\u5b8c\u5168\u72ec\u7acb\u3002\u4ed3\u5e93 git pull \u66f4\u65b0\u540e\u4e0d\u4f1a\u81ea\u52a8\u4f20\u64ad\uff0c\u9700\u624b\u52a8\u91cd\u8dd1\u4ee5\u4e0a\u547d\u4ee4\u3002\n\n---\n\n## \u9644\uff1a\u65b9\u6cd5\u6267\u884c\u5bf9\u7167\n\n- \u589e\u91cf\u8bc6\u522b \u2705\uff1a`git log --diff-filter=A --since=\"90 days\"` \u5b9a\u4f4d 11 \u63d2\u4ef6/31 skill\uff0c\u975e\u7f57\u5217\u5168\u4ed3\u5e93\n- \u67e5\u91cd \u2705\uff1a\u5bf9\u7167 ~/.claude/skills\u3001plugins \u6e05\u5355\u3001demo \u9879\u76ee\uff0c\u65e0\u91cd\u590d\u53ef\u63a8\n- \u590d\u5236\u65b9\u6848 \u2705\uff1a\u6309\u7528\u6237\u6307\u5b9a cp -r \u51fa\u5b89\u88c5\u547d\u4ee4\u4e0e\u9a8c\u8bc1\n- \u672a\u6267\u884c\u4efb\u4f55\u5b89\u88c5/\u5220\u9664/\u6539\u52a8 \u2705\n"}], "grading": null}, {"id": "eval-0-update-assessment-with_skill", "prompt": "wshobson \u7684 agents \u4ed3\u5e93\u521a\u624d git pull \u8fc7\u4e86\uff0c\u597d\u50cf\u52a0\u4e86\u4e00\u4e9b\u65b0 skill\u3002\u6211\u4e3b\u8981\u662f\u505a Python \u540e\u7aef\u548c LLM \u5e94\u7528\u7684\uff0c\u4f60\u5e2e\u6211\u4ece\u91cc\u9762\u6311\u51e0\u4e2a\u503c\u5f97\u88c5\u5230\u5168\u5c40 ~/.claude/skills \u7684\uff0c\u7ed9\u51fa\u63a8\u8350\u6e05\u5355\u548c\u7406\u7531\u3002\u88c5\u7684\u65f6\u5019\u6211\u60f3\u7528\u590d\u5236\u65b9\u5f0f\uff0c\u4e0d\u8981\u8f6f\u94fe\u3002\u5148\u51fa\u65b9\u6848\uff0c\u522b\u771f\u88c5\u3002", "eval_id": 0, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u88c5\u5907\u8bc4\u4f30\uff1awshobson/agents \u589e\u91cf\u7b5b\u9009\u4e0e\u590d\u5236\u5b89\u88c5\u65b9\u6848\n\n> \u6309\u300a\u88c5\u5907\u7ba1\u7406\u5668\u300b\u65b9\u6cd5\u8bba\u6267\u884c\uff1a\u76d8\u70b9 \u2192 \u589e\u91cf\u8bc6\u522b \u2192 \u67e5\u91cd \u2192 \u4e09\u6863\u7b5b\u9009 \u2192 \u65b9\u6848\u3002\u7528\u6237\u5df2\u6307\u5b9a**\u590d\u5236(cp)\u65b9\u5f0f**\u3001\u4ec5\u51fa\u65b9\u6848\u4e0d\u6267\u884c\u3002\n> \u8bc4\u4f30\u65f6\u95f4\uff1a2026-08-04\n\n---\n\n## \u2460 \u76d8\u70b9\u672c\u5730\u73b0\u72b6\n\n| \u4f4d\u7f6e | \u73b0\u72b6 |\n|------|------|\n| `~/.claude/skills/` | 61 \u4e2a\u6761\u76ee\uff1a\u7edd\u5927\u591a\u6570\u4e3a gstack \u751f\u6001\uff08gstack\u3001review\u3001qa\u3001spec\u3001ship\u2026\uff09+ `my-skills`\uff08\u5185\u542b\u6765\u81ea mattpocock \u7684 grill-me / prototype / research / resolving-merge-conflicts\uff09+ find-skills\u3001learned\u3002**\u65e0\u4efb\u4f55 wshobson \u7cfb skill**\uff08\u65e0\u7b26\u53f7\u94fe\u63a5\u3001\u65e0\u540c\u540d\u76ee\u5f55\uff09 |\n| `~/.claude/agents/` | \u7a7a |\n| `~/.claude/plugins/` | `installed_plugins.json` \u7684 plugins \u5217\u8868\u4e3a\u7a7a\uff1b\u5df2\u77e5 marketplace \u6709 karpathy-skills\u3001claude-plugins-official\u3001ponytail\u3001claude-hud \u7b49\uff0c**wshobson/agents \u672a\u63a5\u5165 marketplace** |\n| `/var/www/demo/.claude/skills/` | \u6863\u6848 wshobson.md\u300c\u5df2\u77e5\u5b9e\u8df5\u300d\u8bb0\u8f7d\u7684 15 \u4e2a wshobson \u77e5\u8bc6\u5305\u7b26\u53f7\u94fe\u63a5**\u5df2\u4e0d\u5b58\u5728**\uff08\u5f53\u524d .claude \u4e0b\u4ec5 settings.local.json \u4e0e worktrees\uff0cskills \u76ee\u5f55\u5df2\u6d88\u5931\uff09\u2014\u2014\u6863\u6848\u8be5\u6761\u5df2\u8fc7\u671f |\n\n\u7ed3\u8bba\uff1a\u672c\u673a\u5f53\u524d**\u96f6** wshobson \u7cfb skill\uff0c\u672c\u6b21\u5168\u90e8\u5019\u9009\u5747\u4e3a\u51c0\u65b0\u589e\uff0c\u65e0\u540c\u6e90\u9879\u9700\u8981\u5254\u9664\u3002\n\n## \u2461 \u589e\u91cf\u8bc6\u522b\uff08git log\uff0c\u8fd1 90 \u5929\u65b0\u589e\uff09\n\n- \u4ed3\u5e93\u786e\u8ba4\u5b58\u5728\uff1a`/home/anonymous/agents`\uff0cremote \u6b63\u786e\uff08`https://github.com/wshobson/agents.git`\uff09\uff0cHEAD \u5728 c4b82b0\uff082026-07-18\uff09\u3002\n- \u4f9d\u636e\uff1a`git log --since=\"90 days\" --diff-filter=A --name-only`\uff0c\u53ea\u53d6 `plugins/*/skills/*/SKILL.md`\u3001\u6309\u63d2\u4ef6\u805a\u5408\uff1b\u6392\u9664\u4ec5\u65b0\u589e `.codex-plugin/plugin.json` \u5143\u6570\u636e\u6216 `references/details.md` \u7684\u65e2\u6709\u63d2\u4ef6\uff08python-development\u3001llm-application-dev\u3001backend-development\u3001developer-essentials \u7b49\u5747\u5c5e\u6b64\u7c7b\uff0c\u975e\u65b0\u589e skill\uff09\u3002\n\n\u65b0\u589e\u63d2\u4ef6\u4e0e skills\uff0811 \u4e2a\u63d2\u4ef6\u3001\u5171 27 \u4e2a skill\uff09\uff1a\n\n| \u63d2\u4ef6 | \u65b0\u589e SKILL | \u63d0\u4ea4\u65e5\u671f |\n|------|-----------|---------|\n| **llm-finetuning** | checkpoint-promotion\u3001dataset-curation\u3001eval-harness-first\u3001finetuning-method-selection\u3001grpo-rlvr-training\u3001lora-qlora-recipes\u3001preference-optimization\u3001quantized-export\u3001trace-to-training-data\u3001vision-sft\uff0810 \u4e2a\uff09 | 2026-07-14 |\n| **pptx-deck-creation** | pptx-deck-context\u3001pptx-quality-gates\u3001pptx-reference-deck-analysis\u3001pptx-slide-specification\u3001pptx-visual-assets\uff085 \u4e2a\uff09 | 2026-07-19 |\n| **dgx-spark-ops** | spark-environment-setup\u3001spark-memory-thermal-ops\u3001spark-training-gotchas\uff083 \u4e2a\uff09 | 2026-07-14 |\n| **skill-forge-essentials** | ai-debt-detector\u3001session-guard\u3001visual-edit-precision\uff083 \u4e2a\uff09 | 2026-07-08 |\n| **machine-learning-ops** | recsys-pipeline-architect\uff08\u4ec5\u6b64 1 \u4e2a\u4e3a\u65b0\u589e\uff0cml-pipeline-workflow \u4e3a\u65e7\u6709\uff09 | 2026-05-17 |\n| **ship-mate** | scan\uff081 \u4e2a\uff09 | 2026-05-12 |\n| **social-publishing** | social-publishing\uff081 \u4e2a\uff09 | 2026-05-25 |\n| **before-you-build** | before-you-build\uff081 \u4e2a\uff09 | 2026-06-12 |\n| **file-conversion** | file-conversion\uff081 \u4e2a\uff09 | 2026-06-11 |\n| **hermes-tweet** | hermes-tweet\uff081 \u4e2a\uff09 | 2026-07-08 |\n| **operating-kit** | \uff08\u4ec5 agents\uff0c\u65e0 skill\uff1acode-review-preshipment / deploy-with-verification / prod-logs-health-check / session-start / session-end\uff09 | 2026-07-08 |\n\n\u53e6\u6709 runapi-mcp\uff082026-06-03\uff09\u4e3a MCP server \u63d2\u4ef6\uff0c\u4ec5 agents/commands \u65e0 skill\uff0c\u4e0d\u5728\u300c\u88c5 skill\u300d\u8ba8\u8bba\u8303\u56f4\u3002\n\n## \u2462 \u67e5\u91cd\n\n- \u9010\u4e00\u5bf9\u7167 `~/.claude/skills/`\uff0861 \u9879\uff0c\u542b\u8f6f\u94fe\u68c0\u67e5\uff09\u3001`~/.claude/agents/`\uff08\u7a7a\uff09\u3001`~/.claude/plugins/installed_plugins.json`\uff08\u7a7a\uff09\u3001`/var/www/demo/.claude/skills/`\uff08\u5df2\u6d88\u5931\uff09\u2014\u2014**\u4e0a\u8ff0 27 \u4e2a\u65b0\u589e skill \u5747\u672a\u672c\u5730\u5b89\u88c5\uff0c\u65e0\u540c\u6e90\u91cd\u590d**\u3002\n- \u65e0\u540c\u540d\u6216\u540c\u529f\u80fd\u8fd1\u4eb2\uff1a\u672c\u5730\u65e0 llm-evaluation / rag / prompt-engineering \u7b49\u65e7\u6863\u6848\u8bb0\u8f7d\u7684\u77e5\u8bc6\u5305\u6b8b\u7559\u3002\n- \u7ed3\u8bba\uff1a\u63a8\u8350\u6e05\u5355\u65e0\u9700\u5254\u9664\u91cd\u590d\u9879\u3002\n\n## \u2463 \u57fa\u4e8e\u771f\u5b9e\u9700\u6c42\u4e09\u6863\u7b5b\u9009\n\n\u771f\u5b9e\u6808\uff1a\u7528\u6237\u4e3a **Python \u540e\u7aef\uff08FastAPI\uff09+ LLM \u5e94\u7528** \u5f00\u53d1\u8005\uff1b\u53c2\u8003\u9879\u76ee `/var/www/demo`\uff08FastAPI + uvicorn + httpx + playwright \u7684 LLM \u6b4c\u5355\u6574\u7406\u5e94\u7528\uff09\u7b49\u3002\u6838\u5fc3\u65b9\u5411\uff1aPython \u540e\u7aef\u3001LLM \u5e94\u7528\uff08RAG / \u63d0\u793a\u8bcd / \u8bc4\u4f30 / \u5fae\u8c03\uff09\u3001\u5c11\u91cf\u81ea\u52a8\u5316\u3002\u65e0 GPU/Spark/DGX\u3001\u65e0 PPT \u529e\u516c\u3001\u65e0\u793e\u5a92\u8fd0\u8425\u3001\u65e0\u4ea7\u54c1\u5b75\u5316\u3002\n\n| \u6863\u4f4d | \u5019\u9009 | \u7406\u7531 |\n|------|------|------|\n| **\u4fdd\u7559\uff08\u63a8\u8350\u88c5\uff09** | **llm-finetuning \u5168\u5957 10 \u4e2a skill** | \u7528\u6237\u6838\u5fc3\u6808\u5373 LLM \u5e94\u7528\uff1b\u8be5\u5957\u4ef6\u8986\u76d6\u5fae\u8c03\u5168\u751f\u547d\u5468\u671f\uff08\u65b9\u6cd5\u9009\u578b\u2192\u6570\u636e\u6e05\u6d17\u2192LoRA/QLoRA\u2192eval \u5148\u884c\u2192\u504f\u597d\u4f18\u5316\u2192GRPO/RLVR\u2192trace \u8f6c\u8bad\u7ec3\u6570\u636e\u2192checkpoint \u95e8\u7981\u2192\u91cf\u5316\u5bfc\u51fa\u2192VLM \u5fae\u8c03\uff09\uff0c\u662f LLM \u5e94\u7528\u5de5\u7a0b\u5e08\u7684\u8fdb\u9636\u80fd\u529b\u5305\uff0c\u4e0e\u6808\u76f4\u63a5\u5339\u914d\u3002\u82e5\u60f3\u6536\u655b\uff0c\u6700\u5c0f\u5b50\u96c6\u4e3a `finetuning-method-selection` + `dataset-curation` + `eval-harness-first`\uff08RAG/\u63d0\u793a\u8bcd vs \u5fae\u8c03\u9009\u578b\u4e0e\u8bc4\u4f30\u95e8\u7981\uff0c\u5e94\u7528\u5c42\u4e5f\u9002\u7528\uff09 |\n| **\u4fdd\u7559\uff08\u63a8\u8350\u88c5\uff09** | **ai-debt-detector**\uff08skill-forge-essentials\uff09 | \u5ba1\u67e5 AI \u751f\u6210\u4ee3\u7801\u7684\u8106\u5f31\u70b9/\u503a\u52a1\uff0c\u4e0e\u300cPython \u540e\u7aef + AI \u8f85\u52a9\u5f00\u53d1\u300d\u5f3a\u5339\u914d\uff0c\u662f\u5bf9 AI \u4ea7\u51fa\u628a\u5173\u7684\u901a\u7528\u5de5\u7a0b\u6280\u80fd |\n| **\u4fdd\u7559\uff08\u63a8\u8350\u88c5\uff09** | **recsys-pipeline-architect**\uff08machine-learning-ops\uff09 | Source\u2192Hydrator\u2192Filter\u2192Scorer\u2192Selector\u2192SideEffect \u516d\u6bb5\u6846\u67b6\u76f4\u63a5\u8986\u76d6\u300ctop-K \u7b5b\u9009 / RAG \u91cd\u6392 / \u5185\u5bb9\u63a8\u8350\u300d\uff1b\u7528\u6237\u7684\u6b4c\u5355\u6574\u7406\uff08\u5bf9\u6b4c\u66f2\u6253\u5206\u53d1\u724c\uff09\u4e0e LLM \u91cd\u6392\u6b63\u662f\u6b64\u7c7b\u573a\u666f |\n| \u5f85\u5b9a | **session-guard**\uff08skill-forge-essentials\uff09 | \u957f\u4f1a\u8bdd/\u591a\u6b65\u4efb\u52a1\u884c\u4e3a\u7ea6\u675f\uff0c\u9002\u5408\u4f60\u9ad8\u9891\u591a\u6b65\u5f00\u53d1\u4f1a\u8bdd\uff1b\u884c\u4e3a\u7c7b\u6536\u76ca\u56e0\u4eba\u800c\u5f02\uff0c\u503e\u5411\u88c5 |\n| \u5f85\u5b9a | **visual-edit-precision**\uff08skill-forge-essentials\uff09 | \u9762\u5411\u524d\u7aef/UI \u89c6\u89c9\u6539\u52a8\uff1b\u4f60\u504f\u540e\u7aef\uff0c\u503e\u5411\u4e0d\u88c5 |\n| \u5f85\u5b9a | **scan**\uff08ship-mate\uff09 | \u626b\u63cf\u751f\u6210 AGENTS.md/project-doc.md\uff1b\u4f60\u7684\u4ed3\u5e93\u5df2\u6709 CLAUDE.md \u4f53\u7cfb\uff0c\u8fb9\u9645\u4ef7\u503c\u6709\u9650\uff0c\u82e5\u8981\u505a agent \u53cb\u597d\u65b0\u4ed3\u5e93\u53ef\u88c5 |\n| \u5efa\u8bae\u4e0d\u88c5 | before-you-build | \u9762\u5411 founder/PM \u7684\u4ea7\u54c1\u98ce\u9669\u8bc4\u5ba1\uff0c\u975e\u5de5\u7a0b\u6808 |\n| \u5efa\u8bae\u4e0d\u88c5 | file-conversion | \u7f51\u9875\u8f6c\u6362\u670d\u52a1\u5c01\u88c5\uff0c\u4e00\u6b21\u6027\u5de5\u5177\u58f3\uff0c\u4ef7\u503c\u4f4e |\n| \u5efa\u8bae\u4e0d\u88c5 | hermes-tweet\u3001social-publishing | \u793e\u5a92/\u63a8\u7279\uff0c\u65e0\u5bf9\u5e94\u9879\u76ee |\n| \u5efa\u8bae\u4e0d\u88c5 | dgx-spark-ops\uff083 \u4e2a\uff09 | \u65e0 GPU/Spark/DGX \u57fa\u7840\u8bbe\u65bd |\n| \u5efa\u8bae\u4e0d\u88c5 | pptx-deck-creation\uff085 \u4e2a\uff09 | \u65e0 PPT \u5de5\u4f5c\u6d41 |\n| \u8d85\u8303\u56f4\u8bf4\u660e | operating-kit | \u4ea7\u51fa\u4e3a agents\uff08\u975e skills\uff09\uff0c\u4e0d\u7b26\u300c\u88c5\u5230 ~/.claude/skills\u300d\u9700\u6c42\uff1b\u82e5\u65e5\u540e\u60f3\u8981\uff0c`code-review-preshipment` \u4e0e `prod-logs-health-check` \u503c\u5f97\u8003\u8651\u88c5\u5230 ~/.claude/agents |\n\n## \u2464 \u6f84\u6e05\u70b9\uff08\u4f9b\u5b9a\u593a\uff0c\u4e00\u6b21\u4e00\u95ee\uff09\n\n1. **llm-finetuning \u88c5\u5168\u5957 10 \u4e2a\u8fd8\u662f\u6700\u5c0f 3 \u4e2a\u5b50\u96c6\uff1f**\uff08\u4f60\u5f53\u524d\u9879\u76ee\u504f\u300c\u5e94\u7528\u5c42\u6d88\u8d39 LLM\u300d\uff0c\u82e5\u77ed\u671f\u65e0\u5fae\u8c03/\u8bad\u7ec3\u8ba1\u5212\uff0c3 \u4e2a\u8bc4\u4f30\u7c7b\u5373\u53ef\uff1b\u88c5\u5168\u5957\u4e5f\u65e0\u5bb3\uff0c\u7eaf\u589e\u91cf\u3002\uff09\n2. skill-forge-essentials \u88c5 1 \u4e2a\uff08ai-debt-detector\uff09\u8fd8\u662f 3 \u4e2a\u5168\u88c5\uff1f\n3. scan \u662f\u5426\u8981\uff1f\n\n## \u2465 \u63a8\u8350\u6e05\u5355\u4e0e\u7406\u7531\uff08\u5b9a\u7a3f\uff09\n\n### \u5f3a\u70c8\u63a8\u8350\uff083 \u4e2a\u6765\u6e90\u3001\u5171 12+ \u4e2a skill\uff09\n1. `llm-finetuning` \u5168\u5957 10 \u4e2a\uff08\u6216\u6700\u5c0f\u5b50\u96c6 3 \u4e2a\uff09\u2014 LLM \u5e94\u7528\u6838\u5fc3\u6808\u7684\u5fae\u8c03\u5168\u751f\u547d\u5468\u671f\u80fd\u529b\u5305\n2. `ai-debt-detector` \u2014 AI \u751f\u6210\u4ee3\u7801\u8d28\u91cf\u628a\u5173\uff0cPython \u540e\u7aef + AI \u8f85\u52a9\u5f00\u53d1\u5f3a\u5339\u914d\n3. `recsys-pipeline-architect` \u2014 top-K/\u63a8\u8350/RAG \u91cd\u6392\u6846\u67b6\uff0c\u76f4\u63a5\u547d\u4e2d\u6b4c\u5355\u6574\u7406\u7c7b LLM \u9879\u76ee\n\n### \u5f85\u5b9a\uff083 \u4e2a\uff0c\u503e\u5411\u987a\u5e8f\uff1asession-guard > scan > visual-edit-precision\uff09\n4. `session-guard` \u2014 \u957f\u4f1a\u8bdd\u884c\u4e3a\u7ea6\u675f\uff0c\u9002\u5408\u9ad8\u9891\u591a\u6b65\u5f00\u53d1\n5. `scan` \u2014 AGENTS.md \u5f15\u5bfc\uff0c\u9002\u5408\u65b0\u5efa agent \u53cb\u597d\u4ed3\u5e93\n6. `visual-edit-precision` \u2014 \u504f\u524d\u7aef\uff0c\u5f31\u5339\u914d\n\n### \u5efa\u8bae\u4e0d\u88c5\uff0811 \u4e2a\uff09\nbefore-you-build\u3001file-conversion\u3001hermes-tweet\u3001social-publishing\u3001dgx-spark-ops\u00d73\u3001pptx-deck-creation\u00d75\n\n## \u2466 \u590d\u5236(cp)\u5b89\u88c5\u65b9\u6848\uff08\u4e0d\u6267\u884c\uff09\n\n> \u7528\u6237\u6307\u5b9a\u590d\u5236\u65b9\u5f0f\u3001\u4e0d\u8f6f\u94fe\u3002\u590d\u5236\u540e\u5b8c\u5168\u72ec\u7acb\u4e8e\u4ed3\u5e93\u8def\u5f84\uff0c\u6c38\u4e0d\u65ad\u94fe\uff1b\u4ed3\u5e93 git pull \u66f4\u65b0\u4e0d\u4f1a\u81ea\u52a8\u4f20\u64ad\uff0c\u9700\u624b\u52a8\u91cd\u88c5\u3002\n\n```bash\n# 0) \u5907\u4efd\uff08\u672c\u6b21\u4e3a\u51c0\u65b0\u589e\u3001\u65e0\u8986\u76d6\uff0c\u53ef\u9009\uff09\nmkdir -p ~/.claude/backups/20260804 && cp -r ~/.claude/skills ~/.claude/backups/20260804/skills\n\n# 1) llm-finetuning \u5168\u5957\uff0810 \u4e2a skill\uff0c\u6bcf\u4e2a\u662f\u72ec\u7acb\u76ee\u5f55\uff0c\u542b SKILL.md + references/\uff09\nfor s in /home/anonymous/agents/plugins/llm-finetuning/skills/*/; do\n  cp -r \"$s\" ~/.claude/skills/\ndone\n# \u6536\u655b\u4e3a\u6700\u5c0f\u5b50\u96c6\u65f6\u6539\u4e3a\u9010\u76ee\u5f55\u590d\u5236\uff1a\n# cp -r /home/anonymous/agents/plugins/llm-finetuning/skills/finetuning-method-selection ~/.claude/skills/\n# cp -r /home/anonymous/agents/plugins/llm-finetuning/skills/dataset-curation ~/.claude/skills/\n# cp -r /home/anonymous/agents/plugins/llm-finetuning/skills/eval-harness-first ~/.claude/skills/\n\n# 2) ai-debt-detector\ncp -r /home/anonymous/agents/plugins/skill-forge-essentials/skills/ai-debt-detector ~/.claude/skills/\n\n# 3) recsys-pipeline-architect\ncp -r /home/anonymous/agents/plugins/machine-learning-ops/skills/recsys-pipeline-architect ~/.claude/skills/\n\n# 4) \u5f85\u5b9a\u9879\uff08\u786e\u8ba4\u540e\u518d\u52a0\uff09\uff1a\n# cp -r /home/anonymous/agents/plugins/skill-forge-essentials/skills/session-guard ~/.claude/skills/\n# cp -r /home/anonymous/agents/plugins/ship-mate/skills/scan ~/.claude/skills/\n\n# 5) \u9a8c\u8bc1\uff08\u6bcf\u4e2a\u590d\u5236\u76ee\u5f55\u987b\u542b\u975e\u7a7a SKILL.md\uff09\nfor s in ai-debt-detector recsys-pipeline-architect; do\n  [ -s ~/.claude/skills/$s/SKILL.md ] && echo \"OK: $s\" || echo \"FAIL: $s\"\ndone\n# llm-finetuning \u7684 10 \u4e2a\u5b50\u76ee\u5f55\u6309\u5404\u81ea skill \u540d\u843d\u5230 ~/.claude/skills/\uff0c\n# \u590d\u5236\u524d\u5148 ls /home/anonymous/agents/plugins/llm-finetuning/skills/ \u6838\u5bf9\u5b9e\u9645\u76ee\u5f55\u540d\uff08\u6863\u6848\u63d0\u9192\uff1a\u672c\u5730\u540d vs \u4ed3\u5e93\u540d\u53ef\u80fd\u4e0d\u4e00\u81f4\uff09\n```\n\n\u590d\u5236\u65b9\u5f0f\u7279\u6027\uff08\u53c2\u8003\u6863\u6848 wshobson.md\uff09\uff1a`cp -r` \u9047\u7b26\u53f7\u94fe\u63a5\u4f1a\u539f\u6837\u4fdd\u7559\u94fe\u63a5\uff1b\u672c\u6e05\u5355\u6e90\u5747\u4e3a\u771f\u5b9e\u76ee\u5f55\uff08\u975e\u94fe\u63a5\uff09\uff0c\u590d\u5236\u540e\u4e3a\u666e\u901a\u76ee\u5f55\uff0c\u5b8c\u5168\u72ec\u7acb\u3002\u4ed3\u5e93 git pull \u66f4\u65b0\u540e\u4e0d\u4f1a\u81ea\u52a8\u4f20\u64ad\uff0c\u9700\u624b\u52a8\u91cd\u8dd1\u4ee5\u4e0a\u547d\u4ee4\u3002\n\n---\n\n## \u9644\uff1a\u65b9\u6cd5\u6267\u884c\u5bf9\u7167\n\n- \u589e\u91cf\u8bc6\u522b \u2705\uff1a`git log --since=\"90 days\" --diff-filter=A --name-only` \u5b9a\u4f4d 11 \u63d2\u4ef6/27 skill\uff0c\u6392\u9664\u4ec5\u52a0\u5143\u6570\u636e\u7684\u65e2\u6709\u63d2\u4ef6\uff0c\u975e\u7f57\u5217\u5168\u4ed3\u5e93\n- \u67e5\u91cd \u2705\uff1a\u5bf9\u7167 ~/.claude/skills\uff0861 \u9879\u542b\u8f6f\u94fe\u68c0\u67e5\uff09\u3001agents\uff08\u7a7a\uff09\u3001plugins \u6e05\u5355\uff08\u7a7a\uff09\u3001demo \u9879\u76ee\uff08\u5df2\u6d88\u5931\uff09\uff0c\u65e0\u91cd\u590d\u53ef\u63a8\n- \u590d\u5236\u65b9\u6848 \u2705\uff1a\u6309\u7528\u6237\u6307\u5b9a cp -r \u51fa\u5b89\u88c5\u547d\u4ee4\u4e0e\u9a8c\u8bc1\n- \u672a\u6267\u884c\u4efb\u4f55\u5b89\u88c5/\u5220\u9664/\u6539\u52a8 \u2705\uff08\u786c\u95f8\u95e8\uff1a\u4ec5\u51fa\u65b9\u6848\uff09\n"}], "grading": null}, {"id": "eval-1-slimming-old_skill", "prompt": "\u6211\u672c\u5730 ~/.claude/agents \u4e0b\u88c5\u4e86\u4e00\u5806 engineering \u5f00\u5934\u7684 agent\uff0c\u611f\u89c9\u592a\u591a\u592a\u6742\uff0c\u5e2e\u6211\u7cbe\u7b80\u4e00\u4e0b\u3002\u5148\u7ed9\u6211\u4e00\u4efd\u4fdd\u7559/\u5f85\u5b9a/\u5220\u9664\u7684\u4e09\u6863\u6e05\u5355\uff0c\u522b\u771f\u5220\uff0c\u7b49\u6211\u786e\u8ba4\u3002", "eval_id": 1, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u7cbe\u7b80\u65b9\u6848\uff1aengineering-* agent \u4e09\u6863\u6e05\u5355\n\n> \u751f\u6210\u65f6\u95f4\uff1a2026-08-04 \uff5c \u65b9\u5f0f\uff1a\u771f\u5b9e\u626b\u63cf\u672c\u673a\uff0c\u4e0d\u51ed\u8bb0\u5fc6 \uff5c \u72b6\u6001\uff1a**\u4ec5\u6e05\u5355\u4e0e\u65b9\u6848\uff0c\u672a\u5220\u6539\u4efb\u4f55\u6587\u4ef6\uff0c\u7b49\u3010\u965b\u4e0b\u3011\u62cd\u677f**\n\n## \u4e00\u3001\u626b\u63cf\u5230\u7684\u771f\u5b9e\u60c5\u51b5\uff08\u5148\u5bf9\u8d26\uff0c\u518d\u5224\u65ad\uff09\n\n1. **`~/.claude/agents/` \u5f53\u524d\u662f\u7a7a\u7684**\u3002\u965b\u4e0b\u5370\u8c61\u91cc\"\u88c5\u4e86\u4e00\u5806 engineering agent\"\uff0c\u5b9e\u9645\u8fd9 15 \u4e2a engineering-* agent \u73b0\u5728\u4e0d\u5728 agents \u76ee\u5f55\uff0c\u800c\u5728\u4eca\u5929\u7684\u7edf\u4e00\u5907\u4efd\u76ee\u5f55 `~/.claude/backups/agents-20260804/`\uff082026-08-04 10:26 \u751f\u6210\uff09\u3002\u540c\u76ee\u5f55\u8fd8\u8eba\u7740 7 \u4e2a `security-*` agent\uff08\u4e0d\u5728\u672c\u6b21\u7cbe\u7b80\u8303\u56f4\uff0c\u5148\u4e0d\u52a8\uff09\u3002\n2. **\u6765\u6e90\u786e\u8ba4\u4e3a `msitarzewski/agency-agents`**\uff08git remote = github.com/msitarzewski/agency-agents.git\uff0c\u672c\u5730 clone `~/agency-agents/engineering/`\uff09\u3002\u5907\u4efd\u6587\u4ef6\u4e0e\u6e90\u4ed3\u5e93**\u9010\u5b57\u8282\u6bd4\u5bf9\uff1a14/15 \u5b8c\u5168\u4e00\u81f4**\uff1b\u552f\u4e00\u4f8b\u5916\u662f `engineering-solidity-smart-contract-engineer.md`\u2014\u2014\u672c\u5730\u526f\u672c\u6bd4\u6e90\u4ed3\u5e93\u5c11\u4e86\u4e00\u5904\u94fe\u540d\uff08\u6e90\u542b \"XDC\"\uff0c\u672c\u5730\u5df2\u5220\uff09\uff0c\u7591\u4f3c\u965b\u4e0b\u6539\u8fc7\uff0c\u5220\u9664\u524d\u9700\u786e\u8ba4\u3002\n3. **\u672c\u673a\u771f\u5b9e\u9879\u76ee\u6808**\uff08`/var/www` \u5b9e\u626b 11 \u4e2a\u9879\u76ee\uff09\uff1a\n   - **Python \u540e\u7aef\u4e3a\u4e3b**\uff1arc-api-server / rc-api-server2\uff08FastAPI/Celery API \u670d\u52a1\uff09\u3001rc-platform2 / shy_empower / vietguard2\uff08Django + manage.py\uff09\u3001xiaochu\uff08LLM \u52a9\u624b\uff09\u3001weather-agent\uff08\u624b\u5199 AI Agent\uff09\u3001captcha-ocr-server\uff08Python + ONNX OCR\uff09\u3001demo\uff08AI \u6b4c\u5355\u6574\u7406\uff0cpyproject+requirements\uff09\uff1b\n   - **AI/LLM \u65b9\u5411**\uff1aweather-agent\u3001xiaochu\u3001demo \u4e09\u4e2a AI \u9879\u76ee\uff0cAgent \u5faa\u73af + LLM \u5e94\u7528\uff1b\n   - **DevOps**\uff1a\u591a\u9879\u76ee\u5e26 Dockerfile / docker-compose\uff1b\n   - **\u5c11\u91cf\u524d\u7aef**\uff1ai18n_hardening\uff08Node + nginx \u524d\u7aef\uff0c\u660e\u786e i18n \u52a0\u56fa\uff09\u3001autojs6-feishu-clock\uff08AutoJS6 \u98de\u4e66\u6253\u5361\u811a\u672c\uff0cAndroid \u81ea\u52a8\u5316\uff0c\u975e\u539f\u751f App\uff09\uff1b\n   - **\u5168\u76d8\u786e\u8ba4\u65e0**\uff1aWordPress / Drupal / Filament / PHP\uff08\u65e0\u4efb\u4f55 *.php\u3001composer.json\uff09\u3001\u539f\u751f\u79fb\u52a8 App\u3001\u533a\u5757\u94fe/Solidity\u3001\u5d4c\u5165\u5f0f\u56fa\u4ef6\uff08ESP32/STM32\uff09\u3001\u7f51\u7edc\u8bbe\u5907\uff08Cisco/Juniper\uff09\u3001\u90ae\u4ef6\u5904\u7406\u3001\u8bed\u97f3 ASR\u3001\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u3001OrgScript\u3001ITIL/\u4e8b\u6545\u54cd\u5e94\u7c7b\u6d41\u7a0b\u3002\n4. **\u7ed3\u8bba\u5148\u884c**\uff1a\u8fd9 15 \u4e2a\u5168\u662f\u5782\u76f4\u9886\u57df\u7279\u5316 agent\uff0c\u4e0e\u965b\u4e0b\"\u592a\u591a\u592a\u6742\"\u7684\u611f\u53d7\u4e00\u81f4\u3002\u6309\u771f\u5b9e\u6808\u5212\u5206\uff1a**7 \u4e2a\u9886\u57df\u5728\u672c\u673a\u5b8c\u5168\u4e0d\u5b58\u5728\uff08\u5efa\u8bae\u5220\uff09\uff0c7 \u4e2a\u65b9\u5411\u6cbe\u8fb9\u4f46\u65e0\u5f53\u524d\u9879\u76ee\u652f\u6491\uff08\u5f85\u5b9a\uff0c\u5747\u503e\u5411\u5220\uff09\uff0c\u4ec5 1 \u4e2a\u7b97\u901a\u7528\u515c\u5e95\uff08\u4fdd\u7559\uff09**\u3002\n\n## \u4e8c\u3001\u4e09\u6863\u6e05\u5355\n\n### \u4fdd\u7559\uff081 \u4e2a\uff09\u2014\u2014 \u5efa\u8bae\u7559\n\n| Agent | \u7406\u7531 |\n|---|---|\n| `engineering-senior-developer` | 15 \u4e2a\u91cc\u552f\u4e00\u901a\u7528\u578b\u5f00\u53d1\u89d2\u8272\uff08\u8d44\u6df1\u5b9e\u73b0\u4e13\u5bb6\uff09\u3002\u867d\u7136\u63cf\u8ff0\u504f Laravel/Livewire/Three.js\uff0c\u4f46\u4f5c\u4e3a\u65e5\u5e38\u5f00\u53d1\u515c\u5e95 agent\uff0cPython \u4e3b\u529b\u4efb\u52a1\u4e5f\u80fd\u9876\u4e0a\uff1b\u672c\u673a\u65e0\u5bf9\u5e94\u4e13\u9879 agent\uff0c\u7559\u4e00\u4e2a\u901a\u7528\u515c\u5e95\u6700\u5212\u7b97\u3002\u82e5\u965b\u4e0b\u89c9\u5f97\u5b83\u504f Laravel \u60f3\u964d\u4e3a\u5f85\u5b9a\uff0c\u8bf4\u4e00\u58f0\u5373\u53ef\u3002 |\n\n### \u5f85\u5b9a\uff087 \u4e2a\uff09\u2014\u2014 \u6bcf\u9879\u90fd\u7ed9\u660e\u786e\u7559/\u5220\u503e\u5411\uff0c\u4e0d\u7cca\u5f04\n\n| Agent | \u73b0\u72b6\u5224\u65ad\uff08\u5bf9\u7167 /var/www\uff09 | \u660e\u786e\u503e\u5411 |\n|---|---|---|\n| `engineering-email-intelligence-engineer` | AI \u6570\u636e\u7ba1\u7ebf\u65b9\u5411\uff0c\u4e0e weather-agent \u7b49\u5f31\u76f8\u5173\uff0c\u4f46\u672c\u673a\u6ca1\u6709\u4efb\u4f55\u90ae\u4ef6\u5904\u7406\u9879\u76ee | **\u503e\u5411\u5220**\uff1b\u65e0\u90ae\u4ef6\u9700\u6c42 |\n| `engineering-incident-response-commander` | \u65b9\u6cd5\u8bba\u7c7b\uff08\u4e8b\u6545\u54cd\u5e94/SLO/on-call\uff09\uff0c\u4e0e\u4ee3\u7801\u6808\u65e0\u5173 | **\u503e\u5411\u5220**\uff1b\u4ec5\u5f53\u965b\u4e0b\u672c\u4eba\u8d1f\u8d23\u751f\u4ea7\u8fd0\u7ef4\u65f6\u624d\u7559 |\n| `engineering-it-service-manager` | ITIL 4 \u670d\u52a1\u7ba1\u7406\u65b9\u6cd5\u8bba\uff0c\u540c\u4e0a | **\u503e\u5411\u5220**\uff1b\u4ec5\u5f53\u965b\u4e0b\u505a IT \u670d\u52a1\u7ba1\u7406\u65f6\u624d\u7559 |\n| `engineering-mobile-app-builder` | autojs6-feishu-clock \u662f AutoJS6 Android \u81ea\u52a8\u5316\u811a\u672c\uff0c**\u4e0d\u662f**\u539f\u751f App \u5f00\u53d1\uff1b\u672c\u673a\u65e0 App \u9879\u76ee | **\u503e\u5411\u5220**\uff1b\u672a\u6765\u505a App \u518d\u88c5 |\n| `engineering-voice-ai-integration-engineer` | \u8bed\u97f3 ASR \u7ba1\u7ebf\uff0c\u4e0e captcha-ocr-server\uff08\u56fe\u50cf OCR\uff09\u540c\u5c5e AI \u7ba1\u7ebf\u4f46\u65b9\u5411\u4e0d\u540c\uff0c\u672c\u673a\u65e0\u8bed\u97f3\u9879\u76ee | **\u503e\u5411\u5220**\uff1b\u82e5\u8ba1\u5212\u505a\u8bed\u97f3\u518d\u7559 |\n| `engineering-wechat-mini-program-developer` | \u9879\u76ee\u662f**\u98de\u4e66**\uff08AutoJS6\uff09\uff0c\u4e0d\u662f\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\uff1b\u4e14\u6e90\u4ed3\u5e93\u91cc\u6709\u66f4\u8d34\u5408\u7684 `engineering-feishu-integration-developer` \u4f46**\u672a\u5b89\u88c5** | **\u503e\u5411\u5220**\uff1b\u82e5\u965b\u4e0b\u8981\u98de\u4e66\u65b9\u5411\uff0c\u5e94\u6362\u88c5 feishu \u90a3\u4e2a\u800c\u975e\u7559\u8fd9\u4e2a |\n| `engineering-solidity-smart-contract-engineer` | \u672c\u673a\u65e0\u4efb\u4f55\u533a\u5757\u94fe\u9879\u76ee\uff1b\u4e14\u6b64\u6587\u4ef6\u4e0e\u6e90\u4ed3\u5e93\u6709\u5dee\u5f02\uff08\u672c\u5730\u7591\u4f3c\u6539\u8fc7\uff0c\u6e90\u542b XDC \u672c\u5730\u5df2\u5220\uff09 | **\u503e\u5411\u5220**\uff1b\u82e5\u965b\u4e0b\u6539\u8fc7\u60f3\u7559\uff0c\u8bf7\u544a\u77e5\u6539\u4e86\u4ec0\u4e48 |\n\n### \u5220\u9664\uff087 \u4e2a\uff09\u2014\u2014 \u9886\u57df\u5728\u672c\u673a\u9879\u76ee\u6808\u4e2d\u5b8c\u5168\u4e0d\u5b58\u5728\n\n| Agent | \u5220\u9664\u7406\u7531\uff08\u5bf9\u7167 /var/www \u5b9e\u626b\uff09 |\n|---|---|\n| `engineering-cms-developer` | Drupal/WordPress \u4e3b\u9898\u4e0e\u63d2\u4ef6\uff1b/var/www \u65e0\u4efb\u4f55 CMS/PHP \u9879\u76ee |\n| `engineering-drupal-shopping-cart` | Drupal Commerce \u7535\u5546\uff1b\u65e0 Drupal \u9879\u76ee |\n| `engineering-wordpress-shopping-cart` | WooCommerce \u7535\u5546\uff1b\u65e0 WordPress \u9879\u76ee |\n| `engineering-embedded-firmware-engineer` | ESP32/STM32/RTOS \u56fa\u4ef6\uff1b\u6808\u65e0\u5d4c\u5165\u5f0f |\n| `engineering-filament-optimization-specialist` | Filament PHP \u540e\u53f0\uff1b\u6808\u65e0 PHP |\n| `engineering-network-engineer` | Cisco/Juniper/Palo Alto \u7f51\u7edc\u8bbe\u5907\uff1b\u65e0\u7f51\u7edc\u9879\u76ee |\n| `engineering-orgscript-engineer` | OrgScript \u8bed\u6cd5/AST\uff1b\u65e0\u76f8\u5173\u9879\u76ee |\n\n**\u5408\u8ba1\uff1a\u4fdd\u7559 1 + \u5f85\u5b9a 7\uff08\u5747\u503e\u5411\u5220\uff09+ \u5220\u9664 7 = 15\u3002**\n\n## \u4e09\u3001\u6267\u884c\u65b9\u6848\uff08\u7b49\u3010\u965b\u4e0b\u3011\u786e\u8ba4\uff0c\u73b0\u5728\u4e0d\u52a8\u624b\uff09\n\n**\u786c\u95f8\u95e8\uff1a\u965b\u4e0b\u6ca1\u8bf4\"\u5220\"\uff0c\u5c31\u4e0d\u52a8\u4efb\u4f55\u6587\u4ef6\u3002** \u786e\u8ba4\u540e\u518d\u6267\u884c\uff0c\u65b9\u5f0f\u5982\u4e0b\uff1a\n\n1. **\u5907\u4efd\uff08\u5df2\u5c31\u4f4d\uff0c\u672a\u7528 mv .bak \u4e34\u65f6\u6539\u540d\uff09**\uff1a15 \u4e2a agent \u5df2\u7edf\u4e00\u5728 `~/.claude/backups/agents-20260804/`\uff082026-08-04 \u7edf\u4e00\u5907\u4efd\u76ee\u5f55\uff09\u3002\u5220\u9664\u6267\u884c\u65f6\uff0c\u4ece\u8be5\u5907\u4efd\u76ee\u5f55\u79fb\u9664\u5373\u53ef\uff0c\u65e0\u9700\u989d\u5916\u5907\u4efd\u52a8\u4f5c\u3002\n2. **\u786e\u8ba4\u5220\u9664\u7684**\uff1a\u4e0d\u518d\u590d\u5236\u56de `~/.claude/agents/`\uff08\u5f53\u524d\u4e3a\u7a7a\uff09\uff0c\u5907\u4efd\u4fdd\u7559 N \u5929\u540e\u6e05\u7406\uff08N \u7531\u965b\u4e0b\u5b9a\uff09\u3002\n3. **\u786e\u8ba4\u4fdd\u7559/\u5f85\u5b9a\u4e2d\u7559\u4e0b\u7684**\uff1a\u4ece\u5907\u4efd\u590d\u5236\u56de `~/.claude/agents/`\uff08\u5982\u4ec5\u7559 senior-developer\uff0c\u5219\u53ea\u590d\u5236\u5b83\u4e00\u4e2a\uff09\u3002\n4. **\u9644\u52a0\u5efa\u8bae\uff08\u6362\u8840\uff0c\u53ef\u9009\uff09**\uff1a\u5220\u9664\u540e\u5efa\u8bae\u4ece\u6e90\u4ed3\u5e93 `~/agency-agents/engineering/` \u88c5\u56de\u771f\u6b63\u8d34\u5408\u672c\u673a\u6808\u7684 agent\uff0c\u5982 `engineering-backend-architect`\u3001`engineering-ai-engineer`\uff0c\u4ee5\u53ca\u98de\u4e66\u65b9\u5411\u7684 `engineering-feishu-integration-developer`\u2014\u2014\u5220\u6389 7 \u4e2a\u7528\u4e0d\u4e0a\u7684\uff0c\u8865 2-3 \u4e2a\u7528\u5f97\u4e0a\u7684\u662f\u8fd9\u8f6e\u7cbe\u7b80\u7684\u5b8c\u6574\u95ed\u73af\u3002\u5b89\u88c5\u65b9\u5f0f\uff08\u8f6f\u94fe vs \u590d\u5236\uff09\u5230\u65f6\u7531\u965b\u4e0b\u62cd\u677f\u3002\n\n## \u56db\u3001\u8bf7\u3010\u965b\u4e0b\u3011\u62cd\u677f\uff08\u4e00\u6b21\u9009\u4e00\u4e2a\u5373\u53ef\uff09\n\n- **A**\uff1a\u6309\"\u4fdd\u7559 1 + \u5f85\u5b9a 7 \u5168\u5220 + \u5220\u9664 7\"\u6267\u884c\uff08\u6700\u7ec8\u7559 1 \u4e2a\uff09\uff1f\n- **B**\uff1a\u5f85\u5b9a\u91cc\u67d0\u51e0\u4e2a\u60f3\u7559\uff08\u70b9\u540d\uff09\uff0c\u6211\u8c03\u6574\u540e\u518d\u6267\u884c\uff1f\n- **C**\uff1a\u5148\u53ea\u5220\"\u5220\u9664\"\u6863\u7684 7 \u4e2a\uff0c\u5f85\u5b9a\u6863\u518d\u60f3\u60f3\uff1f\n"}], "grading": null}, {"id": "eval-1-slimming-with_skill", "prompt": "\u6211\u672c\u5730 ~/.claude/agents \u4e0b\u88c5\u4e86\u4e00\u5806 engineering \u5f00\u5934\u7684 agent\uff0c\u611f\u89c9\u592a\u591a\u592a\u6742\uff0c\u5e2e\u6211\u7cbe\u7b80\u4e00\u4e0b\u3002\u5148\u7ed9\u6211\u4e00\u4efd\u4fdd\u7559/\u5f85\u5b9a/\u5220\u9664\u7684\u4e09\u6863\u6e05\u5355\uff0c\u522b\u771f\u5220\uff0c\u7b49\u6211\u786e\u8ba4\u3002", "eval_id": 1, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u7cbe\u7b80\u65b9\u6848\uff1aengineering-* agent \u4e09\u6863\u6e05\u5355\n\n> \u751f\u6210\u65f6\u95f4\uff1a2026-08-04 \uff5c \u65b9\u5f0f\uff1a\u771f\u5b9e\u626b\u63cf\u672c\u673a \uff5c \u72b6\u6001\uff1a**\u4ec5\u6e05\u5355\u4e0e\u65b9\u6848\uff0c\u672a\u5220\u6539\u4efb\u4f55\u6587\u4ef6\uff0c\u7b49\u4f60\u62cd\u677f**\n\n## \u4e00\u3001\u5148\u8bf4\u626b\u63cf\u5230\u7684\u771f\u5b9e\u60c5\u51b5\uff08\u522b\u51ed\u8bb0\u5fc6\uff09\n\n1. **`~/.claude/agents/` \u5f53\u524d\u662f\u7a7a\u7684** \u2014\u2014 \u4f60\u5370\u8c61\u91cc\"\u88c5\u4e86\u4e00\u5806 engineering agent\"\uff0c\u4f46\u8fd9 15 \u4e2a agent \u73b0\u5728\u4e0d\u5728 agents \u76ee\u5f55\u91cc\uff0c\u800c\u662f\u8eba\u5728\u4eca\u5929\u7684\u5907\u4efd\u76ee\u5f55 `~/.claude/backups/agents-20260804/`\uff082026-08-04 10:26 \u751f\u6210\uff09\u3002\u540c\u76ee\u5f55\u8fd8\u8eba\u7740 6 \u4e2a `security-*` agent\uff08\u4e0d\u5728\u672c\u6b21\u7cbe\u7b80\u8303\u56f4\uff0c\u5148\u4e0d\u52a8\uff09\u3002\n2. **\u6765\u6e90**\uff1a\u5168\u90e8\u6765\u81ea `msitarzewski/agency-agents`\uff08git remote = github.com/msitarzewski/agency-agents.git\uff09\uff0c\u672c\u5730 clone \u5728 `~/agency-agents/engineering/`\u3002\u5907\u4efd\u6587\u4ef6\u4e0e\u6e90\u4ed3\u5e93 **14/15 \u9010\u5b57\u8282\u4e00\u81f4**\uff1b\u552f\u4e00\u4f8b\u5916\u662f `engineering-solidity-smart-contract-engineer.md` \u4e0e\u6e90\u6709\u5dee\u5f02\uff08\u53ef\u80fd\u4f60\u672c\u5730\u6539\u8fc7\uff09\u3002\n3. **\u672c\u673a\u771f\u5b9e\u9879\u76ee\u6808**\uff08`/var/www` \u626b\u63cf\uff09\uff1a\u4ee5 **Python \u540e\u7aef\u4e3a\u4e3b**\uff08rc-api-server / rc-api-server2 / rc-platform2 / shy_empower / vietguard2 / xiaochu / weather-agent / captcha-ocr-server\uff0cDjango/FastAPI + Celery\uff09\uff0c\u914d\u5c11\u91cf JS \u9879\u76ee\uff08i18n_hardening\u3001autojs6-feishu-clock \u98de\u4e66\u6253\u5361\u811a\u672c\uff09\u3002**\u6ca1\u6709\u4efb\u4f55** WordPress / Drupal / \u56fa\u4ef6 / \u533a\u5757\u94fe / \u5d4c\u5165\u5f0f / \u5fae\u4fe1\u5c0f\u7a0b\u5e8f / PHP-Filament / \u7f51\u7edc\u8bbe\u5907\u9879\u76ee\u3002\n4. **\u7ed3\u8bba\u5148\u884c**\uff1a\u5df2\u88c5\u7684 15 \u4e2a\u5168\u662f\u5782\u76f4\u9886\u57df\u7279\u5316 agent\uff0c\u548c\u4f60\"\u592a\u591a\u592a\u6742\"\u7684\u611f\u53d7\u4e00\u81f4 \u2014\u2014 \u5176\u4e2d **7 \u4e2a\u7684\u9886\u57df\u5728\u672c\u673a\u5b8c\u5168\u4e0d\u5b58\u5728**\uff0c\u53e6\u6709 7 \u4e2a\u65b9\u5411\u6cbe\u8fb9\u4f46\u65e0\u5f53\u524d\u9879\u76ee\u652f\u6491\uff0c\u4ec5 1 \u4e2a\u52c9\u5f3a\u7b97\u901a\u7528\u515c\u5e95\u3002\n\n## \u4e8c\u3001\u4e09\u6863\u6e05\u5355\n\n### \u4fdd\u7559\uff081 \u4e2a\uff09\u2014\u2014 \u5efa\u8bae\u7559\n\n| Agent | \u7406\u7531 |\n|---|---|\n| `engineering-senior-developer` | 15 \u4e2a\u91cc\u552f\u4e00\u901a\u7528\u578b\u5f00\u53d1\u89d2\u8272\uff08\u8d44\u6df1\u5b9e\u73b0\u4e13\u5bb6\uff09\u3002\u867d\u63cf\u8ff0\u504f Laravel/Three.js\uff0c\u4f46\u53ef\u4f5c\u4e3a\u65e5\u5e38\u5f00\u53d1\u515c\u5e95 agent\uff1b\u672c\u673a Python \u4e3b\u529b\u4efb\u52a1\u5b83\u80fd\u9876\u4e0a\u3002\u82e5\u4f60\u89c9\u5f97\u5b83\u592a\u504f Laravel \u800c\u60f3\u964d\u7ea7\u4e3a\u5f85\u5b9a\uff0c\u8bf4\u4e00\u58f0\u5373\u53ef\u3002 |\n\n### \u5f85\u5b9a\uff087 \u4e2a\uff09\u2014\u2014 \u6bcf\u9879\u90fd\u7ed9\u4e86\u660e\u786e\u7559/\u5220\u503e\u5411\n\n| Agent | \u73b0\u72b6\u5224\u65ad | \u660e\u786e\u503e\u5411 |\n|---|---|---|\n| `engineering-email-intelligence-engineer` | AI \u6570\u636e\u7ba1\u7ebf\u65b9\u5411\uff0c\u4e0e weather-agent \u7b49 agent \u5f31\u76f8\u5173\uff0c\u4f46\u672c\u673a\u6ca1\u6709\u4efb\u4f55\u90ae\u4ef6\u5904\u7406\u9879\u76ee | **\u503e\u5411\u5220** |\n| `engineering-incident-response-commander` | \u65b9\u6cd5\u8bba\u7c7b\uff08\u4e8b\u6545\u54cd\u5e94/SLO/on-call\uff09\uff0c\u8ddf\u4ee3\u7801\u6808\u65e0\u5173 | **\u503e\u5411\u5220**\uff1b\u4ec5\u5f53\u4f60\u672c\u4eba\u8d1f\u8d23\u751f\u4ea7\u8fd0\u7ef4\u65f6\u7559 |\n| `engineering-it-service-manager` | ITIL 4 \u670d\u52a1\u7ba1\u7406\u65b9\u6cd5\u8bba\uff0c\u540c\u4e0a | **\u503e\u5411\u5220**\uff1b\u4ec5\u5f53\u4f60\u505a IT \u670d\u52a1\u7ba1\u7406\u65f6\u7559 |\n| `engineering-mobile-app-builder` | autojs6-feishu-clock \u662f Android \u81ea\u52a8\u5316\u811a\u672c\uff0c\u4e0d\u662f\u539f\u751f App \u5f00\u53d1\uff1b\u672c\u673a\u65e0 App \u9879\u76ee | **\u503e\u5411\u5220**\uff1b\u672a\u6765\u505a App \u518d\u88c5 |\n| `engineering-voice-ai-integration-engineer` | \u8bed\u97f3 ASR \u7ba1\u7ebf\uff0c\u4e0e\u73b0\u6709 captcha-ocr-server\uff08\u56fe\u50cf OCR\uff09\u540c\u5c5e AI \u7ba1\u7ebf\u4f46\u65b9\u5411\u4e0d\u540c | **\u503e\u5411\u5220**\uff1b\u82e5\u8ba1\u5212\u505a\u8bed\u97f3\u518d\u7559 |\n| `engineering-wechat-mini-program-developer` | \u9879\u76ee\u662f**\u98de\u4e66**\uff08AutoJS6\uff09\u4e0d\u662f\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u3002\u4e14\u6e90\u4ed3\u5e93\u91cc\u6709\u66f4\u8d34\u5408\u7684 `engineering-feishu-integration-developer` \u4f46**\u672a\u5b89\u88c5** | **\u503e\u5411\u5220**\uff1b\u82e5\u4f60\u8981\u98de\u4e66\u65b9\u5411\uff0c\u5e94\u6362\u88c5 feishu \u90a3\u4e2a\u800c\u4e0d\u662f\u7559\u8fd9\u4e2a |\n| `engineering-solidity-smart-contract-engineer` | \u672c\u673a\u65e0\u4efb\u4f55\u533a\u5757\u94fe\u9879\u76ee\uff1b\u4e14\u6b64\u6587\u4ef6\u4e0e\u6e90\u4ed3\u5e93\u6709\u5dee\u5f02\uff08\u7591\u4f3c\u4f60\u6539\u8fc7\uff09 | **\u503e\u5411\u5220**\uff1b\u5982\u679c\u4f60\u6539\u8fc7\u60f3\u7559\uff0c\u544a\u8bc9\u6211\u4f60\u6539\u4e86\u4ec0\u4e48 |\n\n### \u5220\u9664\uff087 \u4e2a\uff09\u2014\u2014 \u9886\u57df\u5728\u672c\u673a\u9879\u76ee\u6808\u4e2d\u5b8c\u5168\u4e0d\u5b58\u5728\n\n| Agent | \u5220\u9664\u7406\u7531 |\n|---|---|\n| `engineering-cms-developer` | Drupal/WordPress \u4e3b\u9898\u4e0e\u63d2\u4ef6\uff0c/var/www \u65e0\u4efb\u4f55 CMS \u9879\u76ee |\n| `engineering-drupal-shopping-cart` | Drupal Commerce \u7535\u5546\uff0c\u65e0 Drupal \u9879\u76ee |\n| `engineering-wordpress-shopping-cart` | WooCommerce \u7535\u5546\uff0c\u65e0 WordPress \u9879\u76ee |\n| `engineering-embedded-firmware-engineer` | ESP32/STM32 \u56fa\u4ef6\uff0c\u6808\u65e0\u5d4c\u5165\u5f0f |\n| `engineering-filament-optimization-specialist` | Filament PHP \u540e\u53f0\uff0c\u6808\u65e0 PHP |\n| `engineering-network-engineer` | Cisco/Juniper/Palo Alto \u7f51\u7edc\u8bbe\u5907\uff0c\u65e0\u7f51\u7edc\u9879\u76ee |\n| `engineering-orgscript-engineer` | OrgScript \u8bed\u6cd5/AST\uff0c\u65e0\u76f8\u5173\u9879\u76ee |\n\n**\u5408\u8ba1\uff1a\u4fdd\u7559 1 + \u5f85\u5b9a 7 + \u5220 7 = 15\u3002**\n\n## \u4e09\u3001\u6267\u884c\u65b9\u6848\uff08\u7b49\u4f60\u786e\u8ba4\uff0c\u73b0\u5728\u4e0d\u52a8\u624b\uff09\n\n\u6309\u6280\u80fd\u786c\u95f8\u95e8\uff1a**\u4f60\u6ca1\u8bf4\"\u5220\"\uff0c\u6211\u5c31\u4e0d\u52a8\u4efb\u4f55\u6587\u4ef6\u3002** \u4f60\u786e\u8ba4\u540e\u6211\u518d\u6267\u884c\uff0c\u65b9\u5f0f\u5982\u4e0b\uff1a\n\n1. **\u5907\u4efd**\uff1a\u5168\u90e8 15 \u4e2a\u5df2\u5728 `~/.claude/backups/agents-20260804/`\uff08\u4eca\u5929\u5df2\u7edf\u4e00\u5907\u4efd\uff0c\u4e0d\u662f mv .bak \u4e34\u65f6\u6539\u540d\uff09\u3002\u786e\u8ba4\u5220\u9664\u7684\uff0c\u4ece `~/.claude/agents/`\uff08\u6216\u5907\u4efd\uff09\u79fb\u9664\uff0c\u5907\u4efd\u518d\u4fdd\u7559\u4e00\u6bb5\u65f6\u95f4\u786e\u8ba4\u65e0\u788d\u540e\u6e05\u7406\u3002\n2. **\u4fdd\u7559/\u5f85\u5b9a\u4e2d\u786e\u8ba4\u7559\u4e0b\u7684**\uff1a\u4ece\u5907\u4efd\u590d\u5236\u56de `~/.claude/agents/`\uff08\u5f53\u524d\u662f\u7a7a\u7684\uff09\u3002\n3. **\u786e\u8ba4\u5220\u9664\u7684**\uff1a\u4e0d\u518d\u590d\u5236\u56de agents \u76ee\u5f55\uff1b\u5907\u4efd\u76ee\u5f55\u91cc\u7684\u6587\u4ef6\u5728 N \u5929\u540e\u6e05\u7406\uff08N \u7531\u4f60\u5b9a\uff09\u3002\n4. **\u9644\u52a0\u5efa\u8bae\uff08\u6362\u8840\uff0c\u53ef\u9009\uff09**\uff1a\u5220\u9664\u540e\u5efa\u8bae\u4ece\u6e90\u4ed3\u5e93 `~/agency-agents/engineering/` \u88c5\u56de\u771f\u6b63\u8d34\u5408\u672c\u673a\u6808\u7684 agent\uff0c\u5982 `engineering-backend-architect`\u3001`engineering-ai-engineer`\uff0c\u4ee5\u53ca\u98de\u4e66\u65b9\u5411\u7684 `engineering-feishu-integration-developer` \u2014\u2014 \u5220\u6389 7 \u4e2a\u7528\u4e0d\u4e0a\u7684\uff0c\u8865 2-3 \u4e2a\u7528\u5f97\u4e0a\u7684\u662f\u8fd9\u8f6e\u7cbe\u7b80\u7684\u5b8c\u6574\u95ed\u73af\u3002\n\n## \u56db\u3001\u8bf7\u4f60\u62cd\u677f\n\n\u4e00\u6b21\u9009\u4e00\u4e2a\u5c31\u597d\uff1a\n- **A**\uff1a\u6309\"\u4fdd\u7559 1 + \u5f85\u5b9a 7 \u5168\u503e\u5411\u5220 + \u5220 7\"\u6267\u884c\uff08\u6700\u7ec8\u7559 1 \u4e2a\uff09\uff1f\n- **B**\uff1a\u5f85\u5b9a\u91cc\u67d0\u51e0\u4e2a\u4f60\u60f3\u7559\uff08\u70b9\u540d\uff09\uff0c\u6211\u8c03\u6574\u540e\u518d\u6267\u884c\uff1f\n- **C**\uff1a\u5148\u53ea\u5220\"\u5220\u9664\"\u6863\u7684 7 \u4e2a\uff0c\u5f85\u5b9a\u6863\u518d\u60f3\u60f3\uff1f\n"}], "grading": null}, {"id": "eval-2-install-dedup-old_skill", "prompt": "mattpocock \u7684 skills \u4ed3\u5e93\u91cc\u6709\u4e2a skill \u53eb grill-me\uff0c\u5e2e\u6211\u88c5\u5230 my-skills \u91cc\uff0c\u7528\u8f6f\u94fe\u3002\u5148\u68c0\u67e5\u662f\u4e0d\u662f\u5df2\u7ecf\u88c5\u8fc7\u4e86\uff0c\u518d\u7ed9\u5b89\u88c5\u65b9\u6848\u3002", "eval_id": 2, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u88c5\u5907\u5b89\u88c5\u8bc4\u4f30\uff1amattpocock/skills \u7684 grill-me \u2192 my-skills\uff08\u8f6f\u94fe\uff09\n\n> \u6309 SKILL.md \u4e03\u6b65\u65b9\u6cd5\u8bba\u6267\u884c\u3002\u7ed3\u8bba\u5148\u884c\uff1a**grill-me \u5df2\u7ecf\u88c5\u8fc7\u4e86\uff0c\u88c5\u7684\u662f\u300c\u590d\u5236\u300d\u4e0d\u662f\u300c\u8f6f\u94fe\u300d**\uff0c\u672c\u6b21\u4efb\u52a1\u662f\u300c\u590d\u5236 \u2192 \u8f6f\u94fe\u300d\u7684\u6362\u88c5\uff0c\u800c\u975e\u5168\u65b0\u5b89\u88c5\u3002\n\n---\n\n## \u2460 \u76d8\u70b9\u672c\u5730\u73b0\u72b6\uff08\u5df2\u6838\u5b9e\uff09\n\n| \u9879 | \u8def\u5f84 | \u72b6\u6001 |\n|----|------|------|\n| \u7528\u6237\u7ea7 my-skills \u96c6\u5408 | `~/.claude/skills/my-skills/` | \u5b58\u5728\uff0c\u72ec\u7acb git \u4ed3\u5e93 |\n| \u96c6\u5408\u5185 sub-skills | `~/.claude/skills/my-skills/skills/` | 16 \u4e2a\u6280\u80fd\u76ee\u5f55 |\n| grill-me \u672c\u5730\u526f\u672c | `~/.claude/skills/my-skills/skills/grill-me/` | **\u5b58\u5728** |\n| \u526f\u672c\u5f62\u6001 | \u2014 | **\u771f\u5b9e\u76ee\u5f55\uff08\u590d\u5236\uff09\uff0c\u975e\u7b26\u53f7\u94fe\u63a5**\uff08`readlink` \u65e0\u8f93\u51fa\uff09 |\n| \u526f\u672c git \u8ddf\u8e2a | `skills/grill-me/SKILL.md`\u3001`skills/grill-me/agents/openai.yaml` | \u4e24\u6587\u4ef6\u5747\u5df2\u88ab my-skills \u4ed3\u5e93\u8ddf\u8e2a |\n\n## \u2461 \u8bc6\u522b\u5019\u9009\u6765\u6e90\uff08\u5df2\u6838\u5b9e\uff09\n\n| \u9879 | \u503c |\n|----|----|\n| \u4ed3\u5e93\u8def\u5f84 | `/home/anonymous/skills` |\n| remote | `https://github.com/mattpocock/skills.git`\uff08\u5df2\u786e\u8ba4\uff09 |\n| \u6e90\u6280\u80fd\u8def\u5f84 | `/home/anonymous/skills/skills/productivity/grill-me/` |\n| \u6e90\u5185\u5bb9 | `SKILL.md`\uff08147 \u5b57\u8282\uff09+ `agents/openai.yaml` |\n| \u6700\u8fd1\u76f8\u5173\u63d0\u4ea4 | 2026-07-13 \u6dfb\u52a0 `agents/openai.yaml`\uff1b\u4ed3\u5e93\u6700\u8fd1\u5408\u5165 2026-07-28 |\n\n## \u2462 \u67e5\u91cd\uff08\u5df2\u6838\u5b9e\uff09\n\n- **\u5df2\u88c5**\uff1agrill-me \u5b58\u5728\u4e8e my-skills\uff0c\u4e14**\u975e\u8f6f\u94fe**\u2014\u2014\u662f\u590d\u5236\u5b89\u88c5\u3002\n- **\u5185\u5bb9\u4e00\u81f4\u6027**\uff1a`diff -r` \u6e90\u76ee\u5f55 vs \u672c\u5730\u526f\u672c \u2192 **IDENTICAL**\uff0cSKILL.md \u4e0e agents/openai.yaml \u9010\u5b57\u8282\u4e00\u81f4\uff0c\u65e0\u66f4\u65b0\u9700\u6c42\u3002\n- **\u540c\u7c7b\u5df2\u88c5**\uff1amattpocock \u6e90\u5171\u5f15\u5165 4 \u4e2a\u6280\u80fd\uff08grill-me / prototype / research / resolving-merge-conflicts\uff09\uff0c**\u5168\u90e8\u4e3a\u590d\u5236\u5b89\u88c5**\uff0c\u65e0\u8f6f\u94fe\u5148\u4f8b\u3002\n\n## \u2463 \u7b5b\u9009\n\ngrill-me\uff08\"A relentless interview to sharpen a plan or design\"\uff09\u5c5e\u4e8e\u7528\u6237\u6838\u5fc3\u6808\uff08LLM/\u6587\u6863/\u5de5\u4f5c\u6d41\uff09\uff0c**\u4fdd\u7559**\u3002\u65e0\u5220\u9664\u9879\u3002\n\n## \u2464 \u6f84\u6e05\u70b9\n\n\u4e00\u4e2a\u53d6\u820d\u9700\u8981\u3010\u965b\u4e0b\u3011\u5b9a\u593a\uff1a\n\n- **\u4ec5 grill-me \u6362\u8f6f\u94fe** vs **4 \u4e2a mattpocock \u6e90\u6280\u80fd\u5168\u90e8\u6362\u8f6f\u94fe**\uff1a\u53ea\u6362 grill-me \u4f1a\u9020\u6210\u96c6\u5408\u5185\u540c\u6e90\u6280\u80fd\u5b89\u88c5\u65b9\u5f0f\u4e0d\u4e00\u81f4\uff1b\u5168\u90e8\u6362\u5219\u66f4\u7edf\u4e00\uff0c\u4f46\u6539\u52a8\u9762\u5927\u3001\u4e14\u4e00\u65e6 my-skills \u4ed3\u5e93\u88ab clone \u5230\u522b\u5904\u4f1a\u5168\u90e8\u65ad\u94fe\u3002\n- \u672c\u65b9\u6848\u4ee5\u4e0b\u6309\u7528\u6237\u4efb\u52a1\u539f\u6587\u300c\u88c5 grill-me\u3001\u7528\u8f6f\u94fe\u300d\u53ea\u5199 grill-me \u7684\u6362\u88c5\u6b65\u9aa4\uff1b\u5982\u9700\u5168\u91cf\u6362\u88c5\uff0c\u5957\u7528\u540c\u4e00\u547d\u4ee4\u6a21\u677f\u5373\u53ef\u3002\n\n## \u2465 \u63a8\u8350\u65b9\u6848\uff08\u7528\u6237\u5df2\u660e\u786e\u8981\u8f6f\u94fe\uff09\n\n\u5df2\u88c5\uff08\u590d\u5236\uff09\u2192 \u6362\u88c5\u4e3a\u7b26\u53f7\u94fe\u63a5\u3002\u6309\u65b9\u6cd5\u8bba\u7b2c\u2466\u6b65\u6267\u884c\uff1a\u5907\u4efd \u2192 \u6362\u88c5 \u2192 \u9a8c\u8bc1\u3002\n\n### \u7b2c 1 \u6b65\uff1a\u5907\u4efd\uff08\u8986\u76d6/\u5220\u9664\u524d\u5fc5\u505a\uff09\n\n```bash\nmkdir -p ~/.claude/backups/skills-$(date +%Y%m%d)\ncp -r ~/.claude/skills/my-skills/skills/grill-me ~/.claude/backups/skills-$(date +%Y%m%d)/grill-me\n```\n\n### \u7b2c 2 \u6b65\uff1a\u5220\u9664\u590d\u5236\u76ee\u5f55\uff08\u56e0\u5df2 git \u8ddf\u8e2a\uff0c\u7528 git rm \u4fdd\u7559\u4ed3\u5e93\u8bb0\u5f55\uff09\n\n```bash\ngit -C ~/.claude/skills/my-skills rm -r skills/grill-me\n```\n\n### \u7b2c 3 \u6b65\uff1a\u521b\u5efa\u7b26\u53f7\u94fe\u63a5\uff08\u8f6f\u94fe\uff09\n\n```bash\nln -s /home/anonymous/skills/skills/productivity/grill-me ~/.claude/skills/my-skills/skills/grill-me\n```\n\n> \u5b98\u65b9\u811a\u672c `./scripts/link-skills.sh` \u662f\u88c5\u5230 `~/.claude/skills/` \u9876\u5c42\uff0c\u4e0d\u88c5\u8fdb my-skills \u96c6\u5408\u5185\uff0c\u6545\u6b64\u5904\u624b\u5199 `ln -s` \u5373\u53ef\u3002\n\n### \u7b2c 4 \u6b65\uff1a\u9a8c\u8bc1\n\n```bash\nreadlink ~/.claude/skills/my-skills/skills/grill-me\n# \u671f\u671b\u8f93\u51fa\uff1a/home/anonymous/skills/skills/productivity/grill-me\n\nls -la ~/.claude/skills/my-skills/skills/grill-me/SKILL.md\n# \u671f\u671b\uff1a\u8f6f\u94fe\u6307\u5411\u7684\u6587\u4ef6\u5b58\u5728\u4e14\u975e\u7a7a\uff08147 \u5b57\u8282\uff09\n\ndiff -r /home/anonymous/skills/skills/productivity/grill-me ~/.claude/skills/my-skills/skills/grill-me\n# \u671f\u671b\uff1a\u65e0\u5dee\u5f02\uff08\u8f6f\u94fe\u8ddf\u968f\u76ee\u6807\uff0c\u5185\u5bb9\u4e00\u81f4\u5373\u9a8c\u8bc1\u901a\u8fc7\uff09\n```\n\n## \u2466 \u7ed3\u8bba\n\n- **\u5df2\u88c5**\uff1agrill-me \u5df2\u5b58\u5728\u4e8e my-skills\uff08\u590d\u5236\u65b9\u5f0f\uff09\uff0c\u5185\u5bb9\u4e0e\u6e90\u5b8c\u5168\u4e00\u81f4\uff0c\u65e0\u9700\u91cd\u65b0\u5b89\u88c5\u3002\n- **\u5f85\u529e**\uff1a\u4ec5\u9700\u5c06\u5b89\u88c5\u65b9\u5f0f\u4ece\u300c\u590d\u5236\u300d\u6362\u4e3a\u300c\u8f6f\u94fe\u300d\uff08\u82e5\u3010\u965b\u4e0b\u3011\u786e\u8ba4\uff09\u3002\n- **\u5751\u4f4d\u63d0\u9192**\uff1a\u8f6f\u94fe\u4f9d\u8d56 `/home/anonymous/skills` \u8def\u5f84\u957f\u671f\u5b58\u5728\uff1b\u4ed3\u5e93\u88ab\u79fb\u52a8/\u5220\u9664\u4f1a\u65ad\u94fe\u3002\u4e14 my-skills \u662f\u72ec\u7acb git \u4ed3\u5e93\uff0c\u8f6f\u94fe\u4f1a\u88ab git \u6b63\u5e38\u8ddf\u8e2a\uff0cclone \u5230\u522b\u7684\u673a\u5668\u4f1a\u65ad\u94fe\u2014\u2014\u8fd9\u662f\u300c\u8f6f\u94fe\u88c5\u8fdb git \u7ba1\u7406\u7684\u96c6\u5408\u300d\u7684\u56fa\u6709\u4ee3\u4ef7\uff0c\u5df2\u77e5\u4e14\u63a5\u53d7\u5373\u53ef\u3002\n- **\u4e00\u81f4\u6027\u5907\u6ce8**\uff1a\u5176\u4f59 3 \u4e2a\u540c\u6e90\u6280\u80fd\uff08prototype/research/resolving-merge-conflicts\uff09\u4ecd\u4e3a\u590d\u5236\uff0c\u5982\u9700\u7edf\u4e00\u53ef\u5957\u7528\u540c\u6a21\u677f\uff0c\u7b49\u3010\u965b\u4e0b\u3011\u6307\u793a\u3002\n"}], "grading": null}, {"id": "eval-2-install-dedup-with_skill", "prompt": "mattpocock \u7684 skills \u4ed3\u5e93\u91cc\u6709\u4e2a skill \u53eb grill-me\uff0c\u5e2e\u6211\u88c5\u5230 my-skills \u91cc\uff0c\u7528\u8f6f\u94fe\u3002\u5148\u68c0\u67e5\u662f\u4e0d\u662f\u5df2\u7ecf\u88c5\u8fc7\u4e86\uff0c\u518d\u7ed9\u5b89\u88c5\u65b9\u6848\u3002", "eval_id": 2, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u8bc4\u4f30\uff1a\u628a mattpocock/skills \u7684 grill-me \u88c5\u8fdb my-skills\uff08\u8f6f\u94fe\u65b9\u5f0f\uff09\n\n\u8bc4\u4f30\u65e5\u671f\uff1a2026-08-04\n\u8bc4\u4f30\u65b9\u6cd5\uff1aequipment-manager \u6280\u80fd\uff08\u9636\u6bb5\u4e09\u6478\u5e95\u67e5\u91cd \u2192 \u9636\u6bb5\u56db\u7ed9\u65b9\u6848\uff09\n\u6267\u884c\u72b6\u6001\uff1a**\u53ea\u8bc4\u4f30\u672a\u6539\u52a8**\uff08\u786c\u95f8\u95e8\uff1a\u672a\u83b7\u6279\u51c6\u524d\u4e0d\u52a8\u4efb\u4f55\u6587\u4ef6\uff09\n\n## \u4e00\u3001\u6478\u5e95\u7ed3\u679c\uff08\u5df2\u6838\u5b9e\u7684\u4e8b\u5b9e\uff09\n\n### 1. \u662f\u5426\u5df2\u88c5\uff1a**\u5df2\u88c5\uff0c\u4f46\u88c5\u7684\u662f\u526f\u672c\uff0c\u4e0d\u662f\u8f6f\u94fe**\n- \u76ee\u6807\u8def\u5f84 `/home/anonymous/.claude/skills/my-skills/skills/grill-me/` **\u5df2\u5b58\u5728**\uff0c\u662f\u4e00\u4e2a**\u771f\u5b9e\u76ee\u5f55\uff08\u590d\u5236\u65b9\u5f0f\u5b89\u88c5\uff09**\uff0c\u4e0d\u662f\u7b26\u53f7\u94fe\u63a5\uff08`readlink` \u65e0\u8f93\u51fa\uff09\u3002\n- \u76ee\u5f55\u5185\uff1a`SKILL.md`\uff08147 \u5b57\u8282\uff0c2026-08-03 15:51\uff09\u3001`agents/openai.yaml`\uff08137 \u5b57\u8282\uff09\u3002\n\n### 2. \u6765\u6e90\u4ed3\u5e93\u6838\u5b9e\n- \u4ed3\u5e93\u8def\u5f84 `/home/anonymous/skills`\uff0cremote \u4e3a `https://github.com/mattpocock/skills.git`\uff08\u4e0e\u6863\u6848 `references/mattpocock.md` \u4e00\u81f4\uff09\u3002\n- \u6e90\u6280\u80fd\u4f4d\u4e8e\u4ed3\u5e93\u5185 `/home/anonymous/skills/skills/productivity/grill-me/`\uff0c\u5185\u5bb9\u4e3a `SKILL.md` + `agents/openai.yaml`\u3002\n\n### 3. \u5185\u5bb9\u4e00\u81f4\u6027\uff1a**\u5b8c\u5168\u4e00\u81f4**\n- `diff -r /home/anonymous/skills/skills/productivity/grill-me/ /home/anonymous/.claude/skills/my-skills/skills/grill-me/` \u9000\u51fa\u7801 0\uff0c\u4e24\u4e2a\u6587\u4ef6\u9010\u5b57\u8282\u76f8\u540c\u3002\n- \u7ed3\u8bba\uff1a**\u65e0\u9700\u91cd\u65b0\u5b89\u88c5**\uff0c\u5df2\u88c5\u7684\u526f\u672c\u4e0e\u4ed3\u5e93\u6e90\u96f6\u5dee\u5f02\u3002\n\n### 4. \u547d\u540d\u7a7a\u95f4\n- grill-me \u4f4d\u4e8e my-skills \u63d2\u4ef6\u7684 `skills/` \u4e0b\uff0c\u66b4\u9732\u4e3a `my-skills:grill-me`\u3002\u6539\u9020\u6210\u8f6f\u94fe\u540e\u547d\u540d\u7a7a\u95f4\u4e0d\u53d8\u3002\n\n### 5. \u5b98\u65b9\u811a\u672c\u4e0d\u9002\u7528\n- \u4ed3\u5e93\u5b98\u65b9 `scripts/link-skills.sh` \u6ce8\u660e\u662f **dev-only\u3001\u7ef4\u62a4\u8005\u4e13\u7528**\uff0c\u4e14\u884c\u4e3a\u662f\u628a\u4ed3\u5e93\u91cc**\u5168\u90e8** skill \u8f6f\u94fe\u5230 `~/.claude/skills`\uff08\u9876\u5c42\uff0c\u4e0d\u662f my-skills \u63d2\u4ef6\u76ee\u5f55\uff09\u3002\n- \u4e0d\u9002\u5408\"\u53ea\u88c5 grill-me \u4e00\u4e2a\u5230 my-skills \u63d2\u4ef6\u91cc\"\u7684\u8bc9\u6c42 \u2192 \u8d70**\u624b\u52a8 `ln -s`**\u3002\n\n## \u4e8c\u3001\u67e5\u91cd\u7ed3\u8bba\uff08\u8bf4\u4eba\u8bdd\uff09\n\n| \u9879 | \u7ed3\u8bba |\n|---|---|\n| \u88c5\u6ca1\u88c5 | \u5df2\u7ecf\u88c5\u4e86 |\n| \u600e\u4e48\u88c5\u7684 | \u590d\u5236\uff08\u72ec\u7acb\u526f\u672c\uff09\uff0c\u4e0d\u662f\u8f6f\u94fe |\n| \u5185\u5bb9\u8ddf\u4ed3\u5e93\u4e00\u6837\u5417 | \u4e00\u6837\uff0c\u96f6\u5dee\u5f02 |\n| \u4f60\u8981\u7684\u8f6f\u94fe | \u6ca1\u505a\uff0c\u73b0\u5728\u662f\u526f\u672c |\n\n\u6240\u4ee5\u8fd9\u5355\u7684\u771f\u6b63\u52a8\u4f5c\u4e0d\u662f\"\u5b89\u88c5\"\uff0c\u800c\u662f**\u628a\u5df2\u6709\u526f\u672c\u6539\u9020\u6210\u8f6f\u94fe**\uff08\u526f\u672c\u5220\u9664 + \u5efa\u8f6f\u94fe\uff09\uff0c\u8ba9\u4ed3\u5e93 `git pull` \u7684\u66f4\u65b0\u81ea\u52a8\u4f20\u64ad\u3002\n\n## \u4e09\u3001\u5b89\u88c5\u65b9\u6848\uff08\u9636\u6bb5\u56db\uff0c\u7ed9 2-3 \u4e2a\u9009\u9879\uff09\n\n### \u9009\u9879 A\uff08\u63a8\u8350\uff09\uff1a\u6539\u9020\u6210\u8f6f\u94fe \u2014\u2014 \u6ee1\u8db3\"\u7528\u8f6f\u94fe\"\u7684\u8981\u6c42\n- \u5229\uff1a\u4ed3\u5e93\u66f4\u65b0\u81ea\u52a8\u4f20\u64ad\uff1b\u7701\u78c1\u76d8\uff1b\u7b26\u5408\u4f60\u7684\u660e\u786e\u8981\u6c42\u3002\n- \u5f0a\uff1a\u82e5\u4ed3\u5e93\u8def\u5f84\u53d8\u52a8\u6216\u4ed3\u5e93\u88ab\u5220\uff0c\u8f6f\u94fe\u65ad\u88c2\uff08\u53ef `readlink` \u53d1\u73b0\u3001\u91cd\u94fe\u4fee\u590d\uff09\u3002\n- \u6b65\u9aa4\uff08**\u9700\u4f60\u6279\u51c6\u540e\u624d\u6267\u884c**\uff09\uff1a\n\n```bash\n# 1. \u5907\u4efd\u73b0\u6709\u526f\u672c\uff08\u8986\u76d6\u524d\u5148\u5907\u4efd\uff0c\u4e0d\u7528 mv xxx.bak\uff09\nmkdir -p ~/.claude/backups/2026-08-04\ncp -r /home/anonymous/.claude/skills/my-skills/skills/grill-me ~/.claude/backups/2026-08-04/grill-me-copy\n\n# 2. \u79fb\u9664\u5df2\u88c5\u7684\u526f\u672c\nrm -rf /home/anonymous/.claude/skills/my-skills/skills/grill-me\n\n# 3. \u5efa\u8f6f\u94fe\u6307\u5411\u4ed3\u5e93\u6e90\nln -s /home/anonymous/skills/skills/productivity/grill-me /home/anonymous/.claude/skills/my-skills/skills/grill-me\n\n# 4. \u9a8c\u8bc1\uff1a\u8f6f\u94fe\u76ee\u6807\u5b58\u5728\u3001\u76ee\u5f55\u975e\u7a7a\u3001\u6709 SKILL.md\nls -la /home/anonymous/.claude/skills/my-skills/skills/grill-me   # \u5e94\u663e\u793a -> /home/anonymous/skills/skills/productivity/grill-me\nreadlink /home/anonymous/.claude/skills/my-skills/skills/grill-me # \u5e94\u8f93\u51fa\u6e90\u8def\u5f84\ntest -f /home/anonymous/.claude/skills/my-skills/skills/grill-me/SKILL.md && echo \"\u8f6f\u94fe\u6709\u6548\uff0cSKILL.md \u5b58\u5728\"\n```\n\n### \u9009\u9879 B\uff1a\u4fdd\u6301\u526f\u672c\u73b0\u72b6\uff0c\u4ec0\u4e48\u90fd\u4e0d\u505a\n- \u5229\uff1a\u96f6\u6539\u52a8\u3001\u96f6\u98ce\u9669\uff1b\u5185\u5bb9\u4e0e\u4ed3\u5e93\u5df2\u5b8c\u5168\u4e00\u81f4\u3002\n- \u5f0a\uff1a\u4ed3\u5e93\u66f4\u65b0\u4e0d\u4f1a\u81ea\u52a8\u4f20\u64ad\uff0c\u4e0b\u6b21\u8981\u624b\u52a8\u91cd\u62f7\uff1b\u4e0d\u662f\u4f60\u8981\u7684\u8f6f\u94fe\u3002\n- \u9002\u7528\uff1a\u5982\u679c\u4f60\u5176\u5b9e\u4e0d\u4ecb\u610f\u5b89\u88c5\u65b9\u5f0f\uff0c\u8fd9\u4e2a\u6700\u7701\u4e8b\u3002\n\n### \u9009\u9879 C\uff1a\u5148\u5220\u6389\uff0c\u518d\u91cd\u65b0\u8f6f\u94fe\u5b89\u88c5\uff08\u7b49\u4ef7\u4e8e A \u4f46\u591a\u4e00\u6b65\uff09\n- \u4e0d\u63a8\u8350\uff1a\u4e0e A \u7ed3\u679c\u76f8\u540c\uff0c\u4e14\u591a\u4e86\"\u5148\u5220\u540e\u88c5\"\u7684\u7a97\u53e3\u671f\u98ce\u9669\uff0c\u65e0\u989d\u5916\u6536\u76ca\u3002\n\n## \u56db\u3001\u63a8\u8350\u4e0e\u8bf4\u660e\n\n- **\u63a8\u8350\u9009\u9879 A**\uff1a\u4e00\u6b21\u6267\u884c\u5230\u4f4d\uff0c\u6ee1\u8db3\"\u7528\u8f6f\u94fe\"\uff0c\u4e14\u5df2\u6709\u526f\u672c\u4e0e\u6e90\u4e00\u81f4\uff0c\u5907\u4efd\u540e\u53ef\u5b89\u5168\u66ff\u6362\u3002\n- \u5907\u4efd\u76ee\u5f55 `~/.claude/backups/` \u5df2\u5b58\u5728\u4e14\u5df2\u6709 `agents-20260804`\uff0c\u6cbf\u7528\u540c\u4e00\u65e5\u671f\u76ee\u5f55\u3002\n- \u82e5\u65e5\u540e\u4ed3\u5e93\u8def\u5f84\u53d8\u52a8\uff1a`rm` \u65e7\u8f6f\u94fe + \u91cd\u65b0 `ln -s` \u65b0\u8def\u5f84\u5373\u53ef\uff0c2 \u884c\u547d\u4ee4\u3002\n- \u8f6f\u94fe\u751f\u6548\u540e `git -C /home/anonymous/skills pull` \u5373\u81ea\u52a8\u66f4\u65b0 grill-me\uff0c\u65e0\u9700\u518d\u88c5\u3002\n"}], "grading": null}, {"id": "eval-3-onboard-new-repo-old_skill", "prompt": "\u6211\u51c6\u5907\u63a5\u5165\u4e00\u4e2a\u65b0\u7684\u7b2c\u4e09\u65b9 skill \u4ed3\u5e93\uff0cgit clone \u5230\u672c\u5730 ~/new-skill-repo\uff0c\u91cc\u9762\u662f agents \u548c skills \u6df7\u5408\u7684\u3002\u4f60\u6309\u88c5\u5907\u7ba1\u7406\u7684\u6d41\u7a0b\u5e2e\u6211\u51fa\u4e00\u4efd\u63a5\u5165\u65b9\u6848\u2014\u2014\u8981\u5efa\u4ec0\u4e48\u6863\u6848\u3001\u600e\u4e48\u767b\u8bb0\u3001description \u600e\u4e48\u6539\u3002\u5148\u51fa\u65b9\u6848\u522b\u52a8\u624b\u3002", "eval_id": 3, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u65b0\u4ed3\u5e93\u63a5\u5165\u65b9\u6848\uff1a`~/new-skill-repo`\uff08agents + skills \u6df7\u5408\uff09\n\n> \u672c\u65b9\u6848\u6309\u88c5\u5907\u7ba1\u7406\u5668\u65b9\u6cd5\u8bba\u300c\u63a5\u5165\u65b0\u4ed3\u5e93\u300d\u6d41\u7a0b\u51fa\u5177\uff0c\u4ec5\u51fa\u65b9\u6848\u3001\u4e0d\u52a8\u624b\u3002\n> \u4ed3\u5e93 `~/new-skill-repo` \u672c\u673a\u5c1a\u4e0d\u5b58\u5728\uff0c\u4ee5\u4e0b\u4e3a\u901a\u7528\u63a5\u5165\u65b9\u6848\uff0c\u843d\u5730\u65f6\u6309\u5b9e\u9645\u7ed3\u6784\u6821\u5bf9\u3002\n\n## \u73b0\u72b6\n- \u65b9\u6cd5\u8bba\u5df2\u56fa\u5316\uff08\u76d8\u70b9\u2192\u67e5\u91cd\u2192\u4e09\u6863\u7b5b\u9009\u2192\u63d0\u95ee\u6f84\u6e05\u2192\u5907\u4efd\u5b89\u88c5\u2192\u9a8c\u8bc1\uff09\uff0c\u4ed3\u5e93\u5dee\u5f02\u5168\u90e8\u8d70 `references/` \u6863\u6848\u3002\n- \u5df2\u63a5\u5165 3 \u4e2a\u4ed3\u5e93\uff1amsitarzewski/agency-agents\uff08agent \u4e3a\u4e3b\uff09\u3001wshobson/agents\uff08plugins \u591a\u57df\uff0cagents+skills \u6df7\u5408\uff0c\u6700\u63a5\u8fd1\u672c\u4ed3\u5e93\u5f62\u6001\uff09\u3001mattpocock/skills\uff08skill \u4e3a\u4e3b\uff09\u3002\n- \u65b0\u4ed3\u5e93\u4e3a **agents + skills \u6df7\u5408**\uff0c\u7ed3\u6784\u4e0e wshobson \u6700\u50cf\uff0c\u6863\u6848\u683c\u5f0f\u53ef\u76f4\u63a5\u53c2\u7167\u3002\n\n---\n\n## \u63a5\u5165\u4e94\u6b65\n\n### \u7b2c 1 \u6b65\uff1a\u786e\u8ba4\u6765\u6e90\n- `git -C ~/new-skill-repo remote -v`\uff0c\u786e\u8ba4\u8fdc\u7a0b\u5730\u5740\u3001\u662f\u5426 fork\u3001\u4f5c\u8005\u3002\n- \u6838\u5bf9 `git log -1 --format='%h %ad %s'`\uff0c\u786e\u8ba4 clone \u7248\u672c\u65f6\u95f4\u70b9\u3002\n- \u4ea7\u51fa\uff1a\u6765\u6e90\u4fe1\u606f\u5199\u5165\u6863\u6848\u300c\u57fa\u672c\u4fe1\u606f\u300d\u3002\n\n### \u7b2c 2 \u6b65\uff1a\u6478\u6e05\u7ed3\u6784\n- `tree ~/new-skill-repo -L 3`\uff08\u6216 `ls -R`\uff09\u770b\u9876\u5c42\u76ee\u5f55\u3002\n- \u786e\u8ba4 agents \u4e0e skills \u5404\u81ea\u4f4d\u7f6e\uff1a\u662f `agents/`\u3001`skills/` \u5206\u5f00\uff0c\u8fd8\u662f `plugins/<domain>/{agents,skills}/` \u6df7\u5408\uff08\u53c2\u7167 wshobson\uff09\u3002\n- \u786e\u8ba4\u547d\u540d\u7ea6\u5b9a\uff1a`<domain>-<name>.md` \u8fd8\u662f `skills/<name>/SKILL.md`\u3002\n- \u786e\u8ba4\u5b89\u88c5\u673a\u5236\uff1a\u5b98\u65b9\u811a\u672c\uff08`install.sh`/`link-skills.sh`\uff09\u3001\u8fd8\u662f\u60ef\u4f8b\u7b26\u53f7\u94fe\u63a5/\u590d\u5236\uff08\u53c2\u7167 wshobson \u60ef\u4f8b\u8f6f\u94fe\uff09\u3002\n- \u68c0\u67e5\u6bcf\u4e2a skill \u662f\u5426\u6709 `SKILL.md`\u3001agent \u662f\u5426\u6709 frontmatter `name`/`description`\uff0c\u5bbf\u4e3b\u517c\u5bb9\u6027\uff08\u662f\u5426\u542b `agents/openai.yaml` \u4e4b\u7c7b\u975e Claude \u5bbf\u4e3b\u6587\u4ef6\uff0c\u53c2\u7167 mattpocock \u5751\u4f4d\uff09\u3002\n- \u4ea7\u51fa\uff1a\u7ed3\u6784\u7ed3\u8bba\u5199\u5165\u6863\u6848\u300c\u76ee\u5f55\u7ed3\u6784\u300d\u300c\u5b89\u88c5\u673a\u5236\u300d\u3002\n\n### \u7b2c 3 \u6b65\uff1a\u5efa\u6863\u6848\n\u5728 `references/` \u4e0b\u65b0\u5efa\u6863\u6848\u6587\u4ef6\uff08\u6309\u4ed3\u5e93\u540d\u547d\u540d\uff0c\u5982 `references/new-skill-repo.md`\uff09\uff0c**\u4eff\u7167\u73b0\u6709\u4e09\u4e2a\u6863\u6848\u7684\u4e94\u6bb5\u5f0f\u7ed3\u6784**\uff1a\n\n```markdown\n# \u4ed3\u5e93\u6863\u6848\uff1a<owner>/<repo>\n\n## \u57fa\u672c\u4fe1\u606f\n- **\u672c\u5730\u8def\u5f84**\uff1a`~/new-skill-repo`\n- **git remote**\uff1a`<git clone \u7684\u8fdc\u7a0b\u5730\u5740>`\n\n## \u76ee\u5f55\u7ed3\u6784\n- \u9876\u5c42\u7ed3\u6784\uff1a<\u5b9e\u9645\u7ed3\u6784\uff0c\u5982 `agents/`\u3001`skills/` \u5206\u5f00\uff0c\u6216 `plugins/<domain>/{agents,skills}/` \u6df7\u5408>\n- \u547d\u540d\u7ea6\u5b9a\uff1a<\u5982 `<domain>-<name>.md` / `skills/<name>/SKILL.md`>\n- \u89c4\u6a21\uff1a<\u5982 N agents / M skills\uff0c\u6309\u5b9e\u9645\u7edf\u8ba1>\n\n## \u5b89\u88c5\u673a\u5236\n- <\u5b98\u65b9\u811a\u672c\u547d\u4ee4 / \u60ef\u4f8b\u8f6f\u94fe\u547d\u4ee4>\n- \u26a0\ufe0f \u5b89\u88c5\u65b9\u5f0f\uff08\u8f6f\u94fe/\u590d\u5236\uff09\u6309\u4e3b\u6d41\u7a0b\u7b2c\u2466\u6b65\u8ba9\u7528\u6237\u62cd\u677f\uff0c\u4e0d\u9ed8\u8ba4\n\n## \u5751\u4f4d\u4e0e\u7ea6\u5b9a\n- <\u4e0e\u65e2\u6709\u4ed3\u5e93\u51b2\u7a81\u3001\u975e Claude \u5bbf\u4e3b\u6587\u4ef6\u3001\u672c\u5730\u540d vs \u4ed3\u5e93\u540d\u5dee\u5f02\u7b49>\n\n## \u5df2\u77e5\u5b9e\u8df5\uff08<\u65e5\u671f>\uff09\n- <\u63a5\u5165\u8bc4\u4f30\u540e\u7684\u7ed3\u8bba\uff1a\u88c5\u4e86\u54ea\u4e9b/\u5220\u4e86\u54ea\u4e9b/\u5907\u4efd\u4f4d\u7f6e>\n```\n\n\u8981\u70b9\uff1a\n- \u6863\u6848 = \u4ed3\u5e93\u4e13\u5c5e\u60c5\u62a5\uff0c\u65b9\u6cd5\u8bba\u4e0d\u590d\u5236\u8fdb\u6863\u6848\u3002\n- \u9996\u6b21\u5efa\u6863\u6848\u65f6\u300c\u5df2\u77e5\u5b9e\u8df5\u300d\u53ef\u5148\u7559\u7a7a\u6216\u5199\u300c\u5f85\u8bc4\u4f30\u300d\uff0c\u7b49\u771f\u6b63\u5b89\u88c5\u540e\u518d\u56de\u586b\u3002\n\n### \u7b2c 4 \u6b65\uff1a\u767b\u8bb0\n\u5728 SKILL.md \u7684\u300c\u652f\u6301\u7684\u4ed3\u5e93\u300d\u8868\u683c\u4e2d\u52a0\u4e00\u884c\uff1a\n\n| \u6863\u6848 | \u4ed3\u5e93 | \u5185\u5bb9 |\n|------|------|------|\n| `references/new-skill-repo.md` | <owner>/<repo> | <\u4e00\u53e5\u8bdd\u63cf\u8ff0\u7ed3\u6784\u4e0e\u5b89\u88c5\u673a\u5236\uff0c\u5982 agents+skills \u6df7\u5408\uff0c\u60ef\u4f8b\u8f6f\u94fe> |\n\n### \u7b2c 5 \u6b65\uff1a\u66f4\u65b0 description\n\u5728 SKILL.md frontmatter `description` \u7684\u300c\u5df2\u63a5\u5165\u300d\u5217\u8868\u8865\u4e0a\u4ed3\u5e93\u540d\uff1a\n\n```\ndescription: ... \u5df2\u63a5\u5165\uff1amsitarzewski/agency-agents\u3001wshobson/agents\u3001mattpocock/skills\u3001<owner>/<repo>\uff08\u65b0\u4ed3\u5e93\u53ef\u6309\u6d41\u7a0b\u63a5\u5165\uff09...\n```\n\n\u4fdd\u6301\u89e6\u53d1\u7cbe\u51c6\uff1a\u53ea\u52a0\u540d\u5b57\uff0c\u4e0d\u5c55\u5f00\u7ec6\u8282\uff08\u7ec6\u8282\u5728\u6863\u6848\u91cc\uff09\u3002\n\n---\n\n## \u901a\u7528\u5185\u6838\u4e0d\u52a8\n- \u4e94\u6b65\u5168\u90e8\u662f\u300c\u5efa\u6863\u6848 + \u8868\u683c\u4e00\u884c + description \u8865\u4e00\u4e2a\u540d\u5b57\u300d\uff0c\u65b9\u6cd5\u8bba\u6b63\u6587\uff08\u4e03\u6b65\u6d41\u7a0b\u3001\u514b\u5236\u539f\u5219\uff09\u96f6\u6539\u52a8\u3002\n- \u52a0\u4ed3\u5e93\u4e0d\u6539\u5185\u6838 = \u540e\u7eed\u4efb\u4f55\u65b0\u4ed3\u5e93\u90fd\u80fd\u8d70\u540c\u4e00\u6d41\u7a0b\u3002\n\n## \u4e0b\u4e00\u6b65\uff08\u5f85\u7528\u6237\u62cd\u677f\u540e\u624d\u6267\u884c\uff09\n1. \u4ed3\u5e93 clone \u5c31\u7eea\u540e\uff0c\u5b9e\u9645\u6267\u884c\u7b2c 1~2 \u6b65\uff08\u786e\u8ba4\u6765\u6e90\u3001\u6478\u6e05\u7ed3\u6784\uff09\u3002\n2. \u6309\u4e03\u6b65\u6d41\u7a0b\u8bc4\u4f30\u5177\u4f53\u8be5\u88c5\u54ea\u4e9b\uff1a\u76d8\u70b9\u672c\u5730 \u2192 \u67e5\u91cd \u2192 \u6309\u771f\u5b9e\u9879\u76ee\u6808\u4e09\u6863\u7b5b\u9009 \u2192 \u4e00\u6b21\u4e00\u95ee\u6f84\u6e05 \u2192 \u51fa\u65b9\u6848\u3002\n3. \u5b89\u88c5\u65b9\u5f0f\uff08\u7b26\u53f7\u94fe\u63a5 vs \u590d\u5236\uff09\u7531\u7528\u6237\u9009\u62e9\uff0c\u9ed8\u8ba4\u63a8\u8350\u7b26\u53f7\u94fe\u63a5\u3002\n4. \u4efb\u4f55\u8986\u76d6/\u5220\u9664\u524d\u5148\u5907\u4efd\u5230 `~/.claude/backups/<\u65e5\u671f>/`\u3002\n\n\u672c\u65b9\u6848\u4e0d\u5305\u542b\u4efb\u4f55\u5b9e\u9645\u521b\u5efa\u6863\u6848\u3001\u767b\u8bb0\u6216\u4fee\u6539 description \u7684\u52a8\u4f5c\u3002\n"}], "grading": null}, {"id": "eval-3-onboard-new-repo-with_skill", "prompt": "\u6211\u51c6\u5907\u63a5\u5165\u4e00\u4e2a\u65b0\u7684\u7b2c\u4e09\u65b9 skill \u4ed3\u5e93\uff0cgit clone \u5230\u672c\u5730 ~/new-skill-repo\uff0c\u91cc\u9762\u662f agents \u548c skills \u6df7\u5408\u7684\u3002\u4f60\u6309\u88c5\u5907\u7ba1\u7406\u7684\u6d41\u7a0b\u5e2e\u6211\u51fa\u4e00\u4efd\u63a5\u5165\u65b9\u6848\u2014\u2014\u8981\u5efa\u4ec0\u4e48\u6863\u6848\u3001\u600e\u4e48\u767b\u8bb0\u3001description \u600e\u4e48\u6539\u3002\u5148\u51fa\u65b9\u6848\u522b\u52a8\u624b\u3002", "eval_id": 3, "outputs": [{"name": "analysis.md", "type": "text", "content": "# \u63a5\u5165\u65b9\u6848\uff1a\u65b0\u7b2c\u4e09\u65b9 skill \u4ed3\u5e93\uff08~/new-skill-repo\uff09\n\n> \u6309\u88c5\u5907\u7ba1\u7406\u5668\u65b9\u6cd5\u8bba\u300c\u63a5\u5165\u65b0\u4ed3\u5e93\u300d\u6d41\u7a0b\u8f93\u51fa\u3002**\u672c\u65b9\u6848\u53ea\u51fa\u65b9\u6848\u3001\u4e0d\u6267\u884c**\u2014\u2014\u4ed3\u5e93\u5c1a\u672a clone\uff0c\u4e14\u786c\u95f8\u95e8\u8981\u6c42\uff1a\u5728\u5bf9\u8bdd\u786e\u8ba4\u5e76\u83b7\u5f97\u6279\u51c6\u524d\uff0c\u4e0d\u5efa\u6863\u6848\u3001\u4e0d\u6539 SKILL.md\u3001\u4e0d\u88c5\u4efb\u4f55\u4e1c\u897f\u3002\u4e0b\u6587\u6bcf\u4e00\u6b65\u90fd\u6807\u6ce8\u4e86\"\u5f85\u786e\u8ba4\u540e\u6267\u884c\"\u7684\u52a8\u4f5c\u3002\n\n## \u4ed3\u5e93\u6027\u8d28\u9884\u5224\n\n`~/new-skill-repo` \u662f **agents \u4e0e skills \u6df7\u5408**\u4ed3\u5e93\u3002\u8fd9\u4e0e\u73b0\u6709\u4e09\u4e2a\u4ed3\u5e93\u90fd\u4e0d\u540c\uff08msitarzewski \u7eaf agents\u3001wshobson/mattpocock \u4ee5 skills \u4e3a\u4e3b\uff09\uff0c\u6240\u4ee5\u6863\u6848\u91cc\u8981**\u5206\u522b\u8bb0\u5f55\u4e24\u7c7b\u88c5\u5907\u7684\u76ee\u5f55\u4e0e\u5b89\u88c5\u673a\u5236**\uff0c\u4e0d\u80fd\u6df7\u4e3a\u4e00\u8c08\u3002\n\n---\n\n## \u4e94\u6b65\u63a5\u5165\u6d41\u7a0b\n\n### \u7b2c 1 \u6b65\uff1a\u786e\u8ba4\u6765\u6e90\n\n\u4ed3\u5e93 clone \u5230\u4f4d\u540e\u6267\u884c\uff08\u672c\u673a\u5f53\u524d\u4e0d\u5b58\u5728\uff0c\u6b64\u6b65\u4e3a\u5f85\u529e\u5360\u4f4d\uff09\uff1a\n\n```bash\ngit -C ~/new-skill-repo remote -v\n```\n\n- \u8bb0\u5f55 remote URL\uff08github/gitlab \u7b49\uff09\u4e0e\u9ed8\u8ba4\u5206\u652f\uff0c\u5199\u5165\u6863\u6848\u300c\u57fa\u672c\u4fe1\u606f\u300d\u3002\n- \u76ee\u7684\uff1a\u6863\u6848\u91cc\u5199\u660e\u6765\u6e90\uff0c\u65e5\u540e git pull \u8bc4\u4f30\u589e\u91cf\u3001\u67e5\u8f6f\u94fe\u6307\u5411\u65f6\u80fd\u5bf9\u4e0a\u53f7\u3002\n\n### \u7b2c 2 \u6b65\uff1a\u6478\u6e05\u7ed3\u6784\n\n\u5bf9 `~/new-skill-repo` \u505a\u4e00\u6b21\u53ea\u8bfb\u6478\u5e95\uff0c\u91cd\u70b9\u56db\u9879\uff1a\n\n1. **\u76ee\u5f55\u7ed3\u6784**\uff1aagents \u4e0e skills \u5404\u5728\u54ea\u4e2a\u76ee\u5f55\uff08\u5982 `agents/`\u3001`skills/`\uff0c\u6216\u6df7\u5408\u5728 `plugins/` \u4e0b\uff09\uff0c\u6309 domain \u5206\u76ee\u5f55\u8fd8\u662f\u5e73\u94fa\u3002\n2. **\u547d\u540d\u7ea6\u5b9a**\uff1aagent \u662f `<domain>-<name>.md` \u5355\u6587\u4ef6\uff0c\u8fd8\u662f skill \u662f `skills/<name>/SKILL.md` \u76ee\u5f55\u5f0f\uff1b\u76ee\u5f55\u540d\u4e0e\u88c5\u5907\u540d\u662f\u5426\u53ef\u80fd\u4e0d\u4e00\u81f4\uff08wshobson \u6709\u524d\u8f66\u4e4b\u9274\uff1a\u672c\u5730\u540d vs \u4ed3\u5e93\u540d\u4e0d\u4e00\u81f4\u5bfc\u81f4\u65ad\u94fe\uff09\u3002\n3. **\u5b89\u88c5\u673a\u5236**\uff1a\u6709\u65e0\u5b98\u65b9\u811a\u672c\uff08install.sh / link-skills.sh \u4e4b\u7c7b\uff09\uff1b\u65e0\u811a\u672c\u65f6\u770b\u4ed3\u5e93 README \u7684\u60ef\u4f8b\u662f**\u7b26\u53f7\u94fe\u63a5**\u8fd8\u662f**\u590d\u5236**\u3002agents \u4e0e skills \u7684\u5b89\u88c5\u76ee\u6807\u76ee\u5f55\u4e0d\u540c\u2014\u2014agents \u88c5\u5230 `~/.claude/agents/`\uff0cskills \u88c5\u5230 `~/.claude/skills/`\uff08\u6216\u9879\u76ee\u7ea7 `.claude/`\uff09\uff0c\u8981\u5206\u522b\u786e\u8ba4\u3002\n4. **\u526f\u4ea7\u7269**\uff1a\u4ed3\u5e93\u91cc\u662f\u5426\u5e26 `agents/openai.yaml` \u4e4b\u7c7b\u7684\u9762\u5411\u5176\u4ed6\u5bbf\u4e3b\uff08Codex/OpenAI\uff09\u7684\u6587\u4ef6\uff0cClaude Code \u4f1a\u5ffd\u7565\u4f46\u6539\u52a8\u65f6\u8981\u6ce8\u610f\u540c\u6b65\uff08mattpocock \u6863\u6848\u5df2\u8bb0\u5f55\u6b64\u5751\uff09\u3002\n\n\u4ea7\u51fa\uff1a\u6478\u6e05\u7ed3\u679c\u7528\u5927\u767d\u8bdd\u6c47\u62a5\uff08\u4e0d\u7529\u9ed1\u8bdd\uff09\uff0c\u5e76\u628a\u7ed3\u8bba\u843d\u8fdb\u6863\u6848\u3002\n\n### \u7b2c 3 \u6b65\uff1a\u5efa\u6863\u6848\uff08references/ \u4e0b\u65b0\u5efa\uff09\n\n\u6309\u4f5c\u8005\u6216\u4ed3\u5e93\u540d\u65b0\u5efa `references/new-skill-repo.md`\uff0c**\u4eff\u7167\u73b0\u6709\u4e09\u4e2a\u6863\u6848\u7684\u4e94\u6bb5\u5f0f**\uff1a\n\n```markdown\n# \u4ed3\u5e93\u6863\u6848\uff1a<\u4f5c\u8005>/new-skill-repo\n\n## \u57fa\u672c\u4fe1\u606f\n- **\u672c\u5730\u8def\u5f84**\uff1a`/home/anonymous/new-skill-repo`\n- **git remote**\uff1a`<\u7b2c 1 \u6b65\u786e\u8ba4\u7684 URL>`\n\n## \u76ee\u5f55\u7ed3\u6784\n- `agents/`\uff1a\u2026\uff08\u6309 domain \u5206\u76ee\u5f55 / \u5e73\u94fa\uff0c\u547d\u540d\u7ea6\u5b9a\uff09\n- `skills/`\uff1a\u2026\uff08\u76ee\u5f55\u5f0f SKILL.md / \u5355\u6587\u4ef6\uff09\n- `scripts/`\uff1a\u2026\uff08\u5b98\u65b9\u5b89\u88c5\u811a\u672c\uff0c\u5982\u6709\uff09\n\n## \u5b89\u88c5\u673a\u5236\n- agents \u2192 `~/.claude/agents/`\uff1a\u5b98\u65b9\u811a\u672c\u53c2\u6570 / \u8f6f\u94fe / \u590d\u5236\uff0c\u547d\u4ee4\u793a\u4f8b\n- skills \u2192 `~/.claude/skills/`\uff1a\u540c\u4e0a\n- \u26a0\ufe0f \u5b89\u88c5\u65b9\u5f0f\uff08\u8f6f\u94fe/\u590d\u5236\uff09\u6309\u4e3b\u6d41\u7a0b\u8ba9\u7528\u6237\u62cd\u677f\uff0c\u4e0d\u9ed8\u8ba4\n\n## \u5751\u4f4d\u4e0e\u7ea6\u5b9a\n- \u672c\u5730\u540d vs \u4ed3\u5e93\u540d\u4e0d\u4e00\u81f4\u98ce\u9669\uff1b\u5b89\u88c5\u811a\u672c\u662f\u5426\u8986\u76d6\u540c\u540d\u6587\u4ef6\n- \u6df7\u5408\u4ed3\u5e93\uff1aagents \u4e0e skills \u7684\u8f6f\u94fe/\u590d\u5236\u9009\u62e9\u9700\u5206\u522b\u786e\u8ba4\n\n## \u5df2\u77e5\u5b9e\u8df5\uff082026-08\uff09\n- \u5f85\u63a5\u5165\u540e\u8865\u5145\uff1a\u672c\u5730\u5df2\u88c5\u54ea\u4e9b\u3001\u5b89\u88c5\u65b9\u5f0f\u3001\u5907\u4efd\u4f4d\u7f6e\n```\n\n> \u6863\u6848\u683c\u5f0f\u4e0e\u73b0\u6709\u4e09\u4e2a\u6863\u6848\u5b8c\u5168\u540c\u6784\uff08\u57fa\u672c\u4fe1\u606f/\u76ee\u5f55\u7ed3\u6784/\u5b89\u88c5\u673a\u5236/\u5751\u4f4d/\u5df2\u77e5\u5b9e\u8df5\uff09\uff0c\u65b9\u6cd5\u8bba\u4e00\u4efd\u3001\u4ed3\u5e93\u5dee\u5f02\u5168\u8d70\u6863\u6848\u3002\n\n### \u7b2c 4 \u6b65\uff1a\u767b\u8bb0\u8868\u683c\uff08SKILL.md\u300c\u652f\u6301\u7684\u4ed3\u5e93\u300d\u8868\u52a0\u4e00\u884c\uff09\n\n\u5728 `/home/anonymous/.claude/skills/my-skills/skills/equipment-manager/SKILL.md` \u7684\u8868\u683c\u8ffd\u52a0\u4e00\u884c\uff1a\n\n```markdown\n| `references/new-skill-repo.md` | new-skill-repo | agents + skills \u6df7\u5408\uff0c\u5b89\u88c5\u673a\u5236\u5f85\u6478\u6e05\u540e\u586b\u5199 |\n```\n\n### \u7b2c 5 \u6b65\uff1a\u66f4\u65b0 frontmatter description\uff08\u8865\u4e00\u4e2a\u540d\u5b57\uff09\n\n\u628a\u65b0\u4ed3\u5e93\u540d\u52a0\u5165 `description` \u7684\u300c\u5df2\u63a5\u5165\u300d\u5217\u8868\uff0c\u4fdd\u6301\u89e6\u53d1\u7cbe\u51c6\uff1a\n\n- **\u6539\u524d**\uff1a`\u5df2\u63a5\u5165\uff1amsitarzewski/agency-agents\u3001wshobson/agents\u3001mattpocock/skills\uff08\u65b0\u4ed3\u5e93\u53ef\u6309\u6d41\u7a0b\u63a5\u5165\uff09`\n- **\u6539\u540e**\uff1a`\u5df2\u63a5\u5165\uff1amsitarzewski/agency-agents\u3001wshobson/agents\u3001mattpocock/skills\u3001new-skill-repo\uff08\u65b0\u4ed3\u5e93\u53ef\u6309\u6d41\u7a0b\u63a5\u5165\uff09`\n\n\u53ea\u8865\u540d\u5b57\uff0c\u4e0d\u6539 description \u5176\u4f59\u63aa\u8f9e\u3002\n\n---\n\n## \u8fb9\u754c\u4e0e\u786c\u95f8\u95e8\u58f0\u660e\n\n- **\u901a\u7528\u65b9\u6cd5\u8bba\u4e0d\u52a8**\uff1a\u4e94\u6b65\u6d41\u7a0b\u3001\u5bf9\u8bdd\u5f0f\u8282\u594f\u3001\u5907\u4efd/\u9a8c\u8bc1\u89c4\u5219\u5747\u4e3a\u901a\u7528\u5185\u6838\uff0c\u4e0d\u56e0\u65b0\u4ed3\u5e93\u800c\u6539\u52a8\uff1b\u4ed3\u5e93\u5dee\u5f02\u5168\u90e8\u6536\u655b\u5230 references/ \u6863\u6848\u91cc\u3002\n- **\u4e0d\u64c5\u81ea\u6267\u884c**\uff1a\u672c\u65b9\u6848\u4e0d\u542b\u4efb\u4f55\u5b9e\u9645\u6539\u52a8\u3002\u5f85\u4ed3\u5e93 clone \u5230\u4f4d\u3001\u4f60\u9010\u9879\u786e\u8ba4\uff08\u6765\u6e90\u2192\u7ed3\u6784\u2192\u6863\u6848\u5185\u5bb9\u2192\u767b\u8bb0\u2192description\uff09\u540e\uff0c\u624d\u6309\u9636\u6bb5\u4e94\u6267\u884c\uff1a\u5148 `mkdir -p ~/.claude/backups/<\u65e5\u671f>` + `cp` \u5907\u4efd SKILL.md\uff0c\u518d\u6539\u6863\u6848/\u8868\u683c/description\uff0c\u6700\u540e\u9a8c\u8bc1\u3002\n- **\u6df7\u5408\u4ed3\u5e93\u63d0\u9192**\uff1aagents \u4e0e skills \u7684\u5b89\u88c5\u76ee\u6807\u76ee\u5f55\u3001\u8f6f\u94fe/\u590d\u5236\u9009\u62e9\u9700\u5206\u522b\u62cd\u677f\uff1b\u82e5\u4ed3\u5e93\u6709\u5b98\u65b9\u811a\u672c\uff0c\u4f18\u5148\u7528\u5b98\u65b9\u53c2\u6570\u3002\n\n## \u5f85\u4f60\u786e\u8ba4\u7684\u70b9\n\n1. \u4ed3\u5e93 clone \u5230\u4f4d\u540e\uff0c\u5148\u8dd1\u7b2c 1\u30012 \u6b65\u6478\u5e95\u6c47\u62a5\uff1b\n2. \u6863\u6848\u6309\u4e0a\u9762\u6a21\u677f\u5efa\u662f\u5426 OK\uff1b\n3. description \u6539\u6cd5\uff08\u53ea\u8865\u540d\u5b57\uff09\u662f\u5426 OK\u3002\n"}], "grading": null}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "equipment-manager", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-08-04T07:40:10Z", "evals_run": [0, 1, 2, 3], "runs_per_configuration": 3}, "runs": [{"eval_id": 0, "configuration": "old_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 143.2, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u5e94\u4f7f\u7528 git log \u6216\u5bf9\u6bd4\u4ed3\u5e93\u6863\u6848\u8bc6\u522b\u300e\u65b0\u589e\u300f\u7684 skill\uff0c\u800c\u975e\u7f57\u5217\u6574\u4e2a\u4ed3\u5e93", "passed": true, "evidence": "\u7b2c\u2461\u8282\uff1a\"\u4f9d\u636e\uff1a`git log --diff-filter=A --since=\"90 days\" --name-only`\uff0c\u53ea\u53d6 `plugins/*/skills/*/SKILL.md`\uff0c\u6309\u63d2\u4ef6\u805a\u5408\"\uff0c\u5217\u51fa\u5404\u63d2\u4ef6\u65b0\u589e skill\uff0c\u975e\u7f57\u5217\u6574\u4e2a\u4ed3\u5e93\u3002"}, {"text": "\u8f93\u51fa\u5e94\u5148\u8bc6\u522b\u672c\u5730\u5df2\u88c5\u7684\u540c\u6e90\u9879\u5e76\u8df3\u8fc7/\u6807\u6ce8\uff0c\u4e0d\u91cd\u590d\u63a8\u8350", "passed": true, "evidence": "\u7b2c\u2462\u8282\uff1a\"\u9010\u4e00\u5bf9\u7167 `~/.claude/skills/`\uff0861 \u9879\uff09\u3001`~/.claude/plugins/installed_plugins.json`\uff08\u7a7a\uff09\u3001`/var/www/demo/.claude/skills/`\uff08\u5df2\u65e0\uff09\u2014\u2014\u4e0a\u8ff0 31 \u4e2a\u65b0\u589e skill \u5747\u672a\u672c\u5730\u5b89\u88c5\uff0c\u65e0\u540c\u6e90\u91cd\u590d\"\u3002\u5148\u76d8\u70b9\u672c\u5730\u5df2\u88c5\u9879\u518d\u5224\u5b9a\u65e0\u91cd\u590d\u3002"}, {"text": "\u8f93\u51fa\u5e94\u6309\u7528\u6237\u6307\u5b9a\u7684\u590d\u5236(cp)\u65b9\u5f0f\u7ed9\u5b89\u88c5\u65b9\u6848", "passed": true, "evidence": "\u7b2c\u2466\u8282\"\u7528\u6237\u6307\u5b9a\u590d\u5236\u65b9\u5f0f\u3001\u4e0d\u8f6f\u94fe\"\uff0c\u5b89\u88c5\u547d\u4ee4\u5168\u90e8\u4e3a `cp -r`\uff0c\u5e76\u9644 SKILL.md \u5b58\u5728\u6027\u9a8c\u8bc1\u3002"}], "notes": []}, {"eval_id": 1, "configuration": "old_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 207.9, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u4e09\u6863\u4e2d\u300e\u5f85\u5b9a\u300f\u9879\u5e94\u7ed9\u51fa\u660e\u786e\u7559/\u5220\u503e\u5411\uff0c\u800c\u975e\u542b\u7cca", "passed": true, "evidence": "\u5f85\u5b9a\u6863 7 \u4e2a agent \u8868\u683c\u6bcf\u884c\"\u660e\u786e\u503e\u5411\"\u5217\u5747\u7ed9\u51fa\u503e\u5411\uff0c\u5982\"engineering-mobile-app-builder \u2014\u2014 **\u503e\u5411\u5220**\uff1b\u672a\u6765\u505a App \u518d\u88c5\"\"engineering-solidity-smart-contract-engineer \u2014\u2014 **\u503e\u5411\u5220**\uff1b\u82e5\u965b\u4e0b\u6539\u8fc7\u60f3\u7559\uff0c\u8bf7\u544a\u77e5\u6539\u4e86\u4ec0\u4e48\"\u3002"}, {"text": "\u5220\u9664\u65b9\u6848\u5e94\u4f7f\u7528 ~/.claude/backups/ \u7edf\u4e00\u5907\u4efd\u8def\u5f84\uff0c\u800c\u975e mv .bak \u4e34\u65f6\u6539\u540d", "passed": true, "evidence": "\u7b2c\u4e09\u8282\u6267\u884c\u65b9\u6848\u7b2c 1 \u6761\uff1a\"\u5907\u4efd\uff08\u5df2\u5c31\u4f4d\uff0c\u672a\u7528 mv .bak \u4e34\u65f6\u6539\u540d\uff09\uff1a15 \u4e2a agent \u5df2\u7edf\u4e00\u5728 `~/.claude/backups/agents-20260804/`\uff082026-08-04 \u7edf\u4e00\u5907\u4efd\u76ee\u5f55\uff09\"\u3002"}, {"text": "\u4fdd\u7559/\u5220\u9664\u7406\u7531\u5e94\u57fa\u4e8e\u626b\u63cf\u771f\u5b9e\u9879\u76ee\u6808\uff08/var/www\uff09\u5224\u65ad\u65b9\u5411", "passed": true, "evidence": "\u7b2c\u4e00\u8282\u7b2c 3 \u6761\u5b9e\u626b /var/www \u4e0b 11 \u4e2a\u9879\u76ee\uff08rc-api-server / rc-api-server2\uff08FastAPI/Celery\uff09\u3001rc-platform2 / shy_empower / vietguard2\uff08Django\uff09\u3001weather-agent / xiaochu / demo\uff08AI/LLM\uff09\u3001captcha-ocr-server\uff08ONNX OCR\uff09\u7b49\uff09\uff1b\u5220\u9664\u7406\u7531\u5bf9\u7167\u9879\u76ee\u6808\uff0c\u5982\"engineering-filament-optimization-specialist \u2014\u2014 Filament PHP \u540e\u53f0\uff1b\u6808\u65e0 PHP\"\u3002"}], "notes": []}, {"eval_id": 2, "configuration": "old_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 82.4, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u5e94\u660e\u786e\u544a\u77e5\u300egrill-me \u5df2\u5b89\u88c5\u300f\u5e76\u8bf4\u660e\u5f53\u524d\u5b89\u88c5\u65b9\u5f0f\uff08\u590d\u5236/\u8f6f\u94fe\uff09", "passed": true, "evidence": "\u5f00\u5934\u7ed3\u8bba\uff1a\"grill-me \u5df2\u7ecf\u88c5\u8fc7\u4e86\uff0c\u88c5\u7684\u662f\u300c\u590d\u5236\u300d\u4e0d\u662f\u300c\u8f6f\u94fe\u300d\"\uff1b\u7b2c\u2460\u8282\u76d8\u70b9\u8868\uff1a\"grill-me \u672c\u5730\u526f\u672c\uff1a\u5b58\u5728\uff1b\u526f\u672c\u5f62\u6001\uff1a\u771f\u5b9e\u76ee\u5f55\uff08\u590d\u5236\uff09\uff0c\u975e\u7b26\u53f7\u94fe\u63a5\uff08readlink \u65e0\u8f93\u51fa\uff09\"\u3002"}, {"text": "\u8f93\u51fa\u5e94\u68c0\u67e5\u672c\u5730\u526f\u672c\u4e0e\u4ed3\u5e93\u6e90\u5185\u5bb9\u4e00\u81f4\u6027\uff08diff\uff09\u518d\u51b3\u5b9a\u65b9\u6848", "passed": true, "evidence": "\u7b2c\u2462\u8282\uff1a\"\u5185\u5bb9\u4e00\u81f4\u6027\uff1a`diff -r` \u6e90\u76ee\u5f55 vs \u672c\u5730\u526f\u672c \u2192 **IDENTICAL**\uff0cSKILL.md \u4e0e agents/openai.yaml \u9010\u5b57\u8282\u4e00\u81f4\uff0c\u65e0\u66f4\u65b0\u9700\u6c42\"\u3002"}, {"text": "\u8f6f\u94fe\u8f6c\u6362\u7684\u5907\u4efd\u6b65\u9aa4\u5e94\u4f7f\u7528 cp \u5230 ~/.claude/backups/\uff0c\u800c\u975e mv .bak", "passed": true, "evidence": "\u7b2c\u2465\u8282\u7b2c 1 \u6b65\uff1a\"mkdir -p ~/.claude/backups/skills-$(date +%Y%m%d); cp -r ~/.claude/skills/my-skills/skills/grill-me ~/.claude/backups/skills-$(date +%Y%m%d)/grill-me\"\u3002"}], "notes": []}, {"eval_id": 3, "configuration": "old_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 50.6, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u5e94\u6309\u300e\u786e\u8ba4\u6765\u6e90\u2192\u6478\u6e05\u7ed3\u6784\u2192\u5efa\u6863\u6848\u2192\u767b\u8bb0\u8868\u683c\u2192\u66f4\u65b0 description\u300f\u4e94\u6b65\u7ec4\u7ec7", "passed": true, "evidence": "\u6b63\u6587\u6309\u4e94\u6b65\u7ec4\u7ec7\uff1a\"\u7b2c 1 \u6b65\uff1a\u786e\u8ba4\u6765\u6e90\"\uff08git remote -v + git log -1 \u7248\u672c\u65f6\u95f4\u70b9\uff09\u3001\"\u7b2c 2 \u6b65\uff1a\u6478\u6e05\u7ed3\u6784\"\u3001\"\u7b2c 3 \u6b65\uff1a\u5efa\u6863\u6848\"\u3001\"\u7b2c 4 \u6b65\uff1a\u767b\u8bb0\"\uff08\u8868\u683c\u52a0\u4e00\u884c\uff09\u3001\"\u7b2c 5 \u6b65\uff1a\u66f4\u65b0 description\"\u3002"}, {"text": "\u8f93\u51fa\u5e94\u7ed9\u51fa references/ \u6863\u6848\u6587\u4ef6\u7684\u5177\u4f53\u6a21\u677f/\u4e94\u6bb5\u5f0f\u7ed3\u6784", "passed": true, "evidence": "\u7b2c 3 \u6b65\u7ed9\u51fa\u5b8c\u6574\u6a21\u677f\uff08references/new-skill-repo.md\uff09\uff0c\u542b\"\u57fa\u672c\u4fe1\u606f / \u76ee\u5f55\u7ed3\u6784 / \u5b89\u88c5\u673a\u5236 / \u5751\u4f4d\u4e0e\u7ea6\u5b9a / \u5df2\u77e5\u5b9e\u8df5\"\u4e94\u6bb5\uff0c\u5e76\u7ed9\u51fa\u5404\u6bb5\u5360\u4f4d\u8bf4\u660e\u3002"}, {"text": "\u8f93\u51fa\u5e94\u58f0\u660e\u4e0d\u52a8\u901a\u7528\u65b9\u6cd5\u8bba\u3001\u4e0d\u64c5\u81ea\u6267\u884c\u5b89\u88c5", "passed": true, "evidence": "\"\u901a\u7528\u5185\u6838\u4e0d\u52a8\"\uff1a\"\u4e94\u6b65\u5168\u90e8\u662f'\u5efa\u6863\u6848 + \u8868\u683c\u4e00\u884c + description \u8865\u4e00\u4e2a\u540d\u5b57'\uff0c\u65b9\u6cd5\u8bba\u6b63\u6587\uff08\u4e03\u6b65\u6d41\u7a0b\u3001\u514b\u5236\u539f\u5219\uff09\u96f6\u6539\u52a8\"\uff1b\u672b\u5c3e\"\u672c\u65b9\u6848\u4e0d\u5305\u542b\u4efb\u4f55\u5b9e\u9645\u521b\u5efa\u6863\u6848\u3001\u767b\u8bb0\u6216\u4fee\u6539 description \u7684\u52a8\u4f5c\"\u3002"}], "notes": []}, {"eval_id": 0, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 246.4, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u5e94\u4f7f\u7528 git log \u6216\u5bf9\u6bd4\u4ed3\u5e93\u6863\u6848\u8bc6\u522b\u300e\u65b0\u589e\u300f\u7684 skill\uff0c\u800c\u975e\u7f57\u5217\u6574\u4e2a\u4ed3\u5e93", "passed": true, "evidence": "\u7b2c\u2461\u8282\uff1a\"\u4f9d\u636e\uff1a`git log --since=\"90 days\" --diff-filter=A --name-only`\uff0c\u53ea\u53d6 `plugins/*/skills/*/SKILL.md`\u3001\u6309\u63d2\u4ef6\u805a\u5408\uff1b\u6392\u9664\u4ec5\u65b0\u589e `.codex-plugin/plugin.json` \u5143\u6570\u636e\u6216 `references/details.md` \u7684\u65e2\u6709\u63d2\u4ef6\"\uff0c\u5e76\u5217\u51fa 11 \u4e2a\u63d2\u4ef6/27 \u4e2a\u65b0\u589e skill\uff0c\u672a\u7f57\u5217\u6574\u4e2a\u4ed3\u5e93\u3002"}, {"text": "\u8f93\u51fa\u5e94\u5148\u8bc6\u522b\u672c\u5730\u5df2\u88c5\u7684\u540c\u6e90\u9879\u5e76\u8df3\u8fc7/\u6807\u6ce8\uff0c\u4e0d\u91cd\u590d\u63a8\u8350", "passed": true, "evidence": "\u7b2c\u2460\u8282\"\u65e0\u4efb\u4f55 wshobson \u7cfb skill\uff08\u65e0\u7b26\u53f7\u94fe\u63a5\u3001\u65e0\u540c\u540d\u76ee\u5f55\uff09\"\uff1b\u7b2c\u2462\u8282\u67e5\u91cd\uff1a\"\u9010\u4e00\u5bf9\u7167 `~/.claude/skills/`\uff0861 \u9879\uff0c\u542b\u8f6f\u94fe\u68c0\u67e5\uff09\u3001`~/.claude/agents/`\uff08\u7a7a\uff09\u3001`~/.claude/plugins/installed_plugins.json`\uff08\u7a7a\uff09\u2026\u2026\u4e0a\u8ff0 27 \u4e2a\u65b0\u589e skill \u5747\u672a\u672c\u5730\u5b89\u88c5\uff0c\u65e0\u540c\u6e90\u91cd\u590d\"\u3002\u5148\u8bc6\u522b\u672c\u5730\u5df2\u88c5\u9879\uff0861 \u9879\u542b grill-me \u7b49\uff09\uff0c\u518d\u5224\u65ad\u65e0\u91cd\u590d\u9700\u8df3\u8fc7\u3002"}, {"text": "\u8f93\u51fa\u5e94\u6309\u7528\u6237\u6307\u5b9a\u7684\u590d\u5236(cp)\u65b9\u5f0f\u7ed9\u5b89\u88c5\u65b9\u6848", "passed": true, "evidence": "\u7b2c\u2466\u8282\"\u7528\u6237\u6307\u5b9a\u590d\u5236\u65b9\u5f0f\u3001\u4e0d\u8f6f\u94fe\"\uff0c\u5b89\u88c5\u547d\u4ee4\u5168\u90e8\u4f7f\u7528 `cp -r`\uff08llm-finetuning \u5faa\u73af cp\u3001ai-debt-detector\u3001recsys-pipeline-architect \u5747\u4e3a `cp -r`\uff09\uff0c\u5e76\u9644 `[ -s ~/.claude/skills/$s/SKILL.md ]` \u9a8c\u8bc1\u3002"}], "notes": []}, {"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 130.4, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u4e09\u6863\u4e2d\u300e\u5f85\u5b9a\u300f\u9879\u5e94\u7ed9\u51fa\u660e\u786e\u7559/\u5220\u503e\u5411\uff0c\u800c\u975e\u542b\u7cca", "passed": true, "evidence": "\u5f85\u5b9a\u6863 7 \u4e2a agent \u8868\u683c\u6bcf\u884c\u5747\u6709\"\u660e\u786e\u503e\u5411\"\u5217\u5e76\u7ed9\u51fa\u503e\u5411\uff0c\u5982\"engineering-email-intelligence-engineer \u2014\u2014 **\u503e\u5411\u5220**\"\"engineering-incident-response-commander \u2014\u2014 **\u503e\u5411\u5220**\uff1b\u4ec5\u5f53\u4f60\u672c\u4eba\u8d1f\u8d23\u751f\u4ea7\u8fd0\u7ef4\u65f6\u7559\"\u7b49\uff0c\u65e0\u542b\u7cca\u9879\u3002"}, {"text": "\u5220\u9664\u65b9\u6848\u5e94\u4f7f\u7528 ~/.claude/backups/ \u7edf\u4e00\u5907\u4efd\u8def\u5f84\uff0c\u800c\u975e mv .bak \u4e34\u65f6\u6539\u540d", "passed": true, "evidence": "\u7b2c\u4e09\u8282\u6267\u884c\u65b9\u6848\u7b2c 1 \u6761\uff1a\"\u5907\u4efd\uff1a\u5168\u90e8 15 \u4e2a\u5df2\u5728 `~/.claude/backups/agents-20260804/`\uff08\u4eca\u5929\u5df2\u7edf\u4e00\u5907\u4efd\uff0c\u4e0d\u662f mv .bak \u4e34\u65f6\u6539\u540d\uff09\"\u3002"}, {"text": "\u4fdd\u7559/\u5220\u9664\u7406\u7531\u5e94\u57fa\u4e8e\u626b\u63cf\u771f\u5b9e\u9879\u76ee\u6808\uff08/var/www\uff09\u5224\u65ad\u65b9\u5411", "passed": true, "evidence": "\u7b2c\u4e00\u8282\u7b2c 3 \u6761\uff1a\"/var/www \u626b\u63cf\uff1a\u4ee5 **Python \u540e\u7aef\u4e3a\u4e3b**\uff08rc-api-server / rc-api-server2 / rc-platform2 / shy_empower / vietguard2 / xiaochu / weather-agent / captcha-ocr-server\uff0cDjango/FastAPI + Celery\uff09\"\uff1b\u5220\u9664\u6863\u7406\u7531\u5747\u5bf9\u7167\u9879\u76ee\u6808\uff0c\u5982\"engineering-cms-developer \u2014\u2014 Drupal/WordPress \u4e3b\u9898\u4e0e\u63d2\u4ef6\uff0c/var/www \u65e0\u4efb\u4f55 CMS \u9879\u76ee\"\u3002"}], "notes": []}, {"eval_id": 2, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 76.6, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u5e94\u660e\u786e\u544a\u77e5\u300egrill-me \u5df2\u5b89\u88c5\u300f\u5e76\u8bf4\u660e\u5f53\u524d\u5b89\u88c5\u65b9\u5f0f\uff08\u590d\u5236/\u8f6f\u94fe\uff09", "passed": true, "evidence": "\u7b2c\u4e00\u8282\u7b2c 1 \u6761\uff1a\"\u76ee\u6807\u8def\u5f84 `/home/anonymous/.claude/skills/my-skills/skills/grill-me/` **\u5df2\u5b58\u5728**\uff0c\u662f\u4e00\u4e2a**\u771f\u5b9e\u76ee\u5f55\uff08\u590d\u5236\u65b9\u5f0f\u5b89\u88c5\uff09**\uff0c\u4e0d\u662f\u7b26\u53f7\u94fe\u63a5\uff08`readlink` \u65e0\u8f93\u51fa\uff09\"\uff1b\u7b2c\u4e8c\u8282\u67e5\u91cd\u8868\uff1a\"\u88c5\u6ca1\u88c5\uff1a\u5df2\u7ecf\u88c5\u4e86\uff1b\u600e\u4e48\u88c5\u7684\uff1a\u590d\u5236\uff08\u72ec\u7acb\u526f\u672c\uff09\uff0c\u4e0d\u662f\u8f6f\u94fe\"\u3002"}, {"text": "\u8f93\u51fa\u5e94\u68c0\u67e5\u672c\u5730\u526f\u672c\u4e0e\u4ed3\u5e93\u6e90\u5185\u5bb9\u4e00\u81f4\u6027\uff08diff\uff09\u518d\u51b3\u5b9a\u65b9\u6848", "passed": true, "evidence": "\u7b2c\u4e00\u8282\u7b2c 3 \u6761\uff1a\"`diff -r /home/anonymous/skills/skills/productivity/grill-me/ /home/anonymous/.claude/skills/my-skills/skills/grill-me/` \u9000\u51fa\u7801 0\uff0c\u4e24\u4e2a\u6587\u4ef6\u9010\u5b57\u8282\u76f8\u540c\"\uff0c\u5e76\u636e\u6b64\u51b3\u5b9a\"\u65e0\u9700\u91cd\u65b0\u5b89\u88c5\uff0c\u6539\u9020\u6210\u8f6f\u94fe\"\u3002"}, {"text": "\u8f6f\u94fe\u8f6c\u6362\u7684\u5907\u4efd\u6b65\u9aa4\u5e94\u4f7f\u7528 cp \u5230 ~/.claude/backups/\uff0c\u800c\u975e mv .bak", "passed": true, "evidence": "\u9009\u9879 A \u6b65\u9aa4 1\uff1a\"mkdir -p ~/.claude/backups/2026-08-04; cp -r /home/anonymous/.claude/skills/my-skills/skills/grill-me ~/.claude/backups/2026-08-04/grill-me-copy\"\uff0c\u6ce8\u91ca\"\u8986\u76d6\u524d\u5148\u5907\u4efd\uff0c\u4e0d\u7528 mv xxx.bak\"\u3002"}], "notes": []}, {"eval_id": 3, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 57.8, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "\u8f93\u51fa\u5e94\u6309\u300e\u786e\u8ba4\u6765\u6e90\u2192\u6478\u6e05\u7ed3\u6784\u2192\u5efa\u6863\u6848\u2192\u767b\u8bb0\u8868\u683c\u2192\u66f4\u65b0 description\u300f\u4e94\u6b65\u7ec4\u7ec7", "passed": true, "evidence": "\u6b63\u6587\u6309\u4e94\u6b65\u7ec4\u7ec7\uff1a\"\u7b2c 1 \u6b65\uff1a\u786e\u8ba4\u6765\u6e90\"\uff08git remote -v \u5360\u4f4d\uff09\u3001\"\u7b2c 2 \u6b65\uff1a\u6478\u6e05\u7ed3\u6784\"\uff08\u76ee\u5f55\u7ed3\u6784/\u547d\u540d\u7ea6\u5b9a/\u5b89\u88c5\u673a\u5236/\u526f\u4ea7\u7269\u56db\u9879\uff09\u3001\"\u7b2c 3 \u6b65\uff1a\u5efa\u6863\u6848\"\u3001\"\u7b2c 4 \u6b65\uff1a\u767b\u8bb0\u8868\u683c\"\uff08SKILL.md \u8868\u683c\u52a0\u4e00\u884c\uff09\u3001\"\u7b2c 5 \u6b65\uff1a\u66f4\u65b0 frontmatter description\"\u3002"}, {"text": "\u8f93\u51fa\u5e94\u7ed9\u51fa references/ \u6863\u6848\u6587\u4ef6\u7684\u5177\u4f53\u6a21\u677f/\u4e94\u6bb5\u5f0f\u7ed3\u6784", "passed": true, "evidence": "\u7b2c 3 \u6b65\u7ed9\u51fa\u5b8c\u6574 markdown \u6a21\u677f\uff08references/new-skill-repo.md\uff09\uff0c\u542b\"\u57fa\u672c\u4fe1\u606f / \u76ee\u5f55\u7ed3\u6784 / \u5b89\u88c5\u673a\u5236 / \u5751\u4f4d\u4e0e\u7ea6\u5b9a / \u5df2\u77e5\u5b9e\u8df5\"\u4e94\u6bb5\uff0c\u5e76\u6ce8\u660e\"\u4e0e\u73b0\u6709\u4e09\u4e2a\u6863\u6848\u5b8c\u5168\u540c\u6784\"\u3002"}, {"text": "\u8f93\u51fa\u5e94\u58f0\u660e\u4e0d\u52a8\u901a\u7528\u65b9\u6cd5\u8bba\u3001\u4e0d\u64c5\u81ea\u6267\u884c\u5b89\u88c5", "passed": true, "evidence": "\"\u8fb9\u754c\u4e0e\u786c\u95f8\u95e8\u58f0\u660e\"\uff1a\"**\u901a\u7528\u65b9\u6cd5\u8bba\u4e0d\u52a8**\uff1a\u4e94\u6b65\u6d41\u7a0b\u3001\u5bf9\u8bdd\u5f0f\u8282\u594f\u3001\u5907\u4efd/\u9a8c\u8bc1\u89c4\u5219\u5747\u4e3a\u901a\u7528\u5185\u6838\uff0c\u4e0d\u56e0\u65b0\u4ed3\u5e93\u800c\u6539\u52a8\"\uff1b\"**\u4e0d\u64c5\u81ea\u6267\u884c**\uff1a\u672c\u65b9\u6848\u4e0d\u542b\u4efb\u4f55\u5b9e\u9645\u6539\u52a8\"\uff0c\u4e14\u6bcf\u6b65\u6807\u6ce8\"\u5f85\u786e\u8ba4\u540e\u6267\u884c\"\u3002"}], "notes": []}], "run_summary": {"old_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 121.025, "stddev": 69.4996, "min": 50.6, "max": 207.9}, "tokens": {"mean": 0.0, "stddev": 0.0, "min": 0, "max": 0}}, "with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 127.8, "stddev": 84.8413, "min": 57.8, "max": 246.4}, "tokens": {"mean": 0.0, "stddev": 0.0, "min": 0, "max": 0}}, "delta": {"pass_rate": "+0.00", "time_seconds": "-6.8", "tokens": "+0"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "eval_id": 3,
+  "eval_name": "onboard-new-repo",
+  "prompt": "我准备接入一个新的第三方 skill 仓库，git clone 到本地 ~/new-skill-repo，里面是 agents 和 skills 混合的。你按装备管理的流程帮我出一份接入方案——要建什么档案、怎么登记、description 怎么改。先出方案别动手。",
+  "assertions": [
+    {"name": "repo-profile-creation", "description": "方案含建仓库档案步骤", "text": "输出应包含在 references/ 下新建仓库档案的步骤或模板"},
+    {"name": "register-in-table", "description": "方案含登记到支持仓库表格", "text": "输出应包含在支持的仓库表格中登记新仓库"},
+    {"name": "update-description", "description": "方案含更新 description", "text": "输出应包含更新 frontmatter description 的步骤"}
+  ]
+}

@@ -1,0 +1,60 @@
+Split: 12 train, 8 test (holdout=0.4)
+
+============================================================
+Iteration 1/5
+Description: 管理第三方 skill/agent 仓库的安装、筛选与精简。已接入：msitarzewski/agency-agents、wshobson/agents、mattpocock/skills（新仓库可按流程接入）。当用户提到某个 skill/agent 仓库的更新、安装、精简、盘点时使用——包括 git pull 后评估新内容、从这些仓库装新装备、删除无用的旧装备、或想接入一个新的第三方仓库。凡涉及"要不要装、装什么、删什么"的 skill/agent 决策都用本技能，不直接动手。各仓库结构/安装机制见 references/ 下档案。
+============================================================
+Train: 18/36 correct, precision=100% recall=0% accuracy=50% (142.4s)
+  [FAIL] rate=0/3 expected=True: 盘点一下我本地装了哪些 skill 和 agent，各来自哪个仓库
+  [FAIL] rate=0/3 expected=True: 删掉本地用不上的 skill 和 agent，先给我个清单
+  [FAIL] rate=0/3 expected=True: 刚 pull 完 wshobson 仓库，帮我评估新加的 llm 相关 skill 值不值得装
+  [FAIL] rate=0/3 expected=True: 我想把刚 clone 的 ~/awesome-skills 仓库接入装备管理
+  [FAIL] rate=0/3 expected=True: wshobson 的 agents 仓库 git pull 之后好像多了几个新 skill，帮我看看有没有值得装的
+  [PASS] rate=0/3 expected=False: 写个 python 脚本处理一下这些数据
+  [FAIL] rate=0/3 expected=True: 更新一下 mattpocock 的技能，看看有没有新货值得装
+  [PASS] rate=0/3 expected=False: 帮我写个本周开发周报
+  [PASS] rate=0/3 expected=False: 整理一下我的 QQ 音乐歌单
+  [PASS] rate=0/3 expected=False: 帮我看看这个 skill 的 SKILL.md 是怎么用的
+  [PASS] rate=0/3 expected=False: 帮我画个系统架构图
+  [PASS] rate=0/3 expected=False: 优化一下这段 FastAPI 接口的性能
+Test : 12/24 correct, precision=100% recall=0% accuracy=50% (0.0s)
+  [FAIL] rate=0/3 expected=True: 从 mattpocock 装个 grill-me 类似的技能到 my-skills，用软链
+  [FAIL] rate=0/3 expected=True: 从 msitarzewski 的 agency-agents 装几个 agent 到全局
+  [FAIL] rate=0/3 expected=True: 精简一下我 ~/.claude/agents 里装的 engineering agent，太乱了想清理
+  [PASS] rate=0/3 expected=False: 配置一下项目的 config.toml 的 API key
+  [FAIL] rate=0/3 expected=True: 看看本地装的 skill 有没有重复的，帮我清理掉
+  [PASS] rate=0/3 expected=False: pip 装个依赖到项目里
+  [PASS] rate=0/3 expected=False: 帮我 review 一下这次的 git diff
+  [PASS] rate=0/3 expected=False: 这个 bug 一直报错，帮我查查
+
+Improving description...
+Proposed (80.9s): 当用户想管理本地的 Claude skill 与 agent 时使用本技能：盘点本地已装了哪些、各来自哪个第三方仓库；git pull 或 clone 某个 skill/agent 仓库后，评估新增内容值不值得装；接入一个新的第三方仓库并从中安装 skill/agent；精简删除不再用的旧 skill/agent。凡是"要不要装、装什么、删什么"的 skill/agent 管理决策都用本技能——它输出盘点→查重→筛选→确认→备份安装的方案，不直接替用户动手。这是对 skill/agent 本身的元管理，不等于执行某个具体技能的内容。
+
+============================================================
+Iteration 2/5
+Description: 当用户想管理本地的 Claude skill 与 agent 时使用本技能：盘点本地已装了哪些、各来自哪个第三方仓库；git pull 或 clone 某个 skill/agent 仓库后，评估新增内容值不值得装；接入一个新的第三方仓库并从中安装 skill/agent；精简删除不再用的旧 skill/agent。凡是"要不要装、装什么、删什么"的 skill/agent 管理决策都用本技能——它输出盘点→查重→筛选→确认→备份安装的方案，不直接替用户动手。这是对 skill/agent 本身的元管理，不等于执行某个具体技能的内容。
+============================================================
+Train: 18/36 correct, precision=100% recall=0% accuracy=50% (132.3s)
+  [FAIL] rate=0/3 expected=True: 删掉本地用不上的 skill 和 agent，先给我个清单
+  [FAIL] rate=0/3 expected=True: 我想把刚 clone 的 ~/awesome-skills 仓库接入装备管理
+  [FAIL] rate=0/3 expected=True: 刚 pull 完 wshobson 仓库，帮我评估新加的 llm 相关 skill 值不值得装
+  [FAIL] rate=0/3 expected=True: 盘点一下我本地装了哪些 skill 和 agent，各来自哪个仓库
+  [FAIL] rate=0/3 expected=True: wshobson 的 agents 仓库 git pull 之后好像多了几个新 skill，帮我看看有没有值得装的
+  [FAIL] rate=0/3 expected=True: 更新一下 mattpocock 的技能，看看有没有新货值得装
+  [PASS] rate=0/3 expected=False: 写个 python 脚本处理一下这些数据
+  [PASS] rate=0/3 expected=False: 帮我写个本周开发周报
+  [PASS] rate=0/3 expected=False: 整理一下我的 QQ 音乐歌单
+  [PASS] rate=0/3 expected=False: 帮我画个系统架构图
+  [PASS] rate=0/3 expected=False: 帮我看看这个 skill 的 SKILL.md 是怎么用的
+  [PASS] rate=0/3 expected=False: 优化一下这段 FastAPI 接口的性能
+Test : 12/24 correct, precision=100% recall=0% accuracy=50% (0.0s)
+  [FAIL] rate=0/3 expected=True: 从 mattpocock 装个 grill-me 类似的技能到 my-skills，用软链
+  [FAIL] rate=0/3 expected=True: 从 msitarzewski 的 agency-agents 装几个 agent 到全局
+  [FAIL] rate=0/3 expected=True: 精简一下我 ~/.claude/agents 里装的 engineering agent，太乱了想清理
+  [FAIL] rate=0/3 expected=True: 看看本地装的 skill 有没有重复的，帮我清理掉
+  [PASS] rate=0/3 expected=False: 配置一下项目的 config.toml 的 API key
+  [PASS] rate=0/3 expected=False: pip 装个依赖到项目里
+  [PASS] rate=0/3 expected=False: 帮我 review 一下这次的 git diff
+  [PASS] rate=0/3 expected=False: 这个 bug 一直报错，帮我查查
+
+Improving description...

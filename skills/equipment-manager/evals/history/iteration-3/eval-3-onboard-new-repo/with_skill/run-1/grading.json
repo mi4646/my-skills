@@ -1,0 +1,54 @@
+{
+  "expectations": [
+    {
+      "text": "输出应按『确认来源→摸清结构→建档案→登记表格→更新 description』五步组织",
+      "passed": true,
+      "evidence": "正文按五步组织：\"第 1 步：确认来源\"（git remote -v 占位）、\"第 2 步：摸清结构\"（目录结构/命名约定/安装机制/副产物四项）、\"第 3 步：建档案\"、\"第 4 步：登记表格\"（SKILL.md 表格加一行）、\"第 5 步：更新 frontmatter description\"。"
+    },
+    {
+      "text": "输出应给出 references/ 档案文件的具体模板/五段式结构",
+      "passed": true,
+      "evidence": "第 3 步给出完整 markdown 模板（references/new-skill-repo.md），含\"基本信息 / 目录结构 / 安装机制 / 坑位与约定 / 已知实践\"五段，并注明\"与现有三个档案完全同构\"。"
+    },
+    {
+      "text": "输出应声明不动通用方法论、不擅自执行安装",
+      "passed": true,
+      "evidence": "\"边界与硬闸门声明\"：\"**通用方法论不动**：五步流程、对话式节奏、备份/验证规则均为通用内核，不因新仓库而改动\"；\"**不擅自执行**：本方案不含任何实际改动\"，且每步标注\"待确认后执行\"。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [
+    {
+      "claim": "新仓库为 agents 与 skills 混合，与已接入三仓库结构均不同",
+      "type": "factual",
+      "verified": true,
+      "evidence": "仓库性质预判段明确说明"
+    },
+    {
+      "claim": "档案格式与现有三档案五段式同构",
+      "type": "quality",
+      "verified": true,
+      "evidence": "第 3 步模板五段 + \"方法论一份、仓库差异全走档案\""
+    },
+    {
+      "claim": "description 只补仓库名，不改其余措辞",
+      "type": "process",
+      "verified": true,
+      "evidence": "第 5 步给出改前/改后对比，\"只补名字，不改 description 其余措辞\""
+    },
+    {
+      "claim": "仓库尚未 clone，本方案为待办占位",
+      "type": "process",
+      "verified": true,
+      "evidence": "开头\"仓库尚未 clone，且硬闸门要求……不建档案、不改 SKILL.md、不装任何东西\""
+    }
+  ],
+  "eval_feedback": {
+    "overall": "三条断言均具区分度且全部通过。"
+  }
+}

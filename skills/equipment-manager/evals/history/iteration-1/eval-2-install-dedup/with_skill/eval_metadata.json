@@ -1,0 +1,10 @@
+{
+  "eval_id": 2,
+  "eval_name": "install-dedup",
+  "prompt": "mattpocock 的 skills 仓库里有个 skill 叫 grill-me，帮我装到 my-skills 里，用软链。先检查是不是已经装过了，再给安装方案。",
+  "assertions": [
+    {"name": "detect-already-installed", "description": "查重识别 grill-me 已装", "text": "输出应识别出 grill-me 已在 my-skills 中安装"},
+    {"name": "handle-duplicate", "description": "告知重复并给出处理", "text": "输出应告知用户重复并跳过或提示"},
+    {"name": "symlink-installation", "description": "按用户指定软链方式给安装方案", "text": "输出应包含软链(ln -s/link-skills.sh)安装方案"}
+  ]
+}

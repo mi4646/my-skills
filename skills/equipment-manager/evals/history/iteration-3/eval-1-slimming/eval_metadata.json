@@ -1,0 +1,11 @@
+{
+  "eval_id": 1,
+  "eval_name": "slimming",
+  "prompt": "我本地 ~/.claude/agents 下装了一堆 engineering 开头的 agent，感觉太多太杂，帮我精简一下。先给我一份保留/待定/删除的三档清单，别真删，等我确认。",
+  "assertions": [
+    {"text": "输出三档中『待定』项应给出明确留/删倾向，而非含糊"},
+    {"text": "删除方案应使用 ~/.claude/backups/ 统一备份路径，而非 mv .bak 临时改名"},
+    {"text": "保留/删除理由应基于扫描真实项目栈（/var/www）判断方向"},
+    {"text": "输出应明确等待用户拍板后再执行，而非擅自删除"}
+  ]
+}

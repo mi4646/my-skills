@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "pass_rate": 0.3333333333333333,
+    "passed": 1,
+    "failed": 2,
+    "total": 3
+  },
+  "expectations": [
+    {
+      "text": "输出三档中『待定』项应给出明确留/删倾向，而非含糊",
+      "passed": true,
+      "evidence": "待定 5 个建议列给出倾向"
+    },
+    {
+      "text": "删除方案应使用 ~/.claude/backups/ 统一备份路径，而非 mv .bak 临时改名",
+      "passed": false,
+      "evidence": "仅声明只读未修改，未给出 ~/.claude/backups/ 统一备份路径"
+    },
+    {
+      "text": "保留/删除理由应基于扫描真实项目栈（/var/www）判断方向",
+      "passed": false,
+      "evidence": "删除理由基于与内置 agent 重叠，非扫描项目栈"
+    }
+  ]
+}

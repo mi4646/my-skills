@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "识别 grill-me 已装",
+      "passed": true,
+      "evidence": "查重结果：grill-me 已存在于 my-skills/skills/grill-me，readlink 空、普通目录"
+    },
+    {
+      "text": "告知重复并处理",
+      "passed": true,
+      "evidence": "告知「grill-me 已安装（复制方式），内容与仓库一致」，给出替换方案"
+    },
+    {
+      "text": "按软链方式给安装方案",
+      "passed": true,
+      "evidence": "步骤含备份→删除→ln -s 创建软链，路径指向仓库源"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

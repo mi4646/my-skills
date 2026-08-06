@@ -1,0 +1,22 @@
+[
+  {"query": "wshobson 的 agents 仓库 git pull 之后好像多了几个新 skill，帮我看看有没有值得装的", "should_trigger": true},
+  {"query": "更新一下 mattpocock 的技能，看看有没有新货值得装", "should_trigger": true},
+  {"query": "精简一下我 ~/.claude/agents 里装的 engineering agent，太乱了想清理", "should_trigger": true},
+  {"query": "从 msitarzewski 的 agency-agents 装几个 agent 到全局", "should_trigger": true},
+  {"query": "盘点一下我本地装了哪些 skill 和 agent，各来自哪个仓库", "should_trigger": true},
+  {"query": "我想把刚 clone 的 ~/awesome-skills 仓库接入装备管理", "should_trigger": true},
+  {"query": "刚 pull 完 wshobson 仓库，帮我评估新加的 llm 相关 skill 值不值得装", "should_trigger": true},
+  {"query": "从 mattpocock 装个 grill-me 类似的技能到 my-skills，用软链", "should_trigger": true},
+  {"query": "看看本地装的 skill 有没有重复的，帮我清理掉", "should_trigger": true},
+  {"query": "删掉本地用不上的 skill 和 agent，先给我个清单", "should_trigger": true},
+  {"query": "帮我看看这个 skill 的 SKILL.md 是怎么用的", "should_trigger": false},
+  {"query": "写个 python 脚本处理一下这些数据", "should_trigger": false},
+  {"query": "帮我 review 一下这次的 git diff", "should_trigger": false},
+  {"query": "配置一下项目的 config.toml 的 API key", "should_trigger": false},
+  {"query": "这个 bug 一直报错，帮我查查", "should_trigger": false},
+  {"query": "pip 装个依赖到项目里", "should_trigger": false},
+  {"query": "帮我画个系统架构图", "should_trigger": false},
+  {"query": "整理一下我的 QQ 音乐歌单", "should_trigger": false},
+  {"query": "帮我写个本周开发周报", "should_trigger": false},
+  {"query": "优化一下这段 FastAPI 接口的性能", "should_trigger": false}
+]

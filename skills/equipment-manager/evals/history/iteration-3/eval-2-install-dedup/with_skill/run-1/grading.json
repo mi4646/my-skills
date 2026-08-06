@@ -1,0 +1,58 @@
+{
+  "expectations": [
+    {
+      "text": "输出应明确告知『grill-me 已安装』并说明当前安装方式（复制/软链）",
+      "passed": true,
+      "evidence": "第一节第 1 条：\"目标路径 `/home/anonymous/.claude/skills/my-skills/skills/grill-me/` **已存在**，是一个**真实目录（复制方式安装）**，不是符号链接（`readlink` 无输出）\"；第二节查重表：\"装没装：已经装了；怎么装的：复制（独立副本），不是软链\"。"
+    },
+    {
+      "text": "输出应检查本地副本与仓库源内容一致性（diff）再决定方案",
+      "passed": true,
+      "evidence": "第一节第 3 条：\"`diff -r /home/anonymous/skills/skills/productivity/grill-me/ /home/anonymous/.claude/skills/my-skills/skills/grill-me/` 退出码 0，两个文件逐字节相同\"，并据此决定\"无需重新安装，改造成软链\"。"
+    },
+    {
+      "text": "软链转换的备份步骤应使用 cp 到 ~/.claude/backups/，而非 mv .bak",
+      "passed": true,
+      "evidence": "选项 A 步骤 1：\"mkdir -p ~/.claude/backups/2026-08-04; cp -r /home/anonymous/.claude/skills/my-skills/skills/grill-me ~/.claude/backups/2026-08-04/grill-me-copy\"，注释\"覆盖前先备份，不用 mv xxx.bak\"。"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 76.6,
+    "duration_ms": 76648
+  },
+  "claims": [
+    {
+      "claim": "grill-me 已安装且为复制方式（非软链）",
+      "type": "factual",
+      "verified": true,
+      "evidence": "readlink 无输出 + 目标为真实目录"
+    },
+    {
+      "claim": "本地副本与仓库源逐字节一致（diff 退出码 0）",
+      "type": "factual",
+      "verified": true,
+      "evidence": "第一节第 3 条"
+    },
+    {
+      "claim": "真正动作是把副本改造成软链，而非全新安装",
+      "type": "quality",
+      "verified": true,
+      "evidence": "第二节查重结论\"所以这单的真正动作不是'安装'，而是把已有副本改造成软链\""
+    },
+    {
+      "claim": "官方 link-skills.sh 不适用（dev-only、装到顶层），故手写 ln -s",
+      "type": "process",
+      "verified": true,
+      "evidence": "第一节第 5 条说明并据此给出方案"
+    }
+  ],
+  "eval_feedback": {
+    "overall": "三条断言均具区分度且全部通过。断言 1 要求同时给出\"已安装\"结论与\"复制/软链\"判断，本 run 均满足。"
+  }
+}

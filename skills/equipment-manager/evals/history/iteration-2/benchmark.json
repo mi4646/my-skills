@@ -1,0 +1,330 @@
+{
+  "metadata": {
+    "skill_name": "equipment-manager",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-08-04T06:09:48Z",
+    "evals_run": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 208,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5e94\u4f7f\u7528 git log \u6216\u5bf9\u6bd4\u4ed3\u5e93\u6863\u6848\u8bc6\u522b\u300e\u65b0\u589e\u300f\u7684 skill\uff0c\u800c\u975e\u7f57\u5217\u6574\u4e2a\u4ed3\u5e93",
+          "passed": true,
+          "evidence": "\u7528 `git log --diff-filter=A --since=\"90 days\"` \u8bc6\u522b\u8fd1 90 \u5929\u65b0\u589e\uff0c\u805a\u7126\u589e\u91cf"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u5148\u8bc6\u522b\u672c\u5730\u5df2\u88c5\u7684\u540c\u6e90\u9879\u5e76\u8df3\u8fc7/\u6807\u6ce8\uff0c\u4e0d\u91cd\u590d\u63a8\u8350",
+          "passed": true,
+          "evidence": "\u5148\u5217\u51fa\u672c\u5730\u5df2\u88c5 15 \u4e2a wshobson \u7b26\u53f7\u94fe\u63a5\uff0c\u67e5\u91cd\u7ed3\u8bba\u65e0\u91cd\u53e0\uff0c\u5168\u90e8\u4e3a\u9996\u6b21\u51fa\u73b0"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u6309\u7528\u6237\u6307\u5b9a\u7684\u590d\u5236(cp)\u65b9\u5f0f\u7ed9\u5b89\u88c5\u65b9\u6848",
+          "passed": true,
+          "evidence": "\u660e\u786e\u6309\u7528\u6237\u6307\u5b9a\u590d\u5236\u65b9\u5f0f\uff0c\u7ed9 cp -r \u547d\u4ee4"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 173,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u4e09\u6863\u4e2d\u300e\u5f85\u5b9a\u300f\u9879\u5e94\u7ed9\u51fa\u660e\u786e\u7559/\u5220\u503e\u5411\uff0c\u800c\u975e\u542b\u7cca",
+          "passed": true,
+          "evidence": "\u5f85\u5b9a 6 \u4e2a\u6bcf\u9879\u7ed9\u300e\u503e\u5411\u5220/\u503e\u5411\u4fdd\u7559\u300f"
+        },
+        {
+          "text": "\u5220\u9664\u65b9\u6848\u5e94\u4f7f\u7528 ~/.claude/backups/ \u7edf\u4e00\u5907\u4efd\u8def\u5f84\uff0c\u800c\u975e mv .bak \u4e34\u65f6\u6539\u540d",
+          "passed": true,
+          "evidence": "\u7edf\u4e00\u5907\u4efd\u5230 ~/.claude/backups/agents-engineering-20260804/"
+        },
+        {
+          "text": "\u4fdd\u7559/\u5220\u9664\u7406\u7531\u5e94\u57fa\u4e8e\u626b\u63cf\u771f\u5b9e\u9879\u76ee\u6808\uff08/var/www\uff09\u5224\u65ad\u65b9\u5411",
+          "passed": true,
+          "evidence": "\u7406\u7531\u57fa\u4e8e\u9879\u76ee\u6808\uff08SQLite WAL\u3001HTMX \u524d\u7aef\u3001\u5355\u7528\u6237\u5de5\u5177\uff09"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 127,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5e94\u660e\u786e\u544a\u77e5\u300egrill-me \u5df2\u5b89\u88c5\u300f\u5e76\u8bf4\u660e\u5f53\u524d\u5b89\u88c5\u65b9\u5f0f\uff08\u590d\u5236/\u8f6f\u94fe\uff09",
+          "passed": true,
+          "evidence": "\u7ed3\u8bba\uff1agrill-me \u5df2\u88c5\uff0c\u5f53\u524d\u4ee5\u590d\u5236\u65b9\u5f0f\u5b89\u88c5\u975e\u8f6f\u94fe"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u68c0\u67e5\u672c\u5730\u526f\u672c\u4e0e\u4ed3\u5e93\u6e90\u5185\u5bb9\u4e00\u81f4\u6027\uff08diff\uff09\u518d\u51b3\u5b9a\u65b9\u6848",
+          "passed": true,
+          "evidence": "\u7528 diff -r \u786e\u8ba4\u5185\u5bb9\u4e0e\u6e90\u5b8c\u5168\u4e00\u81f4"
+        },
+        {
+          "text": "\u8f6f\u94fe\u8f6c\u6362\u7684\u5907\u4efd\u6b65\u9aa4\u5e94\u4f7f\u7528 cp \u5230 ~/.claude/backups/\uff0c\u800c\u975e mv .bak",
+          "passed": false,
+          "evidence": "\u5907\u4efd\u7528 mv \u5230 ~/.claude/backups/ \u800c\u975e cp"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 105,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5e94\u6309\u300e\u786e\u8ba4\u6765\u6e90\u2192\u6478\u6e05\u7ed3\u6784\u2192\u5efa\u6863\u6848\u2192\u767b\u8bb0\u8868\u683c\u2192\u66f4\u65b0 description\u300f\u4e94\u6b65\u7ec4\u7ec7",
+          "passed": true,
+          "evidence": "\u4e25\u683c\u4e94\u6b65\uff1a\u786e\u8ba4\u6765\u6e90\u2192\u6478\u6e05\u7ed3\u6784\u2192\u5efa\u6863\u6848\u2192\u767b\u8bb0\u2192\u66f4\u65b0 description"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u7ed9\u51fa references/ \u6863\u6848\u6587\u4ef6\u7684\u5177\u4f53\u6a21\u677f/\u4e94\u6bb5\u5f0f\u7ed3\u6784",
+          "passed": true,
+          "evidence": "\u6863\u6848\u6a21\u677f\u6309\u73b0\u6709\u4e09\u4e2a\u6863\u6848\u683c\u5f0f\u7ed9\u51fa"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u58f0\u660e\u4e0d\u52a8\u901a\u7528\u65b9\u6cd5\u8bba\u3001\u4e0d\u64c5\u81ea\u6267\u884c\u5b89\u88c5",
+          "passed": true,
+          "evidence": "\u58f0\u660e\u65b9\u6cd5\u8bba\u6838\u5fc3\u4e0d\u52a8\uff0c\u53ea\u5efa\u6863\u6848+\u8868\u683c\u4e00\u884c+description \u4e00\u4e2a\u540d\u5b57"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.3333333333333333,
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "time_seconds": 203,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5e94\u4f7f\u7528 git log \u6216\u5bf9\u6bd4\u4ed3\u5e93\u6863\u6848\u8bc6\u522b\u300e\u65b0\u589e\u300f\u7684 skill\uff0c\u800c\u975e\u7f57\u5217\u6574\u4e2a\u4ed3\u5e93",
+          "passed": false,
+          "evidence": "\u672a\u7528 git log \u589e\u91cf\u8bc6\u522b\uff0c\u76f4\u63a5\u6309\u4ed3\u5e93\u7ed3\u6784\u63a8\u8350 16 \u4e2a"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u5148\u8bc6\u522b\u672c\u5730\u5df2\u88c5\u7684\u540c\u6e90\u9879\u5e76\u8df3\u8fc7/\u6807\u6ce8\uff0c\u4e0d\u91cd\u590d\u63a8\u8350",
+          "passed": false,
+          "evidence": "\u4ec5\u987a\u5e26\u63d0\u5230\u5df2\u88c5 skills \u4e0e\u547d\u540d\u51b2\u7a81\uff0c\u672a\u7cfb\u7edf\u8bc6\u522b 15 \u4e2a\u540c\u6e90\u8f6f\u94fe\u5e76\u8df3\u8fc7"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u6309\u7528\u6237\u6307\u5b9a\u7684\u590d\u5236(cp)\u65b9\u5f0f\u7ed9\u5b89\u88c5\u65b9\u6848",
+          "passed": true,
+          "evidence": "\u63d0\u5230\u5b89\u88c5\u65b9\u5f0f\u4e3a\u590d\u5236\uff08\u975e\u8f6f\u94fe\uff09"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.3333333333333333,
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "time_seconds": 158,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u4e09\u6863\u4e2d\u300e\u5f85\u5b9a\u300f\u9879\u5e94\u7ed9\u51fa\u660e\u786e\u7559/\u5220\u503e\u5411\uff0c\u800c\u975e\u542b\u7cca",
+          "passed": true,
+          "evidence": "\u5f85\u5b9a 5 \u4e2a\u5efa\u8bae\u5217\u7ed9\u51fa\u503e\u5411"
+        },
+        {
+          "text": "\u5220\u9664\u65b9\u6848\u5e94\u4f7f\u7528 ~/.claude/backups/ \u7edf\u4e00\u5907\u4efd\u8def\u5f84\uff0c\u800c\u975e mv .bak \u4e34\u65f6\u6539\u540d",
+          "passed": false,
+          "evidence": "\u4ec5\u58f0\u660e\u53ea\u8bfb\u672a\u4fee\u6539\uff0c\u672a\u7ed9\u51fa ~/.claude/backups/ \u7edf\u4e00\u5907\u4efd\u8def\u5f84"
+        },
+        {
+          "text": "\u4fdd\u7559/\u5220\u9664\u7406\u7531\u5e94\u57fa\u4e8e\u626b\u63cf\u771f\u5b9e\u9879\u76ee\u6808\uff08/var/www\uff09\u5224\u65ad\u65b9\u5411",
+          "passed": false,
+          "evidence": "\u5220\u9664\u7406\u7531\u57fa\u4e8e\u4e0e\u5185\u7f6e agent \u91cd\u53e0\uff0c\u975e\u626b\u63cf\u9879\u76ee\u6808"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.3333333333333333,
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "time_seconds": 242,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5e94\u660e\u786e\u544a\u77e5\u300egrill-me \u5df2\u5b89\u88c5\u300f\u5e76\u8bf4\u660e\u5f53\u524d\u5b89\u88c5\u65b9\u5f0f\uff08\u590d\u5236/\u8f6f\u94fe\uff09",
+          "passed": true,
+          "evidence": "\u660e\u786e\u544a\u77e5\u5df2\u88c5\u4f46\u4e3a\u666e\u901a\u76ee\u5f55\u62f7\u8d1d"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u68c0\u67e5\u672c\u5730\u526f\u672c\u4e0e\u4ed3\u5e93\u6e90\u5185\u5bb9\u4e00\u81f4\u6027\uff08diff\uff09\u518d\u51b3\u5b9a\u65b9\u6848",
+          "passed": false,
+          "evidence": "\u672a\u505a\u5185\u5bb9\u4e00\u81f4\u6027\u68c0\u67e5"
+        },
+        {
+          "text": "\u8f6f\u94fe\u8f6c\u6362\u7684\u5907\u4efd\u6b65\u9aa4\u5e94\u4f7f\u7528 cp \u5230 ~/.claude/backups/\uff0c\u800c\u975e mv .bak",
+          "passed": false,
+          "evidence": "\u5907\u4efd\u7528 mv .bak"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 106,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "\u8f93\u51fa\u5e94\u6309\u300e\u786e\u8ba4\u6765\u6e90\u2192\u6478\u6e05\u7ed3\u6784\u2192\u5efa\u6863\u6848\u2192\u767b\u8bb0\u8868\u683c\u2192\u66f4\u65b0 description\u300f\u4e94\u6b65\u7ec4\u7ec7",
+          "passed": true,
+          "evidence": "\u9636\u6bb5\u5f0f\u6d41\u7a0b\u8986\u76d6\u786e\u8ba4\u6765\u6e90/\u6478\u6e05\u7ed3\u6784/\u5efa\u6863\u6848/\u767b\u8bb0/description"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u7ed9\u51fa references/ \u6863\u6848\u6587\u4ef6\u7684\u5177\u4f53\u6a21\u677f/\u4e94\u6bb5\u5f0f\u7ed3\u6784",
+          "passed": true,
+          "evidence": "\u6863\u6848\u6a21\u677f\u4eff\u7167 msitarzewski/wshobson/mattpocock \u4e09\u6863\u6848"
+        },
+        {
+          "text": "\u8f93\u51fa\u5e94\u58f0\u660e\u4e0d\u52a8\u901a\u7528\u65b9\u6cd5\u8bba\u3001\u4e0d\u64c5\u81ea\u6267\u884c\u5b89\u88c5",
+          "passed": true,
+          "evidence": "\u98ce\u9669\u4e0e\u514b\u5236\u6bb5\u58f0\u660e\u65b9\u6cd5\u8bba\u4e0d\u52a8\u3001\u4e0d\u64c5\u81ea\u88c5"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9167,
+        "stddev": 0.1667,
+        "min": 0.6667,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 153.25,
+        "stddev": 46.2052,
+        "min": 105,
+        "max": 208
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.5,
+        "stddev": 0.3333,
+        "min": 0.3333,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 177.25,
+        "stddev": 58.6025,
+        "min": 106,
+        "max": 242
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.42",
+      "time_seconds": "-24.0",
+      "tokens": "+0"
+    }
+  },
+  "notes": []
+}

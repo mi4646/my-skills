@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  },
+  "expectations": [
+    {
+      "text": "输出应使用 git log 或对比仓库档案识别『新增』的 skill，而非罗列整个仓库",
+      "passed": true,
+      "evidence": "用 `git log --diff-filter=A --since=\"90 days\"` 识别近 90 天新增，聚焦增量"
+    },
+    {
+      "text": "输出应先识别本地已装的同源项并跳过/标注，不重复推荐",
+      "passed": true,
+      "evidence": "先列出本地已装 15 个 wshobson 符号链接，查重结论无重叠，全部为首次出现"
+    },
+    {
+      "text": "输出应按用户指定的复制(cp)方式给安装方案",
+      "passed": true,
+      "evidence": "明确按用户指定复制方式，给 cp -r 命令"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "eval_id": 3,
+  "eval_name": "onboard-new-repo",
+  "prompt": "我准备接入一个新的第三方 skill 仓库，git clone 到本地 ~/new-skill-repo，里面是 agents 和 skills 混合的。你按装备管理的流程帮我出一份接入方案——要建什么档案、怎么登记、description 怎么改。先出方案别动手。",
+  "assertions": [
+    {"name": "five-step-followed", "description": "按五步接入流程", "text": "输出应按『确认来源→摸清结构→建档案→登记表格→更新 description』五步组织"},
+    {"name": "profile-template-specified", "description": "给出档案模板", "text": "输出应给出 references/ 档案文件的具体模板/五段式结构"},
+    {"name": "constraint-boundary-stated", "description": "声明克制边界", "text": "输出应声明不动通用方法论、不擅自执行安装"}
+  ]
+}

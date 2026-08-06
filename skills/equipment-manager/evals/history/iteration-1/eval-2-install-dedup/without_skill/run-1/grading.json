@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "识别 grill-me 已装",
+      "passed": true,
+      "evidence": "「已安装：/home/anonymous/.claude/skills/my-skills/skills/grill-me」"
+    },
+    {
+      "text": "告知重复并处理",
+      "passed": true,
+      "evidence": "告知已装但为普通目录非软链，推荐转软链"
+    },
+    {
+      "text": "按软链方式给安装方案",
+      "passed": true,
+      "evidence": "步骤含 ln -s 创建软链指向仓库源"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

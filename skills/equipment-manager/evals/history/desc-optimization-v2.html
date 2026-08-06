@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="5">
+    <title>equipment-manager — Skill Description Optimization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lora', Georgia, serif;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #faf9f5;
+            color: #141413;
+        }
+        h1 { font-family: 'Poppins', sans-serif; color: #141413; }
+        .explainer {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #e8e6dc;
+            color: #b0aea5;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        .summary {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #e8e6dc;
+        }
+        .summary p { margin: 5px 0; }
+        .best { color: #788c5d; font-weight: bold; }
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+        }
+        table {
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #e8e6dc;
+            border-radius: 6px;
+            font-size: 12px;
+            min-width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #e8e6dc;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        th {
+            font-family: 'Poppins', sans-serif;
+            background: #141413;
+            color: #faf9f5;
+            font-weight: 500;
+        }
+        th.test-col {
+            background: #6a9bcc;
+        }
+        th.query-col { min-width: 200px; }
+        td.description {
+            font-family: monospace;
+            font-size: 11px;
+            word-wrap: break-word;
+            max-width: 400px;
+        }
+        td.result {
+            text-align: center;
+            font-size: 16px;
+            min-width: 40px;
+        }
+        td.test-result {
+            background: #f0f6fc;
+        }
+        .pass { color: #788c5d; }
+        .fail { color: #c44; }
+        .rate {
+            font-size: 9px;
+            color: #b0aea5;
+            display: block;
+        }
+        tr:hover { background: #faf9f5; }
+        .score {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .score-good { background: #eef2e8; color: #788c5d; }
+        .score-ok { background: #fef3c7; color: #d97706; }
+        .score-bad { background: #fceaea; color: #c44; }
+        .train-label { color: #b0aea5; font-size: 10px; }
+        .test-label { color: #6a9bcc; font-size: 10px; font-weight: bold; }
+        .best-row { background: #f5f8f2; }
+        th.positive-col { border-bottom: 3px solid #788c5d; }
+        th.negative-col { border-bottom: 3px solid #c44; }
+        th.test-col.positive-col { border-bottom: 3px solid #788c5d; }
+        th.test-col.negative-col { border-bottom: 3px solid #c44; }
+        .legend { font-family: 'Poppins', sans-serif; display: flex; gap: 20px; margin-bottom: 10px; font-size: 13px; align-items: center; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-swatch { width: 16px; height: 16px; border-radius: 3px; display: inline-block; }
+        .swatch-positive { background: #141413; border-bottom: 3px solid #788c5d; }
+        .swatch-negative { background: #141413; border-bottom: 3px solid #c44; }
+        .swatch-test { background: #6a9bcc; }
+        .swatch-train { background: #141413; }
+    </style>
+</head>
+<body>
+    <h1>equipment-manager — Skill Description Optimization</h1>
+    <div class="explainer">
+        <strong>Optimizing your skill's description.</strong> This page updates automatically as Claude tests different versions of your skill's description. Each row is an iteration — a new description attempt. The columns show test queries: green checkmarks mean the skill triggered correctly (or correctly didn't trigger), red crosses mean it got it wrong. The "Train" score shows performance on queries used to improve the description; the "Test" score shows performance on held-out queries the optimizer hasn't seen. When it's done, Claude will apply the best-performing description to your skill.
+    </div>
+
+    <div class="summary">
+        <p><strong>Original:</strong> 管理第三方 skill/agent 仓库的安装、筛选与精简。已接入：msitarzewski/agency-agents、wshobson/agents、mattpocock/skills（新仓库可按流程接入）。当用户提到某个 skill/agent 仓库的更新、安装、精简、盘点时使用——包括 git pull 后评估新内容、从这些仓库装新装备、删除无用的旧装备、或想接入一个新的第三方仓库。凡涉及&quot;要不要装、装什么、删什么&quot;的 skill/agent 决策都用本技能，不直接动手。各仓库结构/安装机制见 references/ 下档案。</p>
+        <p class="best"><strong>Best:</strong> 管理本地已装第三方 skill/agent 的&quot;装不装、装什么、删什么&quot;时，用本技能。用户想盘点自己装了哪些 skill/agent、各来自哪个仓库；想删掉/清理用不上的旧装备；某仓库 git pull 或 clone 后有新内容，想评估新增的 skill/agent 值不值得装；或想把刚 clone 的新仓库接入装备管理——都属于本技能管。它先盘点、给选项，等用户拍板才动手，不擅自改文件。已接入：msitarzewski/agency-agents、wshobson/agents、mattpocock/skills，新仓库可随时接入。</p>
+        <p><strong>Best Score:</strong> in progress (train)</p>
+        <p><strong>Iterations:</strong> 3 | <strong>Train:</strong> 12 | <strong>Test:</strong> 8</p>
+    </div>
+
+    <div class="legend">
+        <span style="font-weight:600">Query columns:</span>
+        <span class="legend-item"><span class="legend-swatch swatch-positive"></span> Should trigger</span>
+        <span class="legend-item"><span class="legend-swatch swatch-negative"></span> Should NOT trigger</span>
+        <span class="legend-item"><span class="legend-swatch swatch-train"></span> Train</span>
+        <span class="legend-item"><span class="legend-swatch swatch-test"></span> Test</span>
+    </div>
+
+    <div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Iter</th>
+                <th>Train</th>
+                <th>Test</th>
+                <th class="query-col">Description</th>
+                <th class="positive-col">删掉本地用不上的 skill 和 agent，先给我个清单</th>
+                <th class="positive-col">我想把刚 clone 的 ~/awesome-skills 仓库接入装备管理</th>
+                <th class="positive-col">刚 pull 完 wshobson 仓库，帮我评估新加的 llm 相关 skill 值不值得装</th>
+                <th class="positive-col">盘点一下我本地装了哪些 skill 和 agent，各来自哪个仓库</th>
+                <th class="positive-col">wshobson 的 agents 仓库 git pull 之后好像多了几个新 skill，帮我看看有没有值得装的</th>
+                <th class="positive-col">更新一下 mattpocock 的技能，看看有没有新货值得装</th>
+                <th class="negative-col">写个 python 脚本处理一下这些数据</th>
+                <th class="negative-col">帮我写个本周开发周报</th>
+                <th class="negative-col">整理一下我的 QQ 音乐歌单</th>
+                <th class="negative-col">帮我画个系统架构图</th>
+                <th class="negative-col">帮我看看这个 skill 的 SKILL.md 是怎么用的</th>
+                <th class="negative-col">优化一下这段 FastAPI 接口的性能</th>
+                <th class="test-col positive-col">从 mattpocock 装个 grill-me 类似的技能到 my-skills，用软链</th>
+                <th class="test-col positive-col">精简一下我 ~/.claude/agents 里装的 engineering agent，太乱了想清理</th>
+                <th class="test-col positive-col">从 msitarzewski 的 agency-agents 装几个 agent 到全局</th>
+                <th class="test-col positive-col">看看本地装的 skill 有没有重复的，帮我清理掉</th>
+                <th class="test-col negative-col">配置一下项目的 config.toml 的 API key</th>
+                <th class="test-col negative-col">pip 装个依赖到项目里</th>
+                <th class="test-col negative-col">帮我 review 一下这次的 git diff</th>
+                <th class="test-col negative-col">这个 bug 一直报错，帮我查查</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="best-row">
+                <td>1</td>
+                <td><span class="score score-ok">18/36</span></td>
+                <td><span class="score score-ok">12/24</span></td>
+                <td class="description">管理第三方 skill/agent 仓库的安装、筛选与精简。已接入：msitarzewski/agency-agents、wshobson/agents、mattpocock/skills（新仓库可按流程接入）。当用户提到某个 skill/agent 仓库的更新、安装、精简、盘点时使用——包括 git pull 后评估新内容、从这些仓库装新装备、删除无用的旧装备、或想接入一个新的第三方仓库。凡涉及&quot;要不要装、装什么、删什么&quot;的 skill/agent 决策都用本技能，不直接动手。各仓库结构/安装机制见 references/ 下档案。</td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+            </tr>
+            <tr class="">
+                <td>2</td>
+                <td><span class="score score-ok">18/36</span></td>
+                <td><span class="score score-ok">12/24</span></td>
+                <td class="description">当对话涉及本地已装第三方 skill/agent 的盘点、评估、安装、精简或更新时使用本技能。触发场景：想看看自己装过哪些 skill/agent、各来自哪个仓库；某仓库 git pull/更新后有新内容，评估值不值得装；从已接入仓库装新装备；删掉/清理本地用不上的旧 skill 或 agent；或把刚 clone 的新仓库接入装备管理。凡是 skill/agent 的&quot;装不装、装什么、删什么&quot;决策都交给本技能——它只盘点、给选项，等你拍板才动手。已接入：msitarzewski/agency-agents、wshobson/agents、mattpocock/skills。不做 skill 的编写、调试或设计。</td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+            </tr>
+            <tr class="">
+                <td>3</td>
+                <td><span class="score score-ok">18/36</span></td>
+                <td><span class="score score-ok">12/24</span></td>
+                <td class="description">管理本地已装第三方 skill/agent 的&quot;装不装、装什么、删什么&quot;时，用本技能。用户想盘点自己装了哪些 skill/agent、各来自哪个仓库；想删掉/清理用不上的旧装备；某仓库 git pull 或 clone 后有新内容，想评估新增的 skill/agent 值不值得装；或想把刚 clone 的新仓库接入装备管理——都属于本技能管。它先盘点、给选项，等用户拍板才动手，不擅自改文件。已接入：msitarzewski/agency-agents、wshobson/agents、mattpocock/skills，新仓库可随时接入。</td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result fail">✗<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result fail">✗<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+                <td class="result test-result pass">✓<span class="rate">0/3</span></td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+</body>
+</html>

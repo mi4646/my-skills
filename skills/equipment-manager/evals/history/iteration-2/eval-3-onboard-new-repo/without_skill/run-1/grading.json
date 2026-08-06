@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  },
+  "expectations": [
+    {
+      "text": "输出应按『确认来源→摸清结构→建档案→登记表格→更新 description』五步组织",
+      "passed": true,
+      "evidence": "阶段式流程覆盖确认来源/摸清结构/建档案/登记/description"
+    },
+    {
+      "text": "输出应给出 references/ 档案文件的具体模板/五段式结构",
+      "passed": true,
+      "evidence": "档案模板仿照 msitarzewski/wshobson/mattpocock 三档案"
+    },
+    {
+      "text": "输出应声明不动通用方法论、不擅自执行安装",
+      "passed": true,
+      "evidence": "风险与克制段声明方法论不动、不擅自装"
+    }
+  ]
+}

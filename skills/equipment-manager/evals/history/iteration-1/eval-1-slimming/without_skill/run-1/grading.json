@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "输出包含保留/待定/删除三档",
+      "passed": true,
+      "evidence": "明确分三档：保留4/待定3/删除12"
+    },
+    {
+      "text": "删除项带理由",
+      "passed": true,
+      "evidence": "每项删除均有理由，如 feishu 因项目不用飞书"
+    },
+    {
+      "text": "删除前备份或等确认，非直接删",
+      "passed": true,
+      "evidence": "开头声明「只读评估，未做任何变更。待陛下确认后执行」"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

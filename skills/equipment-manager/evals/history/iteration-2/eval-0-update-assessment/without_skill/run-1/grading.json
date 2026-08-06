@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "pass_rate": 0.3333333333333333,
+    "passed": 1,
+    "failed": 2,
+    "total": 3
+  },
+  "expectations": [
+    {
+      "text": "输出应使用 git log 或对比仓库档案识别『新增』的 skill，而非罗列整个仓库",
+      "passed": false,
+      "evidence": "未用 git log 增量识别，直接按仓库结构推荐 16 个"
+    },
+    {
+      "text": "输出应先识别本地已装的同源项并跳过/标注，不重复推荐",
+      "passed": false,
+      "evidence": "仅顺带提到已装 skills 与命名冲突，未系统识别 15 个同源软链并跳过"
+    },
+    {
+      "text": "输出应按用户指定的复制(cp)方式给安装方案",
+      "passed": true,
+      "evidence": "提到安装方式为复制（非软链）"
+    }
+  ]
+}

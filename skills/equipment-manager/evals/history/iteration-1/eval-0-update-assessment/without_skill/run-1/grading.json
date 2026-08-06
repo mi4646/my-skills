@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "推荐理由基于用户真实项目栈（Python 后端/LLM）",
+      "passed": true,
+      "evidence": "方案开头声明面向 Python 后端+LLM 应用筛选，Tier1 llm-finetuning 理由基于 LLM 微调需求"
+    },
+    {
+      "text": "明确用复制而非软链安装",
+      "passed": true,
+      "evidence": "方案明确「复制到全局 ~/.claude/skills/」「不装软链」"
+    },
+    {
+      "text": "产出方案而非直接动手",
+      "passed": true,
+      "evidence": "内容为推荐清单与理由，无实际安装执行动作"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  }
+}

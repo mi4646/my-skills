@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 3,
+    "failed": 0,
+    "total": 3
+  },
+  "expectations": [
+    {
+      "text": "输出应按『确认来源→摸清结构→建档案→登记表格→更新 description』五步组织",
+      "passed": true,
+      "evidence": "严格五步：确认来源→摸清结构→建档案→登记→更新 description"
+    },
+    {
+      "text": "输出应给出 references/ 档案文件的具体模板/五段式结构",
+      "passed": true,
+      "evidence": "档案模板按现有三个档案格式给出"
+    },
+    {
+      "text": "输出应声明不动通用方法论、不擅自执行安装",
+      "passed": true,
+      "evidence": "声明方法论核心不动，只建档案+表格一行+description 一个名字"
+    }
+  ]
+}

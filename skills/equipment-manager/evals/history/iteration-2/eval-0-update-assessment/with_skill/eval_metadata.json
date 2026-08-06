@@ -1,0 +1,10 @@
+{
+  "eval_id": 0,
+  "eval_name": "update-assessment",
+  "prompt": "wshobson 的 agents 仓库刚才 git pull 过了，好像加了一些新 skill。我主要是做 Python 后端和 LLM 应用的，你帮我从里面挑几个值得装到全局 ~/.claude/skills 的，给出推荐清单和理由。装的时候我想用复制方式，不要软链。先出方案，别真装。",
+  "assertions": [
+    {"name": "incremental-identification", "description": "识别新增而非全量清单", "text": "输出应使用 git log 或对比仓库档案识别『新增』的 skill，而非罗列整个仓库"},
+    {"name": "dedup-before-recommend", "description": "先识别本地已装同源项", "text": "输出应先识别本地已装的同源项（如 wshobson 的 15 个软链）并跳过/标注，不重复推荐"},
+    {"name": "respect-install-preference", "description": "尊重用户指定安装方式", "text": "输出应按用户指定的复制(cp)方式给安装方案，明确不用软链"}
+  ]
+}
