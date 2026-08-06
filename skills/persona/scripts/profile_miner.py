@@ -46,6 +46,17 @@ STOPWORDS = {
     "first", "last", "next", "new", "old", "good", "bad", "well", "better",
     "really", "actually", "still", "already", "always", "never", "often",
 }
+# 中文弱信息词/口语填充（与英文 STOPWORDS 对称；miner 是中文日志，无停用词表导致
+# 「这个/里面/什么意思」全进候选，挤占真实画像信号）
+CHINESE_WEAK = {
+    "这个", "这些", "那个", "那些", "里面", "这里", "那里", "怎么", "怎么样",
+    "为什么", "什么", "一个", "一些", "一下", "东西", "地方", "情况", "时候",
+    "有什么疑问", "与我沟通", "你有什么建议", "附理由", "什么意思", "感觉",
+    "觉得", "可以", "需要", "应该", "能够", "可能", "继续", "然后", "现在",
+    "我们", "你们", "他们", "大家", "只是", "其实", "还有", "比如", "就是",
+    "真的", "好像", "大概", "明白", "知道", "看到", "问题", "更新", "完成",
+    "进行", "使用", "解决", "处理", "重新", "一种", "真的", "吗", "呢", "吧",
+}
 
 
 def clean_user_input(content):
@@ -168,17 +179,26 @@ def project_label(path):
 NOISE = {
     "null", "true", "false", "undefined", "const", "let", "var", "function",
     "return", "import", "export", "async", "await", "this", "class", "new",
+    # 代码残留：traceback/路径/参数名（出现再多次也是粘贴残留，不是使用习惯）
+    "src", "data", "args", "kwargs", "during", "handling", "start", "rename",
+    "project", "versions", "update", "views", "main", "init", "setup", "test",
+    "tests", "py", "pyc", "api", "http", "url", "get", "post", "self",
+    "traceback", "shutil", "str", "files", "text", "index", "valueerror",
+    "cannot", "stdout", "stderr", "encoding", "attributeerror",
+    "open", "packages", "core",
 }
 
 
 def tokens(text):
-    """轻量中英文 token：英文单词(≥3字符) + 连续中文串，去停用/噪声"""
+    """轻量中英文 token：英文单词(≥3字符) + 连续中文串，去停用/噪声/中文弱词"""
     out = []
     for m in re.finditer(r"[a-z]+|[一-鿿]{2,}", text.lower()):
         t = m.group(0)
         if t.isascii():
             if len(t) < 3 or t in STOPWORDS or t in NOISE:
                 continue
+        elif t in CHINESE_WEAK:  # 中文弱词/口语填充同样过滤
+            continue
         out.append(t)
     return out
 
@@ -227,6 +247,14 @@ def self_test():
     toks = tokens("fastapi python the skill null 优化 性能")
     assert "fastapi" in toks and "python" in toks and "skill" in toks
     assert "the" not in toks and "null" not in toks and "优化" in toks
+    # tokens：中文弱词/口语填充过滤（这个/里面/附理由 不进候选）
+    toks2 = tokens("这个 里面 什么意思 附理由 python")
+    assert "python" in toks2
+    assert "这个" not in toks2 and "里面" not in toks2
+    assert "什么意思" not in toks2 and "附理由" not in toks2
+    # tokens：代码残留（traceback 路径/参数名）不进候选
+    toks3 = tokens("src data args kwargs handling src")
+    assert toks3 == []
     # is_sdk_replay：SDK 批量重放（评测/脚本注入）应被排除，真实 cli 交互应保留
     assert is_sdk_replay({"type": "user", "entrypoint": "sdk-cli"})
     assert is_sdk_replay({"type": "user", "entrypoint": "sdk-py"})

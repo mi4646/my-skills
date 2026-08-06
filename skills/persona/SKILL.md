@@ -1,7 +1,7 @@
 ---
 name: persona
 description: 维护用户的画像（使用习惯）时用本技能：用户要求「更新我的画像/自学习我的使用习惯/挖掘我的偏好」、或设备评估前需要画像举证时。本技能从 Claude Code session 日志挖掘用户实际使用证据，产出带证据与置信度的候选画像，用户确认后写入画像。画像分人工层（profile.md）与自学习层（profile.d/<hostname>.md，每机一个文件、miner 只写本机 → 多机 git pull 零冲突）。不处理装备安装/评估本身。
-version: v1.1.1
+version: v1.1.2
 ---
 
 # 用户画像（User Profile）
@@ -51,7 +51,7 @@ version: v1.1.1
 | `--json` | 结构化候选画像证据 |
 | `bash scripts/scan_profile.sh` | 环境扫描（家目录/git/插件/运行时/模型） |
 
-**内置噪声过滤**（miner 自动执行，无需手动）：排除 SDK 批量重放（`entrypoint=sdk-*`、首行 `queue-operation` 的评测会话，且**文件层排除不占扫描预算**）、`<task-notification>` 注入块、子代理 SendMessage 回传/任务派发文本——只保留用户真实交互输入，防止评测夹具/脚本注入污染画像证据。
+**内置噪声过滤**（miner 自动执行，无需手动）：排除 SDK 批量重放（`entrypoint=sdk-*`、首行 `queue-operation` 的评测会话，且**文件层排除不占扫描预算**）、`<task-notification>` 注入块、子代理 SendMessage 回传/任务派发文本——只保留用户真实交互输入，防止评测夹具/脚本注入污染画像证据。分词层过滤中文口语弱词（这个/里面/什么意思）与代码残留（src/data/traceback 片段），避免「什么都记」挤占真实画像信号。
 
 ## 置信度公式与参数
 
