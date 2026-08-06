@@ -18,15 +18,10 @@
 ## 坑位与约定
 - 每个技能可能带 `agents/openai.yaml`（面向 Codex/OpenAI 宿主，Claude Code 忽略），改动时注意保持同步
 
-## 本地安装现状（2026-08-04）
-- **方式**：插件目录 `~/.claude/skills/mattpocock/`（`.claude-plugin/plugin.json` 只写元信息，技能靠自动发现），10 个技能全部**软链**到仓库 → `git pull` 即更新
-- **软链源**：`/home/anonymous/skills/skills/<domain>/<name>`
-- **精选 10 个**（未装全家桶——to-spec/to-tickets/wayfinder/triage 需配 issue tracker 且与 gstack 规划工具重复，评估不装）：
-  - `personal/`：obsidian-vault、edit-article
-  - `misc/`：git-guardrails-claude-code
-  - `engineering/`：grill-with-docs、domain-modeling、grill-me、prototype、research、resolving-merge-conflicts
-  - `productivity/`：handoff
-- 前置已装：grill-me/prototype/research/resolving-merge-conflicts 原从 my-skills 复制迁入，与仓库逐字一致（未本地改动）
+## 本地安装现状
+安装状态（已装清单/评估结论）见 `~/.config/equipment-manager/state.json`，不进本档案。
+- 2026-08-06 实测：`~/.claude/skills` 无任何 mattpocock 痕迹，**本地 0 已装**（8-04 档案记录的精选 10 个软链已全部消失，原因待查）
+- 8-04 曾精选 10 个软链到 `~/.claude/skills/mattpocock/`，`git pull` 即更新；该目录现已不存在
 
 ## 一键安装（维护于 my-skills/install.sh）
 - `install.sh` 跨平台：`install`（幂等）/ `--update`（pull 全部上游 + 强制重装）；**Linux 全软链、Windows 全复制**（自动检测平台）

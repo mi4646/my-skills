@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-Claude Code 自定义技能插件，只含七个自研技能（第三方技能已迁出，各自独立安装，见 README 部署备忘录）。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
+Claude Code 自定义技能插件，只含八个自研技能（第三方技能已迁出，各自独立安装，见 README 部署备忘录）。通过 `.claude-plugin/plugin.json` 声明为可安装插件，技能定义在 `skills/<name>/SKILL.md`。
 
 ## 技能架构
 
@@ -16,7 +16,8 @@ Claude Code 自定义技能插件，只含七个自研技能（第三方技能�
 - **release-skills**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则执行通用发布工作流，支持多语言 changelog
 - **update-version**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则直接执行 git diff 分析和文件写入
 - **weekly-report**：纯指令技能，无脚本，Claude 依据 SKILL.md 中的规则执行 git log 并归纳周报
-- **equipment-manager**：纯指令方法论技能，管理多个第三方 skill/agent 仓库的安装/筛选/精简；通用七步流程（盘点→查重→三档筛选→提问→备份安装→验证）+ `references/` 下按作者归档专属情报（msitarzewski / wshobson / mattpocock）
+- **equipment-manager**：纯指令方法论技能，管理多个第三方 skill/agent 仓库的安装/筛选/精简；通用七步流程（盘点→查重→三档筛选→提问→备份安装→验证）+ `references/` 下按作者归档专属情报（msitarzewski / wshobson / mattpocock）；评估时消费 persona 的用户画像
+- **persona**：脚本 + 方法论技能，从 Claude Code session 日志自学习用户画像——miner（`scripts/profile_miner.py`）举证 + 置信度/衰减/纠正 + 用户确认；画像分人工层（`profile.md`）与自学习层（`profile.d/<hostname>.md`，每机一个文件、多机 git pull 零冲突）；供 equipment-manager 评估等场景消费
 
 ### evals
 
