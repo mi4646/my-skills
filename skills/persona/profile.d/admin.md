@@ -7,7 +7,7 @@ miner 从本机 session 日志挖掘、经用户确认的画像条目。**每机
 
 ## 技术栈
 
-- **Python 后端为主（FastAPI + Django）**：session 日志实锤——「优化 FastAPI 接口性能」「配置 config.toml API key」、Python traceback/FastAPI 报错排查、django 开发（3 session）🔍（miner 2026-08-06，用户确认）。FastAPI 用户 2026-08-06 确认确实在用，已清 miner-state 纠正记录
+- **Python 后端为主（FastAPI + Django）**：FastAPI 🗣（用户 2026-08-06 口述确认「确实在用」；session 日志仅以 uvicorn/接口 表述，字面 fastapi 无真实命中——早期「优化 FastAPI 接口性能」证据经核为 equipment-manager 评测夹具重放污染，已从画像证据中剔除）。Django 🔍（3 session，/var/www/shyun 业务）
 
 ## 业务项目
 

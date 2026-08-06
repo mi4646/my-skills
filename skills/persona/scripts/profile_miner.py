@@ -76,6 +76,12 @@ def clean_user_input(content):
     head = content[:40].lower()
     if re.match(r"^(you are|你是|the coordinator|review (the |this )|read (the|this) design|i need you|task:|你的任务)", head):
         return "", False
+    # 子代理 SendMessage 回传通知（"Another Claude session sent a message: ..."）
+    if head.startswith("another claude session sent a message"):
+        return "", False
+    # 子代理任务派发（"你在 <worktree> 中继续你刚完成的 Task ..."）
+    if "继续你刚完成的 task" in content.lower() or "中继续你刚完成的" in content:
+        return "", False
     return content, True
 
 
@@ -83,6 +89,17 @@ def is_sdk_replay(entry):
     """SDK 批量重放检测：entrypoint 为 sdk-* 的 user turn 是评测/脚本注入，非用户交互输入。
     （如 equipment-manager benchmark 用 sdk-cli/sdk-py 批量重放 synthetic 查询，会污染画像证据）"""
     return (entry.get("entrypoint") or "").startswith("sdk")
+
+
+def is_sdk_replay_file(path):
+    """SDK 批量重放文件检测：首行含 queue-operation 标记即整个 session 为非交互评测重放。
+    在文件层排除，避免其占用扫描预算、把真实开发日志挤出窗口（实测近 90 天 520/1439 个文件是 SDK 重放）。"""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            first = fh.readline()
+            return bool(first and '"queue-operation"' in first)
+    except OSError:
+        return False
 
 
 def user_turns(path, min_len, since_ts):
@@ -203,6 +220,8 @@ def self_test():
     assert clean_user_input("<task-notification>任务完成</task-notification> 你好")[0] == "你好"
     assert clean_user_input("## When to invoke this skill " + "x" * 200)[1] is False   # skill 正文
     assert clean_user_input("You are a reviewer, judge independently. " + "y" * 50)[1] is False  # 子代理注入
+    assert clean_user_input("Another Claude session sent a message: 任务已完成 plan.md 已落盘")[1] is False  # SendMessage 回传
+    assert clean_user_input("你在 /var/www/demo/.claude/worktrees/feature-x 中继续你刚完成的 Task 8（Web 推送端点）")[1] is False  # 子代理任务派发
     assert clean_user_input("This session is being continued from a previous conversation")[1] is False  # 压缩摘要
     # tokens：停用词/噪声过滤，保留领域词
     toks = tokens("fastapi python the skill null 优化 性能")
@@ -215,6 +234,23 @@ def self_test():
     assert not is_sdk_replay({"type": "user", "entrypoint": "cli"})
     assert not is_sdk_replay({"type": "user", "entrypoint": ""})
     assert not is_sdk_replay({"type": "user"})
+    # is_sdk_replay_file：首行 queue-operation 的评测重放文件应整文件排除（不占扫描预算）
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8") as tf:
+        tf.write('{"type":"queue-operation","operation":"enqueue","content":"Review this change"}\n')
+        tf.write('{"type":"user","entrypoint":"sdk-cli","message":{"content":"优化一下这段 FastAPI 接口的性能"}}\n')
+        sdk_path = tf.name
+    try:
+        assert is_sdk_replay_file(sdk_path)
+    finally:
+        os.unlink(sdk_path)
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8") as tf:
+        tf.write('{"type":"user","message":{"content":"帮我优化一下这段接口的性能"}}\n')
+        real_path = tf.name
+    try:
+        assert not is_sdk_replay_file(real_path)
+    finally:
+        os.unlink(real_path)
     # confidence 公式
     now = time.time()
     c1, _ = confidence(9, "", 0, now, 90, 0.5)      # 9 session 满支持、新证据 → 1.0
@@ -267,9 +303,11 @@ def main():
     since = time.time() - args.days * 86400 if args.days else 0
     root = Path(args.projects)
     files = list(root.rglob("*.jsonl"))
-    # 按 mtime 从新到旧，总量兜底：最多扫前 200 个文件、总预算 60s
+    # 先排除 SDK 批量重放文件（评测夹具），再按 mtime 从新到旧取总量兜底（最多前 200 个文件、总预算 60s）。
+    # 若在预算窗口内排除，评测重放会挤占真实开发日志名额（实测近 90 天 SDK 文件占 36%）。
     files = sorted(
-        [f for f in files if os.path.getmtime(f) >= since],
+        [f for f in files
+         if os.path.getmtime(f) >= since and not is_sdk_replay_file(f)],
         key=os.path.getmtime,
         reverse=True,
     )[:200]
@@ -303,17 +341,29 @@ def main():
                         st["last_ts"] = ts
 
     # 证据追溯 verify：搜支持证据，不足 min-sessions 个不同 session 即 FAIL
+    # （v1.1.1）再叠加纠正降权与置信度门槛：即使有 ≥min-sessions 个 session，
+    # 被 --correct 纠正过（或置信度因衰减跌破 min-confidence）的关键词同样 FAIL，
+    # 防「纠正后仍因旧 session 复活」。防编造 + 防纠正失效双闸。
     if args.verify:
         sessions = set()
+        last_ts = ""
         print(f"== verify \"{args.verify}\" ==")
         for label, ts, text, src in verify_hits[:20]:
             sessions.add(src)
+            if ts and ts > last_ts:
+                last_ts = ts
             print(f"  [{label}] {ts[:10]} :: {text[:110]}  @ {Path(src).name}")
         n_sess = len(sessions)
-        print(f"\n  命中 {len(verify_hits)} 条 | 来自 {n_sess} 个 session | 要求 ≥{args.min_sessions}")
-        verdict = "PASS" if n_sess >= args.min_sessions else "FAIL（证据不足，候选丢弃）"
+        state = load_state(args.state)
+        corr = state.get(args.verify.lower(), {}).get("corrections", 0)
+        c, _days = confidence(n_sess, last_ts, corr, time.time(),
+                              args.decay_days, args.correction_penalty)
+        print(f"\n  命中 {len(verify_hits)} 条 | 来自 {n_sess} 个 session | 纠正 {corr} 次 | 置信度 {c:.3f}")
+        print(f"  门槛: session ≥{args.min_sessions} 且 置信度 ≥{args.min_confidence}")
+        verdict = "PASS" if n_sess >= args.min_sessions and c >= args.min_confidence \
+            else "FAIL（证据不足/已纠正降权，候选丢弃）"
         print(f"  结论: {verdict}")
-        sys.exit(0 if n_sess >= args.min_sessions else 1)
+        sys.exit(0 if verdict == "PASS" else 1)
 
     # 候选画像条目：关键词 → 置信度（公式见 confidence()），供用户逐个确认
     if args.evaluate:
