@@ -54,6 +54,9 @@ def clean_user_input(content):
     content = re.sub(r"<(?:local-command|command|bash)-[^>]*>.*?</(?:local-command|command|bash)-[^>]*>",
                      " ", content, flags=re.S)
     content = re.sub(r"</?(?:local-command|command|bash)-[^>]*>", " ", content)
+    # 去掉 <task-notification> 注入块（Claude Code 自动插入的子代理完成通知，非用户输入）
+    content = re.sub(r"<task-notification>.*?</task-notification>", " ", content, flags=re.S)
+    content = re.sub(r"</?task-notification[^>]*>", " ", content)
     # 去掉 skill 注入文本（Base directory... / AUTO-GENERATED / <!-- -->
     content = re.sub(r"Base directory for this skill:.*?(?=\n|$)", " ", content, flags=re.S)
     content = re.sub(r"<!--.*?-->", " ", content, flags=re.S)
@@ -76,6 +79,12 @@ def clean_user_input(content):
     return content, True
 
 
+def is_sdk_replay(entry):
+    """SDK 批量重放检测：entrypoint 为 sdk-* 的 user turn 是评测/脚本注入，非用户交互输入。
+    （如 equipment-manager benchmark 用 sdk-cli/sdk-py 批量重放 synthetic 查询，会污染画像证据）"""
+    return (entry.get("entrypoint") or "").startswith("sdk")
+
+
 def user_turns(path, min_len, since_ts):
     """yield (text, ts, source_path) for each qualifying user turn in a jsonl."""
     try:
@@ -87,6 +96,11 @@ def user_turns(path, min_len, since_ts):
         fh.close()
         return
     with fh:
+        # SDK 批量重放 session 以 queue-operation 标记开头，整段为非交互输入，跳过
+        first = fh.readline()
+        if first and '"queue-operation"' in first:
+            return
+        fh.seek(0)
         for line in fh:
             line = line.strip()
             if not line:
@@ -96,6 +110,8 @@ def user_turns(path, min_len, since_ts):
             except ValueError:
                 continue
             if e.get("type") != "user":
+                continue
+            if is_sdk_replay(e):
                 continue
             m = e.get("message") or {}
             content = m.get("content")
@@ -184,6 +200,7 @@ def self_test():
     assert clean_user_input("优化一下这段 FastAPI 接口的性能")[0] == "优化一下这段 FastAPI 接口的性能"
     assert clean_user_input("<local-command-caveat>xx</local-command-caveat> 你好")[0] == "你好"
     assert clean_user_input("<bash-stdout>out</bash-stdout> <bash-input>ls</bash-input>")[0] == ""
+    assert clean_user_input("<task-notification>任务完成</task-notification> 你好")[0] == "你好"
     assert clean_user_input("## When to invoke this skill " + "x" * 200)[1] is False   # skill 正文
     assert clean_user_input("You are a reviewer, judge independently. " + "y" * 50)[1] is False  # 子代理注入
     assert clean_user_input("This session is being continued from a previous conversation")[1] is False  # 压缩摘要
@@ -191,6 +208,13 @@ def self_test():
     toks = tokens("fastapi python the skill null 优化 性能")
     assert "fastapi" in toks and "python" in toks and "skill" in toks
     assert "the" not in toks and "null" not in toks and "优化" in toks
+    # is_sdk_replay：SDK 批量重放（评测/脚本注入）应被排除，真实 cli 交互应保留
+    assert is_sdk_replay({"type": "user", "entrypoint": "sdk-cli"})
+    assert is_sdk_replay({"type": "user", "entrypoint": "sdk-py"})
+    assert is_sdk_replay({"type": "user", "entrypoint": "sdk"})
+    assert not is_sdk_replay({"type": "user", "entrypoint": "cli"})
+    assert not is_sdk_replay({"type": "user", "entrypoint": ""})
+    assert not is_sdk_replay({"type": "user"})
     # confidence 公式
     now = time.time()
     c1, _ = confidence(9, "", 0, now, 90, 0.5)      # 9 session 满支持、新证据 → 1.0
