@@ -1,6 +1,6 @@
 # My Skills
 
-个人自研技能集合：7 个自研技能 + install.sh 一键安装第三方技能。
+个人自研技能集合：8 个自研技能 + install.sh 一键安装第三方技能。
 第三方装备来源独立、更新互不影响（构成与调用见文末「三方装备」）。
 
 ## 速览（30 秒）
@@ -8,6 +8,7 @@
 | 技能 | 用途 | 触发 |
 |------|------|------|
 | equipment-manager | 管理第三方安装的 skill/agent：盘点→查重→三档筛选→备份安装→验证 | /my-skills:equipment-manager |
+| persona | 从 session 日志自学习用户画像：扫描→miner 举证→确认写入 | /my-skills:persona |
 | obsidian-icon-assigner | 为 Obsidian Markdown 分配 Iconic 图标与颜色 | /my-skills:obsidian-icon-assigner |
 | opencode-model-optimizer | 推荐 OpenCode Go 模型分层配置 | /my-skills:opencode-model-optimizer |
 | playlist-organizer | 音乐收藏整理成场景歌单 | /my-skills:playlist-organizer |
@@ -24,6 +25,17 @@
 管理从第三方仓库安装的 skill/agent——对话式流程：盘点 → 查重 → 三档筛选 → 备份安装 → 验证。
 
 触发 `/my-skills:equipment-manager` · 目录 [skills/equipment-manager/](./skills/equipment-manager/)
+
+### persona
+
+从 Claude Code session 日志自学习用户画像——机器举证、用户拍板。
+
+- **日志举证**：`profile_miner.py` 从 `~/.claude/projects/**/*.jsonl` 挖掘用户真实输入，产出带证据与置信度的候选画像
+- **置信度闭环**：证据可追溯 + 衰减（90 天无新证据过期）+ 纠正降权（一次纠正置信度砍半）
+- **分区分写**：人工层 `profile.md` + 自学习层 `profile.d/<hostname>.md`，每机只写自己的文件，多机 git pull 零冲突
+- **负面偏好不推断**：只有用户明确表态才记录，日志只能证明「没做过」学不到「不想做」
+
+触发 `/my-skills:persona` · 目录 [skills/persona/](./skills/persona/)
 
 ### obsidian-icon-assigner
 

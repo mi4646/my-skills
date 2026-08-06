@@ -21,7 +21,7 @@ Claude Code 自定义技能插件，只含八个自研技能（第三方技能�
 
 ### evals
 
-`evals/evals.json` 为每个技能定义测试用例（prompt + expected_output），用于评估技能质量。目前没有自动化测试运行器。
+每个技能在 `skills/<name>/evals/evals.json` 定义测试用例（prompt + expected_output），用于评估技能质量。目前没有自动化测试运行器。
 
 ## 关键约定
 
