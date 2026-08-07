@@ -9,7 +9,7 @@
 | baoyu-design | 技能 + 内置子技能/agents | 设计原型生成：网页、PPT、图表、设计系统等交付物 | 主技能 + 50 余个流程子技能 + 3 只读子代理 | `github.com/jimliu/baoyu-design` |
 | hallmark | 纯技能 | 反 AI 味设计指导：新页面 / 重设计 / 审计 | 1 | `github.com/nutlope/hallmark` |
 | storage-analyzer | 技能 + Python 脚本 | 磁盘 / 仓库存储占用扫描分析 | 1 | `github.com/KKKKhazix/khazix-skills` |
-| addyosmani | 独立技能目录 | 生产级工程方法论：上下文工程、需求访谈 | 2（独立目录，非插件） | `github.com/addyosmani/agent-skills` |
+| addyosmani | 独立技能目录 | 生产级工程方法论 | `/context-engineering`（上下文工程：优化 CLAUDE.md/规则文件与上下文分层）<br>`/interview-me`（需求访谈：一次一问挖真实需求） | `github.com/addyosmani/agent-skills` |
 
 ## Agents
 
