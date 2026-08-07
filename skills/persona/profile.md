@@ -7,7 +7,7 @@
 - **人工层（本文件）**：稳定的结构性事实 + 用户明确表态，手工维护
 - **自学习层**：miner 从本机日志挖掘、用户确认的偏好，见 `profile.d/<hostname>.md`——**每机一个文件，miner 只写本机自己的 → 三机各写各的，`git pull` 零冲突**
 
-- **updated**: 2026-08-06
+- **updated**: 2026-08-07
 - **证据来源分级**：🧠记忆记录 / 🔍环境扫描实测（`scripts/scan_profile.sh`）/ 🔍日志挖掘（`scripts/profile_miner.py`，写入 profile.d/）/ 🗣用户口述 / ⚠️推断。单一口述不落地，实测与记忆交叉验证后才写死
 
 ## 工作流（人工层）
@@ -19,7 +19,7 @@
 ## 技术栈（人工层 · 环境配置）
 
 - 多语言运行时已装但非活跃：.nvm/.bun/.dotnet 🔍
-- **四层模型栈已实锤落地**：qwen3.7-max(旗舰/Opus)+deepseek-v4-pro(主力/Sonnet)+deepseek-v4-flash(轻量/兜底/Haiku) 🔍（~/.claude/settings.json 实测；与 OpenCode 记忆同源）
+- **四层模型栈已实锤落地**：qwen3.7-max(旗舰/Opus)+deepseek-v4-pro(主力/Sonnet)+qwen3.7-plus(轻量/Fable)+deepseek-v4-flash(兜底/Haiku) 🔍（~/.claude/settings.json 实测，Fable 槽位 2026-08-07 确认；与 OpenCode 记忆同源）
 - *自学习层证据条目（Python 后端 FastAPI+Django、/var/www 业务项目等）见 `profile.d/<hostname>.md`*
 
 ## 常用场景（人工层）
