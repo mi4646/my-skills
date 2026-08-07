@@ -3,6 +3,7 @@
 ## 基本信息
 - **作者**：Addy Osmani（Google Chrome 团队）
 - **本地路径**：`~/skills/addyosmani/`（2026-08-07 归位，install.sh ④段管理）
+- **浅克隆副本**：`/home/anonymous/agent-skills/`（2026-08-07 登记，同 HEAD d2478bf，非上游、install.sh 不引用，仅作参考）
 - **git remote**：`https://github.com/addyosmani/agent-skills.git`
 - **版本**：0.6.6（MIT）
 - **规模**：24 skill + 4 agent + 8 slash command + hooks + evals 框架

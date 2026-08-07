@@ -13,7 +13,13 @@
 
 ## Agents
 
-仅 baoyu-design 自带 3 个只读子代理，由主流程内部 spawn，**无全局调用命令**：
+**独立安装（install.sh ⑤段，复制到 `~/.claude/agents/`，不用软链）**：
+
+| 资产 | 类型 | 用途 | 内含 | 来源 |
+|---|---|---|---|---|
+| wshobson | agents 文件（复制） | 生产级开发专家人格 + skill 评测裁判 | `eval-judge`（skill 质量评测裁判：触发准确度/编排/输出质量/范围 4 维评分）<br>`python-development-fastapi-pro` + `python-development-django-pro`（Python 后端专家人格）<br>`bash-pro`（防御性 Bash 专家） | [github.com/wshobson/agents](https://github.com/wshobson/agents) |
+
+**baoyu-design 自带 3 个只读子代理**（由主流程内部 spawn，**无全局调用命令**）：
 
 - **vision-probe-agent** — 任务前探测当前模型/提供商是否支持图像输入
 - **fork-verifier-agent** — 校验刚生成的设计交付物，回报 `done` / `needs_work`
@@ -37,4 +43,10 @@
 
 ```
 /context-engineering   /interview-me
+```
+
+**wshobson agents（无前缀，Agent 工具/子代理按名调用）**
+
+```
+eval-judge   python-development-fastapi-pro   python-development-django-pro   bash-pro
 ```
