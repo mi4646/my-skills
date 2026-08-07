@@ -6,10 +6,10 @@
 
 | 资产 | 类型 | 用途 | 内含 | 来源 |
 |---|---|---|---|---|
-| mattpocock | 插件 | 精选个人工作流技能集：写作、原型、研究、Git 协作等 | 10 个技能，命名空间 `mattpocock:` | `github.com/mattpocock/skills` |
 | baoyu-design | 技能 + 内置子技能/agents | 设计原型生成：网页、PPT、图表、设计系统等交付物 | 主技能 + 50 余个流程子技能 + 3 只读子代理 | `github.com/jimliu/baoyu-design` |
 | hallmark | 纯技能 | 反 AI 味设计指导：新页面 / 重设计 / 审计 | 1 | `github.com/nutlope/hallmark` |
 | storage-analyzer | 技能 + Python 脚本 | 磁盘 / 仓库存储占用扫描分析 | 1 | `github.com/KKKKhazix/khazix-skills` |
+| addyosmani | 独立技能目录 | 生产级工程方法论：上下文工程、需求访谈 | 2（独立目录，非插件） | `github.com/addyosmani/agent-skills` |
 
 ## Agents
 
@@ -19,10 +19,6 @@
 - **fork-verifier-agent** — 校验刚生成的设计交付物，回报 `done` / `needs_work`
 - **design-system-checker** — 只读校验便携设计系统，输出一行健康摘要
 
-## Plugins
-
-仅 mattpocock 是插件（`.claude-plugin/plugin.json` 声明），其余为独立技能目录。
-
 ## 维护
 
 - 安装：`bash install.sh`（幂等，已装跳过）
@@ -31,23 +27,14 @@
 
 ### 调用方式
 
-**mattpocock 精选（`mattpocock:` 前缀）**
-
-```
-/mattpocock:obsidian-vault
-/mattpocock:edit-article
-/mattpocock:git-guardrails-claude-code
-/mattpocock:grill-with-docs
-/mattpocock:domain-modeling
-/mattpocock:handoff
-/mattpocock:grill-me
-/mattpocock:prototype
-/mattpocock:research
-/mattpocock:resolving-merge-conflicts
-```
-
 **独立第三方（无前缀）**
 
 ```
 /baoyu-design   /hallmark   /storage-analyzer
+```
+
+**addaysomani 独立技能（无前缀，自动路由触发）**
+
+```
+/context-engineering   /interview-me
 ```
