@@ -453,9 +453,10 @@ def main():
                             args.decay_days, args.correction_penalty, args.min_confidence)
         out = {
             "meta": {"files": len(files), "turns": n_turns, "days": args.days},
-            "rules": "对每条候选：① 判断 keyword 是否『用户画像信号』（真实使用偏好），不是则跳过；"
-                     "② 产出画像候选 = 一句话主张 + 判定依据 + ≥1 个证据 session 引用；"
-                     "③ 证据不足/不确定 → 明确不产出（宁可漏判不编造）；④ 负面偏好不推断",
+            "rules": "对每条候选：① 先给 keyword 打维度标签（技术栈/业务工作流/个人习惯/工具习惯/噪声）；"
+                     "② 技术栈与业务工作流 → 产出候选（一句话主张 + 判定依据 + ≥1 证据 session 引用）到主画像；"
+                     "③ 个人习惯/工具习惯 → 产出到 prefs 备忘（equipment-manager 不读）；项目名/仓库名/噪声 → 不产出；"
+                     "④ 证据不足/不确定 → 明确不产出（宁可漏判不编造）；⑤ 负面偏好不推断",
             "candidates": rows[:40],
         }
         print(json.dumps(out, ensure_ascii=False, indent=2))

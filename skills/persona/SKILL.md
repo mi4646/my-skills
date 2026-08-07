@@ -1,7 +1,7 @@
 ---
 name: persona
-description: 维护用户的画像（使用习惯）时用本技能：用户要求「更新我的画像/自学习我的使用习惯/挖掘我的偏好」、或设备评估前需要画像举证时。本技能从 Claude Code session 日志挖掘用户实际使用证据，产出带证据与置信度、经 LLM 蒸馏的候选画像，用户确认后写入画像。画像分人工层（profile.md）与自学习层（profile.d/<hostname>.md，每机一个文件、miner 只写本机 → 多机 git pull 零冲突）。不处理装备安装/评估本身。
-version: v1.2.0
+description: 维护用户的画像（使用习惯）时用本技能：用户要求「更新我的画像/自学习我的使用习惯/挖掘我的偏好」、或设备评估前需要画像举证时。本技能从 Claude Code session 日志挖掘用户实际使用证据，产出带证据与置信度、经 LLM 蒸馏的候选画像，用户确认后写入画像。画像分人工层（profile.md）与自学习层（profile.d/<hostname>.md 技术栈/业务工作流供 equipment-manager 评估 + profile.d/prefs/<hostname>.md 个人习惯仅备忘；每机一个文件、miner 只写本机 → 多机 git pull 零冲突）。不处理装备安装/评估本身。
+version: v1.3.0
 ---
 
 # 用户画像（User Profile）
@@ -19,10 +19,11 @@ version: v1.2.0
 | 层 | 文件 | 谁写 | 进 git |
 |----|------|------|--------|
 | **人工层** | `profile.md` | 用户手工维护（结构性事实 + 明确表态） | ✅ |
-| **自学习层** | `profile.d/<hostname>.md` | miner 举证 + 用户确认后写入 | ✅ |
+| **自学习层·评估** | `profile.d/<hostname>.md` | miner 举证 + 用户确认（技术栈/业务工作流，喂 equipment-manager） | ✅ |
+| **自学习层·备忘** | `profile.d/prefs/<hostname>.md` | 同上（个人习惯/工具习惯，仅备忘；`profile.d/*.md` 通配符天然不读子目录） | ✅ |
 | **纠正状态** | `~/.config/equipment-manager/miner-state.json` | `--correct` 降权记录 | ❌（本机状态） |
 
-**多机零冲突**：miner 只写本机自己的 `profile.d/<hostname>.md`（文件名=主机名），三机各写各的 → `git pull` 无冲突；确认后的画像结论随 git 汇聚，原始日志不离开本机。
+**多机零冲突**：miner 只写本机自己的 `profile.d/<hostname>.md` 与 `profile.d/prefs/<hostname>.md`（文件名=主机名），三机各写各的 → `git pull` 无冲突；确认后的画像结论随 git 汇聚，原始日志不离开本机。
 
 ## 证据来源分级
 
@@ -38,7 +39,7 @@ version: v1.2.0
 3. 蒸馏提炼     Claude 把线索提炼为画像候选：一句话主张 + 判定依据 + ≥1 证据 session 引用；
                 证据不足/不确定 → 明确跳过（宁可漏判不编造）；负面偏好不推断
 4. 亮候选拍板   逐条展示（主张 + 证据），默认「忽略」；确认 → 写入；纠正 → --correct <关键词>
-5. 写入画像     本机自学习文件 + 每条带 provenance 证据行 + 用户确认 + updated + commit
+5. 写入画像     技术栈/业务工作流 → `profile.d/<hostname>.md`（技术栈条目标 🔒稳定）；个人习惯 → `profile.d/prefs/<hostname>.md`；每条带 provenance 证据行 + updated + commit
 6. 核对         updated 超 90 天提示确认；人工层条目只在用户明确表态时改动
 ```
 
@@ -47,6 +48,12 @@ version: v1.2.0
 - **蒸馏必须绑定证据**：每条画像候选的「一句话主张」必须引用 `--distill` 输出的至少 1 个证据 session；引用不了证据的主张不得产出（防 AI 编造画像，参考 FastAPI 假证据教训）。
 - **provenance 落盘**：写入画像的条目带证据行（项目 · session 文件名 · 时间 · 文本片段），`--verify <关键词>` 重扫日志时可精确回溯到具体 session。
 - **确认防 rubber-stamp**：逐条亮候选（主张 + 证据），默认「忽略」——没有明确「确认」就不写入画像。
+
+## 稳定偏好（技术栈不随窗口衰减）
+
+- 技术栈条目（编程语言/框架/数据库/部署目标）确认写入后标记 **🔒稳定**——核心栈是「一贯用什么」，不因最近窗口（90 天）内无新证据就被提议删除
+- 衰减只作用于「活动型」条目（业务域/运维等近期活动）；🔒条目除非用户 `--correct` 纠正，否则保留
+- 判断标准：技术性（语言/框架/DB/部署）→ 🔒稳定；一次性业务活动 → 活动型
 
 ## 命令速查
 
@@ -76,9 +83,9 @@ confidence = min(1.0, 支持session数/3) × 衰减因子 × correctionPenalty^�
 
 ## 多机注意
 
-- 每台设备跑 `git pull` 拉到共享画像，**本机 miner 只挖本机日志、只写本机 `profile.d/<hostname>.md`**
+- 每台设备跑 `git pull` 拉到共享画像，**本机 miner 只挖本机日志、只写本机 `profile.d/<hostname>.md` + `profile.d/prefs/<hostname>.md`**
 - 新设备部署 my-skills（install.sh）即带上画像，`profile.d/` 自动出现
-- 评估时画像 = `profile.md`（人工层）+ 全部 `profile.d/*.md`（自学习层汇总）
+- 评估时画像 = `profile.md`（人工层）+ 顶层 `profile.d/*.md`（技术栈/工作流；`prefs/` 子目录不读，个人习惯不参与评估）
 
 ## 设计依据
 
