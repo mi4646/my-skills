@@ -231,6 +231,40 @@ def confidence(n_sessions, last_ts, corrections, now, decay_days, penalty):
     return support * decay * (penalty ** corrections), days_since
 
 
+def distill_rows(token_stats, evidence, state, now, decay_days, penalty, min_conf):
+    """蒸馏输入：候选线索 → 置信度 + top3 证据（项目/session/时间/文本片段）。
+
+    词频只是「线索」，是否真是画像信号由上层 LLM 蒸馏判定（语义层）；
+    本函数只负责把每条线索绑上可追溯证据，供蒸馏逐条引用、防编造（参考 FastAPI 假证据教训）。
+    """
+    rows = []
+    for kw, st in token_stats.items():
+        corr = state.get(kw, {}).get("corrections", 0)
+        c, days = confidence(len(st["sessions"]), st["last_ts"], corr, now,
+                             decay_days, penalty)
+        evs = []
+        for src, info in sorted(evidence.get(kw, {}).items(),
+                                key=lambda kv: kv[1]["ts"], reverse=True)[:3]:
+            evs.append({
+                "project": project_label(Path(src)),
+                "session": Path(src).name,
+                "ts": info["ts"],
+                "snippet": info["snippet"],
+            })
+        rows.append({
+            "keyword": kw,
+            "sessions": len(st["sessions"]),
+            "count": st["count"],
+            "confidence": round(c, 3),
+            "days_since": round(days),
+            "corrections": corr,
+            "status": "建议确认" if c >= min_conf else ("低证据" if c >= 0.3 else "衰减/丢弃"),
+            "evidence": evs,
+        })
+    rows.sort(key=lambda r: -r["confidence"])
+    return rows
+
+
 def self_test():
     """最小自检：核心逻辑（过滤/分词/置信度公式）出错即断言失败。"""
     # clean_user_input：注入剔除
@@ -290,7 +324,18 @@ def self_test():
     old_ts = datetime.fromtimestamp(now - 90 * 86400).isoformat()
     c4, _ = confidence(9, old_ts, 0, now, 90, 0.5)  # 90 天前证据 → decay = 1-90/180 = 0.5
     assert abs(c4 - 0.5) < 1e-6, c4
-    print("self-test: 全部通过（clean_user_input/tokens/confidence）")
+    # distill：候选线索绑定 top3 证据（项目/session/时间/文本），供 LLM 蒸馏逐条引用
+    dts = datetime.fromtimestamp(now - 86400).isoformat()
+    d_stats = {"shyun": {"sessions": {"a.jsonl", "b.jsonl"}, "last_ts": dts, "count": 4}}
+    d_ev = {"shyun": {"a.jsonl": {"ts": dts, "snippet": "帮我看看 shyun 的接口"},
+                      "b.jsonl": {"ts": dts, "snippet": "shyun mysql 连不上"}}}
+    rows = distill_rows(d_stats, d_ev, {}, now, 90, 0.5, 0.5)
+    assert rows and rows[0]["keyword"] == "shyun"
+    assert len(rows[0]["evidence"]) == 2
+    for ev in rows[0]["evidence"]:
+        assert sorted(ev.keys()) == ["project", "session", "snippet", "ts"]
+        assert ev["session"].endswith(".jsonl")
+    print("self-test: 全部通过（clean_user_input/tokens/confidence/distill）")
     return 0
 
 
@@ -303,6 +348,8 @@ def main():
     ap.add_argument("--verify", default="", help="验证模式：搜含该关键词的用户输入，不足 --min-sessions 个 session 即 FAIL")
     ap.add_argument("--min-sessions", type=int, default=2, help="verify 通过所需的最少不同 session 数")
     ap.add_argument("--evaluate", action="store_true", help="输出候选画像条目（关键词 → 置信度/状态）")
+    ap.add_argument("--distill", action="store_true",
+                    help="输出蒸馏输入 JSON：候选线索 + 置信度 + top3 证据（项目/session/时间/文本），供 LLM 提炼画像候选")
     ap.add_argument("--correct", default="", help="记录一次纠正降权：--correct <关键词>，写入状态文件")
     ap.add_argument("--state", default=os.path.expanduser("~/.config/equipment-manager/miner-state.json"),
                     help="纠正记录状态文件（默认 ~/.config/equipment-manager/miner-state.json）")
@@ -342,7 +389,8 @@ def main():
 
     per_project = defaultdict(list)   # project -> [(ts, text, source)]
     verify_hits = []                  # [(label, ts, text, source)] for --verify
-    token_stats = {}                  # keyword -> {sessions:set, last_ts, count}（仅 --evaluate）
+    token_stats = {}                  # keyword -> {sessions:set, last_ts, count}（--evaluate/--distill）
+    distill_ev = {}                   # keyword -> {src: {ts, snippet}}（--distill，top3 证据）
     kw_counter = Counter()
     n_turns = 0
     n_chars = 0
@@ -360,13 +408,17 @@ def main():
             kw_counter.update(tokens(text))
             if args.verify and args.verify.lower() in text.lower():
                 verify_hits.append((label, ts, text, src))
-            if args.evaluate:
+            if args.evaluate or args.distill:
                 for t in tokens(text):
                     st = token_stats.setdefault(t, {"sessions": set(), "last_ts": "", "count": 0})
                     st["count"] += 1
                     st["sessions"].add(src)
                     if ts and ts > st["last_ts"]:
                         st["last_ts"] = ts
+                    if args.distill:
+                        ev = distill_ev.setdefault(t, {})
+                        if len(ev) < 3:
+                            ev.setdefault(src, {"ts": ts, "snippet": text[:150]})
 
     # 证据追溯 verify：搜支持证据，不足 min-sessions 个不同 session 即 FAIL
     # （v1.1.1）再叠加纠正降权与置信度门槛：即使有 ≥min-sessions 个 session，
@@ -392,6 +444,22 @@ def main():
             else "FAIL（证据不足/已纠正降权，候选丢弃）"
         print(f"  结论: {verdict}")
         sys.exit(0 if verdict == "PASS" else 1)
+
+    # 蒸馏输入：证据绑定的候选线索 JSON。语义判定（是否真画像信号）由执行 skill 的 LLM 蒸馏做，
+    # 本脚本只保证每条线索带可追溯证据（项目/session/时间/文本），供蒸馏逐条引用、防编造。
+    if args.distill:
+        state = load_state(args.state)
+        rows = distill_rows(token_stats, distill_ev, state, time.time(),
+                            args.decay_days, args.correction_penalty, args.min_confidence)
+        out = {
+            "meta": {"files": len(files), "turns": n_turns, "days": args.days},
+            "rules": "对每条候选：① 判断 keyword 是否『用户画像信号』（真实使用偏好），不是则跳过；"
+                     "② 产出画像候选 = 一句话主张 + 判定依据 + ≥1 个证据 session 引用；"
+                     "③ 证据不足/不确定 → 明确不产出（宁可漏判不编造）；④ 负面偏好不推断",
+            "candidates": rows[:40],
+        }
+        print(json.dumps(out, ensure_ascii=False, indent=2))
+        return
 
     # 候选画像条目：关键词 → 置信度（公式见 confidence()），供用户逐个确认
     if args.evaluate:

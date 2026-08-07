@@ -1,7 +1,7 @@
 ---
 name: persona
-description: 维护用户的画像（使用习惯）时用本技能：用户要求「更新我的画像/自学习我的使用习惯/挖掘我的偏好」、或设备评估前需要画像举证时。本技能从 Claude Code session 日志挖掘用户实际使用证据，产出带证据与置信度的候选画像，用户确认后写入画像。画像分人工层（profile.md）与自学习层（profile.d/<hostname>.md，每机一个文件、miner 只写本机 → 多机 git pull 零冲突）。不处理装备安装/评估本身。
-version: v1.1.2
+description: 维护用户的画像（使用习惯）时用本技能：用户要求「更新我的画像/自学习我的使用习惯/挖掘我的偏好」、或设备评估前需要画像举证时。本技能从 Claude Code session 日志挖掘用户实际使用证据，产出带证据与置信度、经 LLM 蒸馏的候选画像，用户确认后写入画像。画像分人工层（profile.md）与自学习层（profile.d/<hostname>.md，每机一个文件、miner 只写本机 → 多机 git pull 零冲突）。不处理装备安装/评估本身。
+version: v1.2.0
 ---
 
 # 用户画像（User Profile）
@@ -33,25 +33,33 @@ version: v1.1.2
 
 ```
 1. 环境扫描     scripts/scan_profile.sh        （家目录/git/插件/运行时/模型/活跃目录）
-2. 日志举证     scripts/profile_miner.py --days 90 --evaluate
-                产出候选条目（session 数/置信度/状态），✅建议确认 即机器举证
-3. 亮候选拍板   确认 → 写入 profile.d/<hostname>.md；忽略 → 丢弃；纠正 → --correct <关键词>
-4. 写入画像     本机自学习文件 + 标记 🔍miner 证据 + 用户确认 + updated + commit
-5. 核对         updated 超 90 天提示确认；人工层条目只在用户明确表态时改动
+2. 日志举证     scripts/profile_miner.py --days 90 --distill
+                → 证据绑定的候选线索 JSON（关键词 + 置信度 + top3 证据 session/时间/文本）
+3. 蒸馏提炼     Claude 把线索提炼为画像候选：一句话主张 + 判定依据 + ≥1 证据 session 引用；
+                证据不足/不确定 → 明确跳过（宁可漏判不编造）；负面偏好不推断
+4. 亮候选拍板   逐条展示（主张 + 证据），默认「忽略」；确认 → 写入；纠正 → --correct <关键词>
+5. 写入画像     本机自学习文件 + 每条带 provenance 证据行 + 用户确认 + updated + commit
+6. 核对         updated 超 90 天提示确认；人工层条目只在用户明确表态时改动
 ```
+
+## 证据与防编造
+
+- **蒸馏必须绑定证据**：每条画像候选的「一句话主张」必须引用 `--distill` 输出的至少 1 个证据 session；引用不了证据的主张不得产出（防 AI 编造画像，参考 FastAPI 假证据教训）。
+- **provenance 落盘**：写入画像的条目带证据行（项目 · session 文件名 · 时间 · 文本片段），`--verify <关键词>` 重扫日志时可精确回溯到具体 session。
+- **确认防 rubber-stamp**：逐条亮候选（主张 + 证据），默认「忽略」——没有明确「确认」就不写入画像。
 
 ## 命令速查
 
 | 命令 | 用途 |
 |------|------|
-| `python3 scripts/profile_miner.py --days 90 --evaluate` | 产出候选画像条目（session 数/置信度/状态） |
+| `python3 scripts/profile_miner.py --days 90 --distill` | 产出证据绑定的候选线索 JSON（关键词 + 置信度 + top3 证据 session/时间/文本），供 LLM 蒸馏提炼画像候选 |
 | `--verify <关键词>` | 证据追溯：不足 --min-sessions 个 session，**或被纠正降权/置信度跌破 --min-confidence** 即 FAIL（防编造 + 防纠正失效） |
 | `--correct <关键词>` | 纠正降权（写 miner-state.json） |
 | `--self-test` | 核心逻辑自检（过滤/分词/置信度） |
 | `--json` | 结构化候选画像证据 |
 | `bash scripts/scan_profile.sh` | 环境扫描（家目录/git/插件/运行时/模型） |
 
-**内置噪声过滤**（miner 自动执行，无需手动）：排除 SDK 批量重放（`entrypoint=sdk-*`、首行 `queue-operation` 的评测会话，且**文件层排除不占扫描预算**）、`<task-notification>` 注入块、子代理 SendMessage 回传/任务派发文本——只保留用户真实交互输入，防止评测夹具/脚本注入污染画像证据。分词层过滤中文口语弱词（这个/里面/什么意思）与代码残留（src/data/traceback 片段），避免「什么都记」挤占真实画像信号。
+**内置噪声过滤**（miner 自动执行，无需手动）：排除 SDK 批量重放（`entrypoint=sdk-*`、首行 `queue-operation` 的评测会话，且**文件层排除不占扫描预算**）、`<task-notification>` 注入块、子代理 SendMessage 回传/任务派发文本——只保留用户真实交互输入，防止评测夹具/脚本注入污染画像证据。分词层过滤中文口语弱词（这个/里面/什么意思）与代码残留（src/data/traceback 片段），避免「什么都记」挤占真实画像信号。**这是 token 层过滤；`--distill` 之上再由 LLM 蒸馏做语义层判定（是否真画像信号），两层结合根治「什么都记」。**
 
 ## 置信度公式与参数
 
