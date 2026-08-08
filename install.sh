@@ -30,7 +30,8 @@ EQUIP=(
   "baoyu-design|github.com/jimliu/baoyu-design|"
   "hallmark|github.com/nutlope/hallmark|"
   "storage-analyzer|github.com/KKKKhazix/khazix-skills|"
-  "addyosmani|github.com/addyosmani/agent-skills|context-engineering,interview-me"
+  "addyosmani|github.com/addyosmani/agent-skills|context-engineering,interview-me,source-driven-development"
+  "mattpocock|github.com/mattpocock/skills|teach"
   "wshobson|github.com/wshobson/agents||eval-judge,python-development-fastapi-pro,python-development-django-pro,bash-pro"
 )
 
@@ -108,32 +109,39 @@ skill() {
 }
 
 # ---------- ① baoyu-design ----------
-say "[1/5] baoyu-design"
+say "[1/6] baoyu-design"
 REPO="$VENDOR_DIR/baoyu-design"
 repo https://github.com/jimliu/baoyu-design.git "$REPO"
 skill "$REPO/skills/baoyu-design" "$SKILLS_DIR/baoyu-design" "baoyu-design"
 
 # ---------- ② hallmark ----------
-say "[2/5] hallmark"
+say "[2/6] hallmark"
 REPO="$VENDOR_DIR/hallmark"
 repo https://github.com/nutlope/hallmark.git "$REPO"
 skill "$REPO/skills/hallmark" "$SKILLS_DIR/hallmark" "hallmark"
 
 # ---------- ③ storage-analyzer ----------
-say "[3/5] storage-analyzer"
+say "[3/6] storage-analyzer"
 REPO="$VENDOR_DIR/khazix-skills"
 repo https://github.com/KKKKhazix/khazix-skills.git "$REPO"
 skill "$REPO/storage-analyzer" "$SKILLS_DIR/storage-analyzer" "storage-analyzer"
 
-# ---------- ④ addyosmani 精选 2 个（独立 skill 目录形态）----------
-say "[4/5] addyosmani 精选 2 个"
+# ---------- ④ addyosmani 精选 3 个（独立 skill 目录形态）----------
+say "[4/6] addyosmani 精选 3 个"
 REPO="$VENDOR_DIR/addyosmani"
 repo https://github.com/addyosmani/agent-skills.git "$REPO"
 skill "$REPO/skills/context-engineering" "$SKILLS_DIR/context-engineering" "context-engineering"
 skill "$REPO/skills/interview-me" "$SKILLS_DIR/interview-me" "interview-me"
+skill "$REPO/skills/source-driven-development" "$SKILLS_DIR/source-driven-development" "source-driven-development"
 
-# ---------- ⑤ wshobson 精选 agents 4 个（复制到 ~/.claude/agents/，用户偏好一律复制不软链）----------
-say "[5/5] wshobson agents 4 个"
+# ---------- ⑤ mattpocock teach（独立 skill 目录形态，纯用户唤起）----------
+say "[5/6] mattpocock teach"
+REPO="$VENDOR_DIR/mattpocock"
+repo https://github.com/mattpocock/skills.git "$REPO"
+skill "$REPO/skills/productivity/teach" "$SKILLS_DIR/teach" "teach"
+
+# ---------- ⑥ wshobson 精选 agents 4 个（复制到 ~/.claude/agents/，用户偏好一律复制不软链）----------
+say "[6/6] wshobson agents 4 个"
 AGENTS_DIR="${HOME}/.claude/agents"
 REPO="$VENDOR_DIR/wshobson"
 repo https://github.com/wshobson/agents.git "$REPO"

@@ -9,7 +9,8 @@
 | baoyu-design | 技能 + 内置子技能/agents | 设计原型生成：网页、PPT、图表、设计系统等交付物 | 主技能 + 50 余个流程子技能 + 3 只读子代理 | [github.com/jimliu/baoyu-design](https://github.com/jimliu/baoyu-design) |
 | hallmark | 纯技能 | 反 AI 味设计指导：新页面 / 重设计 / 审计 | 1 | [github.com/nutlope/hallmark](https://github.com/nutlope/hallmark) |
 | storage-analyzer | 技能 + Python 脚本 | 磁盘 / 仓库存储占用扫描分析 | 1 | [github.com/KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills) |
-| addyosmani | 独立技能目录 | 生产级工程方法论 | `/context-engineering`（上下文工程：优化 CLAUDE.md/规则文件与上下文分层）<br>`/interview-me`（需求访谈：一次一问挖真实需求） | [github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
+| addyosmani | 独立技能目录 | 生产级工程方法论 | `/context-engineering`（上下文工程：优化 CLAUDE.md/规则文件与上下文分层）<br>`/interview-me`（需求访谈：一次一问挖真实需求）<br>`/source-driven-development`（官方文档驱动开发：框架代码查文档+给来源） | [github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
+| mattpocock | 独立技能目录 | 结构化多会话教学 | `/teach`（纯用户唤起：MISSION.md + 教案 HTML + 学习记录） | [github.com/mattpocock/skills](https://github.com/mattpocock/skills) |
 
 ## Agents
 
@@ -42,7 +43,7 @@
 **addaysomani 独立技能（无前缀，自动路由触发）**
 
 ```
-/context-engineering   /interview-me
+/context-engineering   /interview-me   /source-driven-development   /teach
 ```
 
 **wshobson agents（无前缀，Agent 工具/子代理按名调用）**
