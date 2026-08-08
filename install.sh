@@ -7,7 +7,7 @@
 set -euo pipefail
 
 SKILLS_DIR="${HOME}/.claude/skills"
-VENDOR_DIR="${HOME}/skills"
+VENDOR_DIR="${HOME}/.cache/equipment-manager/vendor"
 
 UPDATE=false
 LIST=false
@@ -19,7 +19,8 @@ esac
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 skip() { printf '  · %s 已存在，跳过\n' "$*"; }
 
-# 默认复制安装：软链指向 ~/skills/ vendor 目录，误删该目录会断链，故全平台一律复制
+# 默认复制安装：软链指向缓存 vendor 目录，误删会断链，故全平台一律复制。
+# vendor 为临时 clone 缓存（~/.cache/equipment-manager/vendor），安装完即删，不持久占用用户目录
 INSTALL_MODE="${INSTALL_MODE:-copy}"
 [ "$UPDATE" = true ] && LABEL="升级" || LABEL="安装"
 [ "$LIST" = false ] && printf '  · 安装方式: %s | 模式: %s\n' "$INSTALL_MODE" "$LABEL"
@@ -151,5 +152,11 @@ agent "$REPO/plugins/python-development/agents/fastapi-pro.md" "$AGENTS_DIR/pyth
 agent "$REPO/plugins/python-development/agents/django-pro.md" "$AGENTS_DIR/python-development-django-pro.md" "django-pro"
 agent "$REPO/plugins/shell-scripting/agents/bash-pro.md" "$AGENTS_DIR/bash-pro.md" "bash-pro"
 agent "$REPO/plugins/plugin-eval/agents/eval-judge.md" "$AGENTS_DIR/eval-judge.md" "eval-judge"
+
+# 临时缓存用完即删：vendor 目录只用于 clone 厂商仓库，安装完成后清理，不持久占用用户目录
+if [ "$INSTALL_MODE" = "copy" ]; then
+  rm -rf "$VENDOR_DIR"
+  echo "  · 已清理临时缓存 $VENDOR_DIR"
+fi
 
 say "完成！重启 Claude Code 或 /reload-plugins 生效。"
