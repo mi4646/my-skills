@@ -113,14 +113,14 @@ gstack_host_copies() {
 
 # --check: 设计文档第 1 节验证标准 1-5
 check_all() {
-  local fail=0 statejson tagsfile tmp
+  local fail=0 statejson tagsfile out
   statejson="${EM_CONFIG:-$HOME/.config/equipment-manager}/state.json"
 
   # 断言 1: 覆盖度——插件 skill 数 + 顶层扁平 + agents 无遗漏（输出行数 ≥ 断言基线，避免重复计数陷阱）
   local n_plugin n_flat n_agent
-  n_plugin=$(scan_plugins | grep -c $'\tskill\tyes')
-  n_flat=$(scan_flat_skills | grep -c $'\tskill\tyes')
-  n_agent=$(scan_agents | grep -c $'\tagent\tyes')
+  n_plugin=$(scan_plugins | grep -c $'\tskill\tyes' || true)
+  n_flat=$(scan_flat_skills | grep -c $'\tskill\tyes' || true)
+  n_agent=$(scan_agents | grep -c $'\tagent\tyes' || true)
   echo "CHECK 覆盖度: 插件skill=$n_plugin 顶层扁平=$n_flat agents=$n_agent"
   [ "$n_flat" -ge 60 ] || { echo "FAIL 1: 顶层扁平 skill 异常偏少 ($n_flat < 60)"; fail=1; }
   [ "$n_agent" -ge 5 ] || { echo "FAIL 1: agents 偏少 ($n_agent < 5)"; fail=1; }
@@ -135,40 +135,54 @@ check_all() {
   dup=$( { scan_flat_skills; } | awk -F'\t' '$2=="gstack"' | awk -F'\t' '{print $1}' | sort | uniq -d)
   [ -z "$dup" ] || { echo "FAIL 3: gstack 命令重复: $dup"; fail=1; }
 
-  # 断言 4: inventory 完整性——每个 enabled=true 装备都有 purpose/tags
+  # 断言 4: inventory 完整性——每个 enabled=true 装备都有 purpose/tags（完整报告，不中途退出）
   if [ -f "$statejson" ]; then
-    tmp=$(mktemp)
-    python3 - "$statejson" >"$tmp" <<'PYEOF' || fail=1
+    if out=$(python3 - "$statejson" <<'PYEOF'
 import json,sys
 d=json.load(open(sys.argv[1]))
 inv=d.get("inventory",{})
-for k,v in inv.items():
-    if v.get("enabled") and (not v.get("purpose") or not v.get("tags")):
-        print(f"FAIL 4: {k} enabled 但缺 purpose/tags")
-        sys.exit(1)
-print(f"CHECK inventory: {len(inv)} 条, enabled 装备全部有 purpose/tags")
+bad=[f"FAIL 4: {k} enabled 但缺 purpose/tags" for k,v in inv.items()
+     if v.get("enabled") and (not v.get("purpose") or not v.get("tags"))]
+if bad:
+    print("\n".join(bad))
+else:
+    print(f"CHECK inventory: {len(inv)} 条, enabled 装备全部有 purpose/tags")
 PYEOF
-    cat "$tmp"; rm -f "$tmp"
+    ); then
+      echo "$out"
+      if echo "$out" | grep -q '^FAIL 4:'; then fail=1; fi
+    else
+      echo "FAIL 4: state.json 解析失败 ($statejson)"; fail=1
+    fi
   else
     echo "FAIL 4: state.json 不存在 ($statejson)"; fail=1
   fi
 
-  # 断言 5: tags 合规——∈ 受控词表
+  # 断言 5: tags 合规——∈ 受控词表 且 数量 2-4（完整报告，不中途退出）
   if [ -f "$statejson" ]; then
-    python3 - "$statejson" <<'PYEOF' || fail=1
+    if out=$(python3 - "$statejson" <<'PYEOF'
 import json,sys
 d=json.load(open(sys.argv[1]))
 WORDS={"需求澄清","方案审查","代码质量","测试","部署发布","上下文管理","调试排障","创意评估","教学","装备管理","自动化","评测"}
-bad=False
+bad=[]
 for k,v in d.get("inventory",{}).items():
     for t in v.get("tags",[]):
         if t not in WORDS:
-            print(f"FAIL 5: {k}.tags 含非词表项「{t}」"); bad=True
-    if bad:
-        sys.exit(1)
-if not bad:
-    print("CHECK tags: 全部 ∈ 受控词表")
+            bad.append(f"FAIL 5: {k}.tags 含非词表项「{t}」")
+    n=len(v.get("tags",[]))
+    if not (2 <= n <= 4):
+        bad.append(f"FAIL 5: {k}.tags 数量 {n}（需 2-4）")
+if bad:
+    print("\n".join(bad))
+else:
+    print("CHECK tags: 全部 ∈ 受控词表 且 数量 2-4")
 PYEOF
+    ); then
+      echo "$out"
+      if echo "$out" | grep -q '^FAIL 5:'; then fail=1; fi
+    else
+      echo "FAIL 5: state.json 解析失败 ($statejson)"; fail=1
+    fi
   fi
 
   [ "$fail" = 0 ] || die "check_all 失败"
