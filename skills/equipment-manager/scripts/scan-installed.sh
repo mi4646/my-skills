@@ -108,7 +108,7 @@ gstack_host_copies() {
   for h in .cursor .opencode .agents .factory .kiro; do
     [ -d "$EM_HOME/skills/gstack/$h/skills" ] && n=$((n+1))
   done
-  [ "$n" -gt 0 ] && print_row "gstack@宿主副本" "gstack" "skill" "yes" "${n} 套宿主副本（.cursor/.opencode/.agents/.factory/.kiro）折叠"
+  if [ "$n" -gt 0 ]; then print_row "gstack@宿主副本" "gstack" "skill" "yes" "${n} 套宿主副本（.cursor/.opencode/.agents/.factory/.kiro）折叠"; fi
 }
 
 case "${1:-}" in
