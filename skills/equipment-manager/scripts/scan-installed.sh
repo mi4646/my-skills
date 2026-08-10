@@ -16,7 +16,7 @@ print_row() { printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5"; }
 
 # 插件部分：官方 CLI 权威来源
 scan_plugins() {
-  local plugin list_line name mp details skills_desc
+  local plugin list_line name mp details
   # plugin list 的块格式: "  ❯ name@marketplace" + Version/Scope/Status 行
   while IFS= read -r list_line; do
     case "$list_line" in
@@ -71,6 +71,46 @@ frontmatter_desc() {
   awk 'NR==1&&$0=="---"{infm=1;next} infm&&$0=="---"{exit} infm&&/^description:/{sub(/^description:[[:space:]]*/, ""); print; exit}' "$1"
 }
 
+# 顶层扁平 skill：目录含 SKILL.md 即算一个；排除插件包（.claude-plugin/plugin.json）
+# gstack 命令（名字 ∈ gstack 仓库内部含 SKILL.md 的目录）→ source=gstack
+scan_flat_skills() {
+  local d name in_gstack
+  for d in "$EM_HOME/skills/"*/; do
+    name="$(basename "$d")"
+    [ -f "$d/SKILL.md" ] || continue
+    [ -f "$d/.claude-plugin/plugin.json" ] && continue   # 插件包（my-skills）排除
+    [ "$name" = "gstack" ] && continue                    # gstack 容器目录排除（命令已逐条计）
+    if [ -d "$EM_HOME/skills/gstack/$name" ] && [ -f "$EM_HOME/skills/gstack/$name/SKILL.md" ]; then
+      in_gstack=yes
+    else
+      in_gstack=no
+    fi
+    if [ "$in_gstack" = yes ]; then
+      print_row "$name" "gstack" "skill" "yes" "$(frontmatter_desc "$d/SKILL.md")"
+    else
+      print_row "$name" "顶层" "skill" "yes" "$(frontmatter_desc "$d/SKILL.md")"
+    fi
+  done
+}
+
+# agents: 每个 .md = 1 个 agent
+scan_agents() {
+  local f
+  for f in "$EM_HOME/agents/"*.md; do
+    [ -f "$f" ] || continue
+    print_row "$(basename "$f" .md)" "agents" "agent" "yes" ""
+  done
+}
+
+# gstack 5 套宿主副本折叠成一条来源标注（不逐条输出）
+gstack_host_copies() {
+  local n=0 h
+  for h in .cursor .opencode .agents .factory .kiro; do
+    [ -d "$EM_HOME/skills/gstack/$h/skills" ] && n=$((n+1))
+  done
+  [ "$n" -gt 0 ] && print_row "gstack@宿主副本" "gstack" "skill" "yes" "${n} 套宿主副本（.cursor/.opencode/.agents/.factory/.kiro）折叠"
+}
+
 case "${1:-}" in
   --check) check_mode=1 ;;
   -h|--help) echo "scan-installed.sh — 本地装备地图事实层（纯只读）
@@ -81,7 +121,9 @@ esac
 
 check_mode=${check_mode:-0}
 scan_plugins
-# Task 1 追加: scan_flat_skills / scan_agents
+scan_flat_skills
+scan_agents
+gstack_host_copies
 # Task 2 追加: check_all (check_mode 时执行)
 [ "$check_mode" = 1 ] && check_all
 exit 0
