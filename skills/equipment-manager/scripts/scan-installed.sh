@@ -111,6 +111,70 @@ gstack_host_copies() {
   if [ "$n" -gt 0 ]; then print_row "gstack@宿主副本" "gstack" "skill" "yes" "${n} 套宿主副本（.cursor/.opencode/.agents/.factory/.kiro）折叠"; fi
 }
 
+# --check: 设计文档第 1 节验证标准 1-5
+check_all() {
+  local fail=0 statejson tagsfile tmp
+  statejson="${EM_CONFIG:-$HOME/.config/equipment-manager}/state.json"
+
+  # 断言 1: 覆盖度——插件 skill 数 + 顶层扁平 + agents 无遗漏（输出行数 ≥ 断言基线，避免重复计数陷阱）
+  local n_plugin n_flat n_agent
+  n_plugin=$(scan_plugins | grep -c $'\tskill\tyes')
+  n_flat=$(scan_flat_skills | grep -c $'\tskill\tyes')
+  n_agent=$(scan_agents | grep -c $'\tagent\tyes')
+  echo "CHECK 覆盖度: 插件skill=$n_plugin 顶层扁平=$n_flat agents=$n_agent"
+  [ "$n_flat" -ge 60 ] || { echo "FAIL 1: 顶层扁平 skill 异常偏少 ($n_flat < 60)"; fail=1; }
+  [ "$n_agent" -ge 5 ] || { echo "FAIL 1: agents 偏少 ($n_agent < 5)"; fail=1; }
+
+  # 断言 2: LSP/工具插件（Skills (0)）不得进清单
+  local lsp_leak
+  lsp_leak=$( { scan_plugins; } | grep -E '^(pyright-lsp|typescript-lsp|playwright|context7)\t' || true)
+  [ -z "$lsp_leak" ] || { echo "FAIL 2: LSP/工具插件泄漏: $lsp_leak"; fail=1; }
+
+  # 断言 3: gstack 宿主副本折叠后不出现 54×5 重复——每 gstack 命令名只 1 行
+  local dup
+  dup=$( { scan_flat_skills; } | awk -F'\t' '$2=="gstack"' | awk -F'\t' '{print $1}' | sort | uniq -d)
+  [ -z "$dup" ] || { echo "FAIL 3: gstack 命令重复: $dup"; fail=1; }
+
+  # 断言 4: inventory 完整性——每个 enabled=true 装备都有 purpose/tags
+  if [ -f "$statejson" ]; then
+    tmp=$(mktemp)
+    python3 - "$statejson" >"$tmp" <<'PYEOF' || fail=1
+import json,sys
+d=json.load(open(sys.argv[1]))
+inv=d.get("inventory",{})
+for k,v in inv.items():
+    if v.get("enabled") and (not v.get("purpose") or not v.get("tags")):
+        print(f"FAIL 4: {k} enabled 但缺 purpose/tags")
+        sys.exit(1)
+print(f"CHECK inventory: {len(inv)} 条, enabled 装备全部有 purpose/tags")
+PYEOF
+    cat "$tmp"; rm -f "$tmp"
+  else
+    echo "FAIL 4: state.json 不存在 ($statejson)"; fail=1
+  fi
+
+  # 断言 5: tags 合规——∈ 受控词表
+  if [ -f "$statejson" ]; then
+    python3 - "$statejson" <<'PYEOF' || fail=1
+import json,sys
+d=json.load(open(sys.argv[1]))
+WORDS={"需求澄清","方案审查","代码质量","测试","部署发布","上下文管理","调试排障","创意评估","教学","装备管理","自动化","评测"}
+bad=False
+for k,v in d.get("inventory",{}).items():
+    for t in v.get("tags",[]):
+        if t not in WORDS:
+            print(f"FAIL 5: {k}.tags 含非词表项「{t}」"); bad=True
+    if bad:
+        sys.exit(1)
+if not bad:
+    print("CHECK tags: 全部 ∈ 受控词表")
+PYEOF
+  fi
+
+  [ "$fail" = 0 ] || die "check_all 失败"
+  echo "CHECK: 全部通过"
+}
+
 case "${1:-}" in
   --check) check_mode=1 ;;
   -h|--help) echo "scan-installed.sh — 本地装备地图事实层（纯只读）
