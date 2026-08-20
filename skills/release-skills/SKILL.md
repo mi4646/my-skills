@@ -1,6 +1,7 @@
 ---
 name: release-skills
 description: Universal release workflow. Auto-detects version files and changelogs. Supports Node.js, Python, Rust, Claude Plugin, GitHub Releases, annotated tags, historical release backfill, and generic projects. Use when user says "release", "发布", "new version", "bump version", "push", "推送", "release notes", "GitHub Release", or "回填 Release".
+version: v1.0.0
 ---
 
 # Release Skills

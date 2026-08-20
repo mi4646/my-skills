@@ -26,6 +26,7 @@ Claude Code 自定义技能插件，只含八个自研技能（第三方技能�
 ## 关键约定
 
 - SKILL.md frontmatter 的 `description` 字段决定技能何时被触发，需精确描述触发场景
+- 修改任何自研技能时，同步更新该技能 SKILL.md frontmatter 顶部的 `version` 字段（仅本仓库自研技能，第三方技能不动）；版本号递增幅度与改动匹配，酌情处理：小改动递增修订号（v1.0.0 → v1.0.1），功能/结构调整递增次版本（v1.0 → v1.1），破坏性变更递增主版本（v1.x → v2.0）
 - 脚本路径使用 `${CLAUDE_PLUGIN_ROOT}` 环境变量，不硬编码路径
 - 所有技能面向中文用户，SKILL.md 和输出均为中文
 - `update-version` 依赖 `humanizer-zh` 技能优化文本
