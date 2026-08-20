@@ -11,6 +11,7 @@
 | storage-analyzer | 技能 + Python 脚本 | 磁盘 / 仓库存储占用扫描分析 | 1 | [github.com/KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills) |
 | addyosmani | 独立技能目录 | 生产级工程方法论 | `/context-engineering`（上下文工程：优化 CLAUDE.md/规则文件与上下文分层）<br>`/interview-me`（需求访谈：一次一问挖真实需求）<br>`/source-driven-development`（官方文档驱动开发：框架代码查文档+给来源） | [github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
 | mattpocock | 独立技能目录 | 结构化多会话教学 | `/teach`（纯用户唤起：MISSION.md + 教案 HTML + 学习记录） | [github.com/mattpocock/skills](https://github.com/mattpocock/skills) |
+| wshobson | 独立技能目录 | 反 AI 味写作审计 | `/avoid-ai-writing`（detect/rewrite/edit 三模式 + 三级词表，纯 markdown 零依赖） | [github.com/wshobson/agents](https://github.com/wshobson/agents) |
 
 ## Agents
 
@@ -50,4 +51,10 @@
 
 ```
 eval-judge   python-development-fastapi-pro   python-development-django-pro   bash-pro
+```
+
+**wshobson 独立技能（无前缀）**
+
+```
+/avoid-ai-writing
 ```
