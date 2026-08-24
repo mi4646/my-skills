@@ -2,7 +2,7 @@
 
 miner 从本机 session 日志挖掘、经用户确认的画像条目。**每机一个文件 `profile.d/<hostname>.md`，miner 只写本机自己的文件** → 三机各写各的，`git pull` 零冲突。
 
-- **updated**: 2026-08-11
+- **updated**: 2026-08-24
 - **证据**: 🔍miner 提取 + 🗣用户确认（设计：自学习层写入分区）
 
 ## 技术栈
@@ -15,7 +15,7 @@ miner 从本机 session 日志挖掘、经用户确认的画像条目。**每机
 - **/var/www 下有业务开发**：new/license/shyun、shyun、demo 等，session 日志证实业务开发与服务器运维并存 🔍（miner 2026-08-06，用户确认）
 - **vietguard2 是 Django + Docker 前后端分离项目**：/var/www/vietguard2（manage.py + 多 app + html 前端），`docker-compose.full.yml` 前后端分离部署，含前端 html 更新流程；2026-08-10/11 活跃（nginx 502 排障、docker 部署升级咨询）🔍（miner 2026-08-11，用户确认）
 - **shyun 是 Django 项目**：「python manage.py dbshell 连接的 mysql」「Internal Server Error: /api/captcha/」django 3 sessions 举证 🔍（miner 2026-08-06，用户确认）
-- **QQ音乐歌单业务域**：/var/www/demo 歌单项目（AI 分类后推送到账号流程）+ ~/.qqplaylist 目录 7 天内活跃；日志落盘于 ~/.qqplaylist/logs 🔍（miner 2026-08-07，用户确认）
+- **QQ音乐歌单业务域**：/var/www/demo 歌单项目（AI 分类后推送到账号流程）+ ~/.qqplaylist 目录活跃（日志落盘 ~/.qqplaylist/logs）🔍（miner 2026-08-07，用户确认）。**2026-08-21 高峰 ✅**：新建歌单流程迭代（先查用户端同名歌单→询问客户更新/新建）、push_service 云拉取功能调研（src/qqplaylist/push_service.py:72-100）、QQMusicApi 0.7.2 版本适配 🔍（用户确认 2026-08-24；证据 /var/www/demo · b0f0e0ba/fbb9c8da/b7187dc2 08-21 歌单流程 ×3 + agent-aed5e64566fc154af push_service 云拉取调研 + 944e1c95 QQMusicApi 0.7.2）
 
 ## 运维
 
