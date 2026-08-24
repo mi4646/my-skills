@@ -6,7 +6,6 @@
 
 | 资产 | 类型 | 用途 | 内含 | 来源 |
 |---|---|---|---|---|
-| baoyu-design | 技能 + 内置子技能/agents | 设计原型生成：网页、PPT、图表、设计系统等交付物 | 主技能 + 50 余个流程子技能 + 3 只读子代理 | [github.com/jimliu/baoyu-design](https://github.com/jimliu/baoyu-design) |
 | hallmark | 纯技能 | 反 AI 味设计指导：新页面 / 重设计 / 审计 | 1 | [github.com/nutlope/hallmark](https://github.com/nutlope/hallmark) |
 | storage-analyzer | 技能 + Python 脚本 | 磁盘 / 仓库存储占用扫描分析 | 1 | [github.com/KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills) |
 | addyosmani | 独立技能目录 | 生产级工程方法论 | `/context-engineering`（上下文工程：优化 CLAUDE.md/规则文件与上下文分层）<br>`/interview-me`（需求访谈：一次一问挖真实需求）<br>`/source-driven-development`（官方文档驱动开发：框架代码查文档+给来源） | [github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
@@ -21,12 +20,6 @@
 |---|---|---|---|---|
 | wshobson | agents 文件（复制） | 生产级开发专家人格 + skill 评测裁判 | `eval-judge`（skill 质量评测裁判：触发准确度/编排/输出质量/范围 4 维评分）<br>`python-development-fastapi-pro` + `python-development-django-pro`（Python 后端专家人格）<br>`bash-pro`（防御性 Bash 专家） | [github.com/wshobson/agents](https://github.com/wshobson/agents) |
 
-**baoyu-design 自带 3 个只读子代理**（由主流程内部 spawn，**无全局调用命令**）：
-
-- **vision-probe-agent** — 任务前探测当前模型/提供商是否支持图像输入
-- **fork-verifier-agent** — 校验刚生成的设计交付物，回报 `done` / `needs_work`
-- **design-system-checker** — 只读校验便携设计系统，输出一行健康摘要
-
 ## 维护
 
 - 安装：`bash install.sh`（幂等，已装跳过）
@@ -38,7 +31,7 @@
 **独立第三方（无前缀）**
 
 ```
-/baoyu-design   /hallmark   /storage-analyzer
+/hallmark   /storage-analyzer
 ```
 
 **addaysomani 独立技能（无前缀，自动路由触发）**

@@ -30,5 +30,5 @@ Claude Code 自定义技能插件，只含八个自研技能（第三方技能�
 - 脚本路径使用 `${CLAUDE_PLUGIN_ROOT}` 环境变量，不硬编码路径
 - 所有技能面向中文用户，SKILL.md 和输出均为中文
 - `update-version` 依赖 `humanizer-zh` 技能优化文本
-- 第三方技能（mattpocock 精选、baoyu-design、hallmark、storage-analyzer）已迁出，位于 `~/.claude/skills/` 各独立目录，不在本仓库维护
+- 第三方技能（mattpocock 精选、hallmark、storage-analyzer）已迁出，位于 `~/.claude/skills/` 各独立目录，不在本仓库维护
 - 插件名称在 `.claude-plugin/plugin.json` 中定义，安装后技能命名空间为 `my-skills:<skill-name>`

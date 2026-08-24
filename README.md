@@ -94,5 +94,5 @@ bash ~/.claude/skills/my-skills/install.sh   # 一键装好第三方技能
 
 ## 三方装备
 
-baoyu-design、hallmark、storage-analyzer、addyosmani 由 install.sh 一键安装，来源独立、更新互不影响。
-构成、来源、维护与全部调用命令（`/baoyu-design`、`/hallmark`、`/storage-analyzer`、`/context-engineering`、`/interview-me`）见 [THIRD-PARTY.md](./THIRD-PARTY.md)。
+hallmark、storage-analyzer、addyosmani 由 install.sh 一键安装，来源独立、更新互不影响。
+构成、来源、维护与全部调用命令（`/hallmark`、`/storage-analyzer`、`/context-engineering`、`/interview-me`）见 [THIRD-PARTY.md](./THIRD-PARTY.md)。
