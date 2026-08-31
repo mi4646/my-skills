@@ -28,7 +28,7 @@ ICON_CATEGORIES = {
         "lucide-library", "lucide-notebook", "lucide-notebook-text"
     ],
     "tool": [
-        "lucide-wrench", "lucide-settings", "lucide-tool", "lucide-hammer",
+        "lucide-wrench", "lucide-settings", "lucide-pickaxe", "lucide-hammer",
         "lucide-cog", "lucide-sliders", "lucide-microwave"
     ],
     "tech": [
@@ -45,7 +45,7 @@ ICON_CATEGORIES = {
     ],
     "communication": [
         "lucide-message-square", "lucide-mail", "lucide-send",
-        "lucide-chat", "lucide-phone", "lucide-video"
+        "lucide-messages-square", "lucide-phone", "lucide-video"
     ],
     "person": [
         "lucide-user", "lucide-users", "lucide-user-plus",
@@ -89,7 +89,7 @@ ICON_CATEGORIES = {
     ],
     "sport": [
         "lucide-trophy", "lucide-medal", "lucide-gamepad-2",
-        "lucide-football", "lucide-basketball", "lucide-tennis"
+        "lucide-dumbbell", "lucide-volleyball", "lucide-award"
     ],
     "folder": [
         "lucide-folder", "lucide-folder-open", "lucide-folder-plus",
@@ -105,20 +105,21 @@ KEYWORD_ICONS = {
     "文档": "lucide-file-text",
     "AI": "lucide-brain",
     "agent": "lucide-bot",
-    "python": "lucide-python",
-    "docker": "lucide-container",
+    "python": "lucide-file-code-2",
+    "docker": "lucide-box",
     "kubernetes": "lucide-ship-wheel",
     "k8s": "lucide-ship-wheel",
     "linux": "lucide-terminal",
     "mysql": "lucide-database",
-    "rust": "lucide-ferris",
+    "rust": "lucide-cog",
     "elastic": "lucide-search",
     "rabbitmq": "lucide-message-circle",
-    "tauri": "lucide-window",
+    "tauri": "lucide-app-window",
     "wsl": "lucide-monitor",
-    "工具": "lucide-tool",
+    "工具": "lucide-wrench",
     "项目": "lucide-briefcase",
     "旅游": "lucide-plane",
+    "机场": "lucide-plane",
     "资源": "lucide-bookmark",
     "收藏": "lucide-star",
     "个人": "lucide-user",
@@ -153,7 +154,7 @@ KEYWORD_ICONS = {
     "git": "lucide-git-branch",
     "Git": "lucide-git-branch",
    "基础概念": "lucide-book",
-    "工具使用": "lucide-tool",
+    "工具使用": "lucide-wrench",
     "提示词技巧": "lucide-message-square",
     "资源收集": "lucide-bookmark",
     "AI插件": "lucide-puzzle",
@@ -493,9 +494,14 @@ class IconAssigner:
                 self.config['fileIcons'][file_path]['icon'] = icon
 
                 # 设置颜色：使用文件所在目录的颜色
-               dir_path = '/'.join(file_path.split('/')[:-1])
-               if dir_path and dir_path in dir_colors:
-                   self.config['fileIcons'][file_path]['color'] = dir_colors[dir_path]
+                dir_path = '/'.join(file_path.split('/')[:-1])
+                if dir_path and dir_path in dir_colors:
+                    self.config['fileIcons'][file_path]['color'] = dir_colors[dir_path]
+                elif not dir_path:
+                    # 根目录文件：基于文件名哈希生成HSL颜色
+                    hash_bytes = hashlib.sha256(file_path.encode()).digest()
+                    hue = int.from_bytes(hash_bytes[:2], 'big') % 360
+                    self.config['fileIcons'][file_path]['color'] = f"hsl({hue}, 70%, 50%)"
 
         # 确保目录也有图标和颜色记录（用于未来继承）
         for dir_path, color in dir_colors.items():
@@ -621,8 +627,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-                elif not dir_path:
-                    # 根目录文件：基于文件名哈希生成HSL颜色
-                    hash_bytes = hashlib.sha256(file_path.encode()).digest()
-                    hue = int.from_bytes(hash_bytes[:2], 'big') % 360
-                    self.config['fileIcons'][file_path]['color'] = f"hsl({hue}, 70%, 50%)"
