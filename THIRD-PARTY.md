@@ -8,9 +8,9 @@
 |---|---|---|---|---|
 | hallmark | 纯技能 | 反 AI 味设计指导：新页面 / 重设计 / 审计 | 1 | [github.com/nutlope/hallmark](https://github.com/nutlope/hallmark) |
 | storage-analyzer | 技能 + Python 脚本 | 磁盘 / 仓库存储占用扫描分析 | 1 | [github.com/KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills) |
-| addyosmani | 独立技能目录 | 生产级工程方法论 | `/context-engineering`（上下文工程：优化 CLAUDE.md/规则文件与上下文分层）<br>`/interview-me`（需求访谈：一次一问挖真实需求）<br>`/source-driven-development`（官方文档驱动开发：框架代码查文档+给来源） | [github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
+| addyosmani | 独立技能目录 | 生产级工程方法论 | `/context-engineering`（上下文工程：优化 CLAUDE.md/规则文件与上下文分层）<br>`/interview-me`（需求访谈：一次一问挖真实需求）<br>`/source-driven-development`（官方文档驱动开发：框架代码查文档+给来源）<br>`/constraint-driven-development`（约束驱动开发：写 CONSTRAINTS.md 定质量门槛，防子代理静默降标） | [github.com/addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) |
 | mattpocock | 独立技能目录 | 结构化多会话教学 | `/teach`（纯用户唤起：MISSION.md + 教案 HTML + 学习记录） | [github.com/mattpocock/skills](https://github.com/mattpocock/skills) |
-| wshobson | 独立技能目录 | 反 AI 味写作审计 | `/avoid-ai-writing`（detect/rewrite/edit 三模式 + 三级词表，纯 markdown 零依赖） | [github.com/wshobson/agents](https://github.com/wshobson/agents) |
+| wshobson | 独立技能目录 | 反 AI 味写作审计 + 溯源型知识库规范 | `/avoid-ai-writing`（detect/rewrite/edit 三模式 + 三级词表，纯 markdown 零依赖）<br>`/grounded-vault`（raw/wiki/archive 三层溯源知识库：每条论断链回源头 + git 指纹检测陈旧，纯 markdown 零依赖） | [github.com/wshobson/agents](https://github.com/wshobson/agents) |
 
 ## Agents
 
@@ -37,7 +37,7 @@
 **addaysomani 独立技能（无前缀，自动路由触发）**
 
 ```
-/context-engineering   /interview-me   /source-driven-development   /teach
+/context-engineering   /interview-me   /source-driven-development   /constraint-driven-development   /teach
 ```
 
 **wshobson agents（无前缀，Agent 工具/子代理按名调用）**
@@ -49,5 +49,5 @@ eval-judge   python-development-fastapi-pro   python-development-django-pro   ba
 **wshobson 独立技能（无前缀）**
 
 ```
-/avoid-ai-writing
+/avoid-ai-writing   /grounded-vault
 ```

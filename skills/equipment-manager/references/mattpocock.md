@@ -5,7 +5,7 @@
 - **git remote**：`https://github.com/mattpocock/skills.git`
 
 ## 目录结构
-- `skills/<domain>/`：`deprecated`、`engineering`、`in-progress`、`misc`、`personal`、`productivity`
+- `skills/<domain>/`：`deprecated`、`engineering`、`in-progress`、`misc`、`productivity`（原记的 `personal` 2026-09-14 实测已不存在）
 - `scripts/`：link-skills.sh、list-skills.sh
 
 ## 安装机制（官方）
@@ -20,11 +20,12 @@
 
 ## 本地安装现状
 安装状态（已装清单/评估结论）见 `~/.config/equipment-manager/state.json`，不进本档案。
-- 2026-08-06 实测：`~/.claude/skills` 无任何 mattpocock 痕迹，**本地 0 已装**（8-04 档案记录的精选 10 个软链已全部消失，原因待查）
-- 8-04 曾精选 10 个软链到 `~/.claude/skills/mattpocock/`，`git pull` 即更新；该目录现已不存在
+- 2026-08-06 实测（历史）：`~/.claude/skills` 无任何 mattpocock 痕迹，当时 0 已装（8-04 精选 10 个软链已全部消失）
+- 8-04 曾精选 10 个软链到 `~/.claude/skills/mattpocock/`，该目录已于 2026-08-08 删除
+- 2026-09-14 实测：`teach` 已装（`~/.claude/skills/teach`，复制非软链）
 
 ## 一键安装（维护于 my-skills/install.sh）
-- `install.sh` 跨平台：`install`（幂等）/ `--update`（pull 全部上游 + 强制重装）；**Linux 全软链、Windows 全复制**（自动检测平台）
+- `install.sh` 跨平台：`install`（幂等）/ `--update`（pull 全部上游 + 强制重装）；**全平台一律复制**（`INSTALL_MODE=copy`，用户拍板不用软链；原记「Linux 全软链」已作废）
 - 对应 my-skills/README「部署备忘录」；Windows 用 Git Bash，无需开发者模式
-- **更新**：`bash ~/.claude/skills/my-skills/install.sh --update` 或逐仓库 `git pull`；**卸载**：`rm -rf ~/.claude/skills/mattpocock`
+- **更新**：`bash ~/.claude/skills/my-skills/install.sh --update` 或逐仓库 `git pull`；**卸载**：`rm -rf ~/.claude/skills/<skill-name>`（如 `teach`，非 `mattpocock/` 目录形态）
 

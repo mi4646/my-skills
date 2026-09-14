@@ -5,7 +5,7 @@
 - **git remote**：`https://github.com/wshobson/agents.git`
 
 ## 目录结构
-- `plugins/<domain>/{agents,skills,plugins}/`，规模 94 plugins / 203 agents / 175 skills / 109 commands
+- `plugins/<domain>/{agents,skills,plugins}/`，规模 92 plugins / 202 agents / 183 skills / 105 commands（2026-09-14 实测）
 - 常见域：`python-development`、`backend-development`、`database-design`、`llm-application-dev`、`documentation-generation`、`shell-scripting`
 
 ## 安装机制

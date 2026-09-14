@@ -29,9 +29,9 @@ INSTALL_MODE="${INSTALL_MODE:-copy}"
 EQUIP=(
   "hallmark|github.com/nutlope/hallmark|"
   "storage-analyzer|github.com/KKKKhazix/khazix-skills|"
-  "addyosmani|github.com/addyosmani/agent-skills|context-engineering,interview-me,source-driven-development"
+  "addyosmani|github.com/addyosmani/agent-skills|context-engineering,interview-me,source-driven-development,constraint-driven-development"
   "mattpocock|github.com/mattpocock/skills|teach"
-  "wshobson|github.com/wshobson/agents|avoid-ai-writing|eval-judge,python-development-fastapi-pro,python-development-django-pro,bash-pro"
+  "wshobson|github.com/wshobson/agents|avoid-ai-writing,grounded-vault|eval-judge,python-development-fastapi-pro,python-development-django-pro,bash-pro"
 )
 
 # 三方装备清单：扫描已安装目录实时统计（不联网、不写盘）
@@ -119,13 +119,14 @@ REPO="$VENDOR_DIR/khazix-skills"
 repo https://github.com/KKKKhazix/khazix-skills.git "$REPO"
 skill "$REPO/storage-analyzer" "$SKILLS_DIR/storage-analyzer" "storage-analyzer"
 
-# ---------- ③ addyosmani 精选 3 个（独立 skill 目录形态）----------
-say "[3/6] addyosmani 精选 3 个"
+# ---------- ③ addyosmani 精选 4 个（独立 skill 目录形态）----------
+say "[3/6] addyosmani 精选 4 个"
 REPO="$VENDOR_DIR/addyosmani"
 repo https://github.com/addyosmani/agent-skills.git "$REPO"
 skill "$REPO/skills/context-engineering" "$SKILLS_DIR/context-engineering" "context-engineering"
 skill "$REPO/skills/interview-me" "$SKILLS_DIR/interview-me" "interview-me"
 skill "$REPO/skills/source-driven-development" "$SKILLS_DIR/source-driven-development" "source-driven-development"
+skill "$REPO/skills/constraint-driven-development" "$SKILLS_DIR/constraint-driven-development" "constraint-driven-development"
 
 # ---------- ④ mattpocock teach（独立 skill 目录形态，纯用户唤起）----------
 say "[4/6] mattpocock teach"
@@ -154,11 +155,12 @@ agent "$REPO/plugins/python-development/agents/django-pro.md" "$AGENTS_DIR/pytho
 agent "$REPO/plugins/shell-scripting/agents/bash-pro.md" "$AGENTS_DIR/bash-pro.md" "bash-pro"
 agent "$REPO/plugins/plugin-eval/agents/eval-judge.md" "$AGENTS_DIR/eval-judge.md" "eval-judge"
 
-# ---------- ⑥ wshobson avoid-ai-writing（独立 skill 目录形态，复制到 ~/.claude/skills/，纯 markdown 零依赖）----------
-say "[6/6] wshobson avoid-ai-writing"
+# ---------- ⑥ wshobson avoid-ai-writing + grounded-vault（独立 skill 目录形态，复制到 ~/.claude/skills/，纯 markdown 零依赖）----------
+say "[6/6] wshobson avoid-ai-writing + grounded-vault"
 REPO="$VENDOR_DIR/wshobson"
 repo https://github.com/wshobson/agents.git "$REPO"
 skill "$REPO/plugins/avoid-ai-writing/skills/avoid-ai-writing" "$SKILLS_DIR/avoid-ai-writing" "avoid-ai-writing"
+skill "$REPO/plugins/documentation-standards/skills/grounded-vault" "$SKILLS_DIR/grounded-vault" "grounded-vault"
 
 # 临时缓存用完即删：vendor 目录只用于 clone 厂商仓库，安装完成后清理，不持久占用用户目录
 if [ "$INSTALL_MODE" = "copy" ]; then

@@ -1,7 +1,7 @@
 ---
 name: equipment-manager
 description: 管理本地已装第三方 Claude skill 与 agent 的盘点、评估、精简、接入时用本技能：想盘点自己装了哪些 skill/agent、各来自哪个仓库？某仓库 git pull 或 clone 后，想评估新增的 skill/agent 值不值得装？想从某仓库装 skill/agent 到 my-skills、~/.claude/skills 或 ~/.claude/agents？想删掉/清理用不上的旧装备、查重去重？本技能先盘点、给出带理由的三张清单（建议安装/待权衡项/不建议安装），你拍板才动手，不擅自改文件。已接入 msitarzewski/agency-agents、wshobson/agents、mattpocock/skills、addyosmani/agent-skills，新仓库可随时接入。注意：本技能只管理『skill/agent 装备本身』，不处理改代码、优化性能、写文档、数据处理等普通开发任务；用户画像的维护（自学习）走独立 persona 技能。
-version: v2.5.0
+version: v2.5.1
 ---
 
 # 装备管理器（Equipment Manager）

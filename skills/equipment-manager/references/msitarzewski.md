@@ -17,6 +17,6 @@
 - ⚠️ 安装方式（软链/复制）按主流程第⑦步让用户拍板：官方默认复制，需软链时用 `--link` 参数
 
 ## 坑位与约定
-- 本地 `~/.claude/agents/engineering-*.md` 是该仓库复制产物（非链接）
+- 本地 `~/.claude/agents/` 内该仓库产物现仅 `specialized-codebase-archaeologist.md`（复制非链接；2026-09-14 实测，原记的 `engineering-*.md` 已随 2026-08 清理移除）
 - `install.sh` 会覆盖同名文件
 
