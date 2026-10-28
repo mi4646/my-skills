@@ -116,14 +116,13 @@ check_all() {
   local fail=0 statejson tagsfile out
   statejson="${EM_CONFIG:-$HOME/.config/equipment-manager}/state.json"
 
-  # 断言 1: 覆盖度——插件 skill 数 + 顶层扁平 + agents 无遗漏（输出行数 ≥ 断言基线，避免重复计数陷阱）
-  local n_plugin n_flat n_agent
+  # 断言 1: 覆盖度——插件 skill 数 + 顶层扁平无遗漏（输出行数 ≥ 断言基线，避免重复计数陷阱）
+  # agents 计数断言已于 2026-10-28 随四仓装备卸载移除（拍板后 0 agent 为合法终态，哨兵预设失效）
+  local n_plugin n_flat
   n_plugin=$(scan_plugins | grep -c $'\tskill\tyes' || true)
   n_flat=$(scan_flat_skills | grep -c $'\tskill\tyes' || true)
-  n_agent=$(scan_agents | grep -c $'\tagent\tyes' || true)
-  echo "CHECK 覆盖度: 插件skill=$n_plugin 顶层扁平=$n_flat agents=$n_agent"
+  echo "CHECK 覆盖度: 插件skill=$n_plugin 顶层扁平=$n_flat"
   [ "$n_flat" -ge 60 ] || { echo "FAIL 1: 顶层扁平 skill 异常偏少 ($n_flat < 60)"; fail=1; }
-  [ "$n_agent" -ge 5 ] || { echo "FAIL 1: agents 偏少 ($n_agent < 5)"; fail=1; }
 
   # 断言 2: LSP/工具插件（Skills (0)）不得进清单
   local lsp_leak

@@ -26,12 +26,10 @@ INSTALL_MODE="${INSTALL_MODE:-copy}"
 [ "$LIST" = false ] && printf '  · 安装方式: %s | 模式: %s\n' "$INSTALL_MODE" "$LABEL"
 
 # 三方装备元数据（来源与下方 repo URL 同源；第三字段=独立 skill 目录形态的已装清单，逗号分隔；第四字段=独立 agent 文件的已装清单）
+# 2026-10-28 卸载四厂商装备（addyosmani/mattpocock/wshobson/msitarzewski），已装清单见 ~/.config/equipment-manager/state.json
 EQUIP=(
   "hallmark|github.com/nutlope/hallmark|"
   "storage-analyzer|github.com/KKKKhazix/khazix-skills|"
-  "addyosmani|github.com/addyosmani/agent-skills|context-engineering,interview-me,source-driven-development,constraint-driven-development"
-  "mattpocock|github.com/mattpocock/skills|teach"
-  "wshobson|github.com/wshobson/agents|avoid-ai-writing,grounded-vault|eval-judge,python-development-fastapi-pro,python-development-django-pro,bash-pro"
 )
 
 # 三方装备清单：扫描已安装目录实时统计（不联网、不写盘）
@@ -108,59 +106,16 @@ skill() {
 }
 
 # ---------- ① hallmark ----------
-say "[1/6] hallmark"
+say "[1/2] hallmark"
 REPO="$VENDOR_DIR/hallmark"
 repo https://github.com/nutlope/hallmark.git "$REPO"
 skill "$REPO/skills/hallmark" "$SKILLS_DIR/hallmark" "hallmark"
 
 # ---------- ② storage-analyzer ----------
-say "[2/6] storage-analyzer"
+say "[2/2] storage-analyzer"
 REPO="$VENDOR_DIR/khazix-skills"
 repo https://github.com/KKKKhazix/khazix-skills.git "$REPO"
 skill "$REPO/storage-analyzer" "$SKILLS_DIR/storage-analyzer" "storage-analyzer"
-
-# ---------- ③ addyosmani 精选 4 个（独立 skill 目录形态）----------
-say "[3/6] addyosmani 精选 4 个"
-REPO="$VENDOR_DIR/addyosmani"
-repo https://github.com/addyosmani/agent-skills.git "$REPO"
-skill "$REPO/skills/context-engineering" "$SKILLS_DIR/context-engineering" "context-engineering"
-skill "$REPO/skills/interview-me" "$SKILLS_DIR/interview-me" "interview-me"
-skill "$REPO/skills/source-driven-development" "$SKILLS_DIR/source-driven-development" "source-driven-development"
-skill "$REPO/skills/constraint-driven-development" "$SKILLS_DIR/constraint-driven-development" "constraint-driven-development"
-
-# ---------- ④ mattpocock teach（独立 skill 目录形态，纯用户唤起）----------
-say "[4/6] mattpocock teach"
-REPO="$VENDOR_DIR/mattpocock"
-repo https://github.com/mattpocock/skills.git "$REPO"
-skill "$REPO/skills/productivity/teach" "$SKILLS_DIR/teach" "teach"
-
-# ---------- ⑤ wshobson 精选 agents 4 个（复制到 ~/.claude/agents/，用户偏好一律复制不软链）----------
-say "[5/6] wshobson agents 4 个"
-AGENTS_DIR="${HOME}/.claude/agents"
-REPO="$VENDOR_DIR/wshobson"
-repo https://github.com/wshobson/agents.git "$REPO"
-mkdir -p "$AGENTS_DIR"
-agent() {
-  local src="$1" dest="$2" name="$3"
-  if [ "$UPDATE" = true ]; then
-    rm -f "$dest"; cp "$src" "$dest"; printf '  复制 %s\n' "$name"
-  elif [ -e "$dest" ]; then
-    skip "$name"
-  else
-    cp "$src" "$dest"; printf '  复制 %s\n' "$name"
-  fi
-}
-agent "$REPO/plugins/python-development/agents/fastapi-pro.md" "$AGENTS_DIR/python-development-fastapi-pro.md" "fastapi-pro"
-agent "$REPO/plugins/python-development/agents/django-pro.md" "$AGENTS_DIR/python-development-django-pro.md" "django-pro"
-agent "$REPO/plugins/shell-scripting/agents/bash-pro.md" "$AGENTS_DIR/bash-pro.md" "bash-pro"
-agent "$REPO/plugins/plugin-eval/agents/eval-judge.md" "$AGENTS_DIR/eval-judge.md" "eval-judge"
-
-# ---------- ⑥ wshobson avoid-ai-writing + grounded-vault（独立 skill 目录形态，复制到 ~/.claude/skills/，纯 markdown 零依赖）----------
-say "[6/6] wshobson avoid-ai-writing + grounded-vault"
-REPO="$VENDOR_DIR/wshobson"
-repo https://github.com/wshobson/agents.git "$REPO"
-skill "$REPO/plugins/avoid-ai-writing/skills/avoid-ai-writing" "$SKILLS_DIR/avoid-ai-writing" "avoid-ai-writing"
-skill "$REPO/plugins/documentation-standards/skills/grounded-vault" "$SKILLS_DIR/grounded-vault" "grounded-vault"
 
 # 临时缓存用完即删：vendor 目录只用于 clone 厂商仓库，安装完成后清理，不持久占用用户目录
 if [ "$INSTALL_MODE" = "copy" ]; then
