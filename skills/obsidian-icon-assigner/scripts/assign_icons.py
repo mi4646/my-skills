@@ -180,7 +180,14 @@ for _cat_name, _icons in ICON_CATEGORIES.items():
 
 
 def _match_keyword(name: str, keyword: str) -> bool:
-    """关键词匹配函数，短关键词（<3字符）用词边界正则避免假阳性"""
+    """关键词匹配函数。
+
+    - 含非ASCII字符（CJK等）的关键词直接用子串匹配：\b 词边界对中文无效，
+      否则如「配置」「安全」「网络」等2字中文关键词会永远匹配失败，退化成哈希。
+    - 纯ASCII短关键词（<3字符）保留 \b 词边界，避免 git/ai 等误命中长单词内部。
+    """
+    if any(ord(c) > 127 for c in keyword):
+        return keyword.lower() in name.lower()
     if len(keyword) < 3:
         return bool(re.search(r'\b' + re.escape(keyword) + r'\b', name, re.IGNORECASE))
     return keyword.lower() in name.lower()
