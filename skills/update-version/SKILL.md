@@ -3,12 +3,12 @@ name: update-version
 description: |
   根据 git diff 差异自动更新版本号到 update_info.txt 和 version 文件。
   小改递增小版本，大修递增主版本；update_info.txt 仅保留最新更新，
-  version 文件追加保留完整历史；完成后自动调用 humanizer-zh。
+  version 文件追加保留完整历史；完成后自动调用 humanizer-zh，不可用时回退 humanizer。
 metadata:
   trigger: 根据代码修改更新版本号，维护 update_info.txt 和 version 文件
   author: custom
 user-invocable: true
-version: v1.0.0
+version: v1.1.0
 ---
 
 # Update Version: 自动更新版本号
@@ -31,7 +31,7 @@ version: v1.0.0
 5. **更新文件**：
    - `update_info.txt`：**仅保留最新版本**的更新记录（不带日期）
    - `version` 文件：**追加**新版本信息到文件末尾（带当前日期），保留所有历史
-6. **人性化处理** - 调用 `/humanizer-zh` 优化更新描述
+6. **人性化处理** - 调用 `/humanizer-zh` 优化更新描述；该技能不可用时改用 `/humanizer`；两者都不可用则按现有文件风格手写，并在输出中说明
 7. **输出结果** - 显示新版本号和更新内容，提示可以提交
 
 ---
@@ -103,7 +103,9 @@ v2.3.8
 
 ### 4. 人性化处理
 - 提取更新描述文本
-- 调用 `humanizer-zh` 去除 AI 生成痕迹
+- 按顺序选第一个可用的技能：`humanizer-zh` → `humanizer`
+- 用它去除 AI 生成痕迹
+- 两者都不可用时，按文件现有风格手写描述，并在输出中明确说明「未做人性化处理」
 - 输出最终结果
 
 ---
@@ -165,7 +167,7 @@ v2.3.8
 - ✓ version 中每条记录都有当前日期
 - ✓ update_info 不带日期，符合项目约定
 - ✓ 更新描述准确反映 git diff 的实际修改
-- ✓ 已调用 humanizer-zh 处理描述文本
+- ✓ 已调用 humanizer-zh 或 humanizer 处理描述文本（两者都不可用时已在输出中说明）
 
 ---
 
