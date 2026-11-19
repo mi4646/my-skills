@@ -1,7 +1,7 @@
 ---
 name: equipment-manager
 description: 管理本地已装第三方 Claude skill 与 agent 的盘点、评估、精简、接入时用本技能：想盘点自己装了哪些 skill/agent、各来自哪个仓库？某仓库 git pull 或 clone 后，想评估新增的 skill/agent 值不值得装？想从某仓库装 skill/agent 到 my-skills、~/.claude/skills 或 ~/.claude/agents？想删掉/清理用不上的旧装备、查重去重？本技能先盘点、给出带理由的三张清单（建议安装/待权衡项/不建议安装），你拍板才动手，不擅自改文件。已接入 msitarzewski/agency-agents、wshobson/agents、mattpocock/skills、addyosmani/agent-skills，新仓库可随时接入。注意：本技能只管理『skill/agent 装备本身』，不处理改代码、优化性能、写文档、数据处理等普通开发任务；用户画像的维护（自学习）走独立 persona 技能。
-version: v2.5.2
+version: v2.5.3
 ---
 
 # 装备管理器（Equipment Manager）
@@ -28,7 +28,7 @@ version: v2.5.2
 
 - **仓库档案** `references/*.md`：稳定情报（基本信息/目录结构/安装机制/坑位），变更低频、进 git 语义干净
 - **装备状态** `~/.config/equipment-manager/state.json`：易变状态（已装清单/评估结论），**不进 git**，装删零噪音、可被 dotfiles 同步
-- **用户画像**：属独立 skill `persona`（`skills/persona/profile.md` 人工层 + `profile.d/<hostname>.md` 自学习层 + miner-state 纠正状态）——本技能只**消费**画像，不维护
+- **用户画像**：属独立 skill `persona`（`${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/my-skills}/skills/persona/profile.md` 人工层 + `profile.d/<hostname>.md` 自学习层 + miner-state 纠正状态）——本技能只**消费**画像，不维护
 
 查重以实际目录为准（`ls ~/.claude/skills/` + 软链来源识别），台账仅辅助回忆历史决策。
 
@@ -64,7 +64,7 @@ version: v2.5.2
 一次只问一个，问到 95% 确定理解需求为止；优先给多选，开放回答也行。涉及删除，先复述你理解的清单让你确认，再继续。
 
 **评估场景（B）必须先对齐使用习惯**：推荐的第一标准是「你用不用得上」，不是「本地有没有同类」。动工前**先读用户画像**（画像维护归 `persona` skill）：
-- **读画像**：`cat skills/persona/profile.md`（人工层）+ `skills/persona/profile.d/*.md`（自学习层汇总；顶层通配符天然不匹配 `profile.d/prefs/` 子目录，个人习惯备忘不参与评估）。画像 = 🧠记忆 + 🔍扫描/miner 实测 + 🗣口述交叉验证，单一口述不落地
+- **读画像**：`cat "${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/my-skills}/skills/persona/profile.md"`（人工层）+ `"${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/my-skills}/skills/persona/profile.d/"*.md`（自学习层汇总；顶层通配符天然不匹配 `profile.d/prefs/` 子目录，个人习惯备忘不参与评估）。画像 = 🧠记忆 + 🔍扫描/miner 实测 + 🗣口述交叉验证，单一口述不落地
 - 画像 `updated` **超 90 天或缺失** → 先跑 `persona` skill 更新画像（扫描 + miner 举证 + 你确认），再评估
 - 画像可用 → 亮出画像要点（工作流/技术栈/明确不用的领域），问一句「这份画像还准吗？有变化就回写」，以你当场确认为准
 - **判定依据必须标注证据来源**：每个「用得上/用不上/建议/不建议」判定，理由一律标依据——🧠画像实证 / 🔍实测 / 🗣用户表态 / ⚠️推断。画像「明确不用领域」为空时，「用不上」多是推断，必须标 ⚠️推断，不得冒充实证；⚠️推断驱动的「建议安装」不直接进建议表，先走第二意见或降级待权衡
@@ -122,13 +122,13 @@ version: v2.5.2
 1. 覆盖/删除前先备份：`mkdir -p ~/.claude/backups/<日期>` + `cp`，不用 `mv xxx.bak`
 2. 按你选的安装方式执行（软链 `ln -s` / 复制 `cp -r`，官方脚本有软链选项优先用官方参数，具体见对应仓库档案）
 3. 验证：文件存在且非空；软链 `readlink` 确认目标存在、目标目录有 `SKILL.md`
-4. 同步台账：装/删后更新 `~/.config/equipment-manager/state.json`（installed、notes 与 inventory）。**评估结论必须记录审核状态**：过第二意见的记「经审核」（附一句结论），未过审的推断项记「⚠️推断未审核」。**inventory 增量维护**：
+4. 同步台账：装/删后更新 `~/.config/equipment-manager/state.json`（notes 与 inventory；installed 字段已废弃——**装了什么以 install.sh 清单为准**）。**评估结论必须记录审核状态**：过第二意见的记「经审核」（附一句结论），未过审的推断项记「⚠️推断未审核」。**inventory 增量维护**：
    - 装/删后重跑 `scan-installed.sh`，对比 inventory 与事实层差异
    - 模型只对新增装备写 purpose/tags（按模板细心琢磨），已存在不动
    - 删除装备整条移除；词表扩充时存量 tags 由模型重映射
 5. **接入一键安装（自动收尾，不额外征询）**：装/删完成后同步 my-skills 的三机部署入口，保证其他机器 `bash install.sh` 即自动带上/移除该装备：
    - 仓库**已接入** my-skills `install.sh` → 自动更新 `my-skills/install.sh`（EQUIP 元数据行 + 对应安装段；装=加、删=同步移除）与 `my-skills/THIRD-PARTY.md`（表格行 + 调用方式），然后 `bash -n` 校验语法 + `bash install.sh --list` 复核统计
-   - 仓库**未接入** my-skills → 走「接入新仓库」流程先建档案再接入；用户没让接入新仓库时，只提示该装备未进一键安装，不擅自塞入
+   - 仓库**未接入** my-skills → 先走「接入新仓库」流程建档案；**清单即事实源**：用户批准安装即等于批准补进清单，只装不登记会让 `--check` 的双向一致性断言变红
 
 ### 接入新仓库（同样对话式）
 用户说"接入新仓库"时，走阶段一 B/C 分支，确认仓库路径后依次确认：来源（`git remote -v`）→ 结构（目录/命名/安装机制）→ 建档案（`references/` 下按作者或仓库名新建，仿现有三个档案）→ 登记表格 → 更新 frontmatter description。**每一步都先确认再做下一步**，不一口气全做。
@@ -139,7 +139,7 @@ version: v2.5.2
 |------|------------|
 | 盘点已装 | `scripts/scan-installed.sh`（全量事实 TSV，插件走官方 CLI、LSP 天然过滤、gstack 折叠）；`scan-installed.sh --check`（自动断言覆盖度/合规） |
 | 读装备语义 | `~/.config/equipment-manager/state.json` 的 `inventory`（purpose/tags），评估查重按 tags 聚簇 + purpose 精判 |
-| 读用户画像 | `cat skills/persona/profile.md` + `skills/persona/profile.d/*.md`；过期/缺失则先跑 persona skill 更新 |
+| 读用户画像 | `cat "${CLAUDE_PLUGIN_ROOT:-$HOME/.claude/skills/my-skills}/skills/persona/profile.md"` + 同目录 `profile.d/*.md`；过期/缺失则先跑 persona skill 更新 |
 | 识别仓库增量 | `git -C <repo> log --diff-filter=A --name-only --since="90 days"` |
 | 查重 | 以实际目录为准，台账仅辅助回忆历史决策 |
 | 备份 | `mkdir -p ~/.claude/backups/<日期>` + `cp`，不用 `mv xxx.bak` |

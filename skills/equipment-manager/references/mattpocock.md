@@ -1,7 +1,7 @@
 # 仓库档案：mattpocock/skills
 
 ## 基本信息
-- **本地路径**：`/home/anonymous/skills`
+- **本地路径**：无常驻克隆（2026-11-19 实测 `/home/anonymous/skills` 已不存在）。安装时临时浅克隆到 `${HOME}/.cache/equipment-manager/vendor/`，装完删除
 - **git remote**：`https://github.com/mattpocock/skills.git`
 
 ## 目录结构
@@ -22,7 +22,8 @@
 安装状态（已装清单/评估结论）见 `~/.config/equipment-manager/state.json`，不进本档案。
 - 2026-08-06 实测（历史）：`~/.claude/skills` 无任何 mattpocock 痕迹，当时 0 已装（8-04 精选 10 个软链已全部消失）
 - 8-04 曾精选 10 个软链到 `~/.claude/skills/mattpocock/`，该目录已于 2026-08-08 删除
-- 2026-09-14 实测：`teach` 已装（`~/.claude/skills/teach`，复制非软链）
+- 2026-09-14 实测：`teach` 已装（`~/.claude/skills/teach`，复制非软链）；2026-10-28 已随四厂商全量卸载移除
+- 2026-11-19 实测：装 `grill-me` / `grill-with-docs` / `grilling` / `domain-modeling` 四件套（复制；同日定 install.sh 为唯一清单，已补进 install.sh 第 ⑤ 段与 THIRD-PARTY）。**坑**：`grill-me`、`grill-with-docs` 各只有 3 行，是转调壳——单装它们会因找不到 `grilling` / `domain-modeling` 而失效，必须连带装依赖
 
 ## 一键安装（维护于 my-skills/install.sh）
 - `install.sh` 跨平台：`install`（幂等）/ `--update`（pull 全部上游 + 强制重装）；**全平台一律复制**（`INSTALL_MODE=copy`，用户拍板不用软链；原记「Linux 全软链」已作废）

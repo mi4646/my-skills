@@ -116,13 +116,27 @@ check_all() {
   local fail=0 statejson tagsfile out
   statejson="${EM_CONFIG:-$HOME/.config/equipment-manager}/state.json"
 
-  # 断言 1: 覆盖度——插件 skill 数 + 顶层扁平无遗漏（输出行数 ≥ 断言基线，避免重复计数陷阱）
-  # agents 计数断言已于 2026-10-28 随四仓装备卸载移除（拍板后 0 agent 为合法终态，哨兵预设失效）
-  local n_plugin n_flat
+  # 断言 1: 清单 ↔ 目录双向一致（清单 = install.sh 的 EQUIP；目录 = 顶层含 SKILL.md 的目录）
+  # 覆盖度按清单实时推导，不再硬编码数量基线（2026-10-28 卸载四厂商后 60 的基线恒红）
+  local n_plugin manifest_path manifest_names actual_names missing untracked
   n_plugin=$(scan_plugins | grep -c $'\tskill\tyes' || true)
-  n_flat=$(scan_flat_skills | grep -c $'\tskill\tyes' || true)
-  echo "CHECK 覆盖度: 插件skill=$n_plugin 顶层扁平=$n_flat"
-  [ "$n_flat" -ge 60 ] || { echo "FAIL 1: 顶层扁平 skill 异常偏少 ($n_flat < 60)"; fail=1; }
+  manifest_path="${EM_MANIFEST:-$EM_HOME/skills/my-skills/install.sh}"
+  if [ ! -f "$manifest_path" ]; then
+    echo "FAIL 1: 清单不存在（$manifest_path）"
+    fail=1
+  else
+    manifest_names=$(bash "$manifest_path" --manifest 2>/dev/null | cut -f1 | sort -u | grep -v '^$' || true)
+    actual_names=$(scan_flat_skills | awk -F'\t' '$2!="gstack" && $3=="skill"{print $1}' | sort -u || true)
+    if [ -z "$manifest_names" ]; then
+      echo "FAIL 1: 清单为空或不可执行（$manifest_path --manifest 无输出）"
+      fail=1
+    fi
+    missing=$(comm -23 <(printf '%s\n' "$manifest_names") <(printf '%s\n' "$actual_names") | grep -v '^$' || true)
+    untracked=$(comm -13 <(printf '%s\n' "$manifest_names") <(printf '%s\n' "$actual_names") | grep -v '^$' || true)
+    echo "CHECK 清单↔目录: 清单 $(printf '%s\n' "$manifest_names" | grep -c . || true) 项 / 目录 $(printf '%s\n' "$actual_names" | grep -c . || true) 项 / 插件skill=$n_plugin"
+    [ -z "$missing" ] || { echo "FAIL 1: 清单有、目录缺: $(echo $missing)"; fail=1; }
+    [ -z "$untracked" ] || { echo "FAIL 1: 目录有、清单无: $(echo $untracked)"; fail=1; }
+  fi
 
   # 断言 2: LSP/工具插件（Skills (0)）不得进清单
   local lsp_leak
